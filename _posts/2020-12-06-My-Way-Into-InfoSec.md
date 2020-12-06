@@ -14,7 +14,7 @@ I had a job as a normal admin for about 8 years, before joining my current compa
 Here I started as Senior Security Engineer (meaning that I worked with all McAfee Endpoint related stuff) for over 2 years, and was recently offered the 
 chance to join our pentest-team in the position as Security Consultant. Why everyone is naming job positions to their likings is a mystery I will never be able understand.  
 So here I am. A total noob regarding penetration-testing, doing stuff that others get arrested for legally and getting payed for it. Or in other words:  
-**I finally arrived where I always wanted to be **(at least I believe so).
+**I finally arrived where I always wanted to be**(at least I believe so).
 
 
 
