@@ -225,7 +225,7 @@ nav {
 
   a {
     margin-left: 20px;
-    color: $darkGray;
+    color: $green;
     text-align: right;
     font-weight: 300;
     letter-spacing: 1px;
@@ -273,8 +273,8 @@ nav {
 
 .wrapper-footer {
   margin-top: 50px;
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
+  border-top: 1px solid $black;
+  border-bottom: 1px solid $black;
   background-color: $darkGray;
 }
 
