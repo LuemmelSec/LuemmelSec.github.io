@@ -69,11 +69,11 @@ p {
 }
 
 a {
-  color: $blue;
+  color: $white;
   text-decoration: none;
 	cursor: pointer;
   &:hover, &:active {
-    color: $blue;
+    color: $green;
   }
 }
 
@@ -202,7 +202,7 @@ img {
 
 .site-description {
   margin: -5px 0 0 0;
-  color: $gray;
+  color: $green;
   font-size: 16px;
 
   @include mobile {
