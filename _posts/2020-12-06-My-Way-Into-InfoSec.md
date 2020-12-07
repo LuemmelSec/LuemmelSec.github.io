@@ -41,7 +41,7 @@ In parallel two of my colleagues, that where working in my team, prepared for th
 
 The company agreed and I was allowed to also take the course. I didn´t want to start from scratch again when beginning the lab-phase of the OSCP, and so decided to do a 6 month selfpaced learning with the help of HTB, and when I felt confident enough start my lab-time.
 
-I began in June 2019, and read a lot of **OSCP like machines** posts on the internet. I solved about 30 boxes, retired and active ones. I wrote down anything that seemed to be of interest, so that I had everything in one place, organized to my needs.
+I began in June 2019, and read a lot of **OSCP like machines** posts on the internet. I solved about 30 boxes, retired and active ones. The biggest inspiration here where my colleagues and of course the infamous [ippsec](https://twitter.com/ippsec), who shares his knowledge like noone else. I wrote down anything that seemed to be of interest, so that I had everything in one place, organized to my needs.
 
 My 90 days of lab-time started in January 2020.  
 I decided to first go through all the materials and solve all tasks as well as documenting the pwnage of 10 unique machines in the lab, to get my 5 bonus points. That alone cost me 15 days of hard work. I didn´t touch any of the lab-machines until then.
