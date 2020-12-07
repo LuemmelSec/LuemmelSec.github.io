@@ -135,8 +135,9 @@ There´s tons of topics he covers, and he´s extending all the time. From simple
 
 ## FIN
 
-So that´s it for my first blog-post. If you made it till here - congratulations.
-I hope you liked it, at least a little bit.
+So that´s it for my first blog-post.  
+If you made it till here - congratulations.  
+I hope you liked it, at least a little bit.  
 Any maybe it´s of some kind of help for someone who also is just starting his journey into InfoSec.
 
 ----
