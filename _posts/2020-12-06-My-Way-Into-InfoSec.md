@@ -69,7 +69,7 @@ But honestly I am still very unsure if they believe to have made the right decis
 I was offered a one month trial works, which took place in August 2020. So both sides would be able to see if this is a feasible solution for all of us. Afterwards we would discuss about how a change of departments could be done and when.  
 Long story short: I was assimilated and never saw my old office again.
 
-Since October 2020 I work as a full-time pentester - mission completed.
+Since October 2020 I work as a full-time pentester - mission completed. Thx to my company and special thanks to the guys that brought me here: [S3cur3Th1sSh1t](https://twitter.com/ShitSecure) & [0x23353435](https://twitter.com/0x23353435).
 
 ## Further steps and current situation
 
