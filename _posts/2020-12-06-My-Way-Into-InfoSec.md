@@ -85,7 +85,7 @@ By now the more experienced guys take me with them from time to time, when doing
 
 But to be honest: These guys are out of this world.  
 Watching them doing their job is an honour, but at the same time scares me and makes me feel very small.  
-It´s hard for me to keep track. There are so many things going on in such little timeframes - always feels like getting hit by a bus, doing 60 mph, and spikes in the front grille, driven by Mike Tyson.  
+It´s hard for me to keep track. There are so many things going on in such little timeframes - always feels like getting hit by a bus, doing 60 mph, with spikes in the front grille, driven by Mike Tyson.  
 Sometimes I feel I know less then I knew before the pentest.
 I´m in doubt when I am responsible for a pentest, and when they leave it to me to do all the testing. I think that the customer would get much more value for his money when they would be doing the tests instead of me. They will surely find way more problems, misconfigurations and security-holes than I will ever be able to. Maybe I miss crucial parts.   
 But I will not give up. The team is pushing me, and for now this is good enough. As long as I don´t dissapoint them I am fine.  
