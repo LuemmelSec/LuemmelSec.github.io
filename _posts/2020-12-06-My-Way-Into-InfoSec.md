@@ -123,7 +123,7 @@ I took the most out of the lab-times during all my online-courses. It gave me mu
 But maybe it´s comparable to an assessment. The fun part, where you will learn the most, is the one where you pull out the guns and shoot everything down. But what counts is your report, as this is the proof of your knowledge and value to the customer.
 
 The [OSCP](https://www.offensive-security.com/pwk-oscp/) was something like a prestige object. Everyone starting in InfoSec want´s to own it - and so did I.  
-I personally think it´s just because of OffSec´s good reputation from the past, that it is so hyped. It was the first of it´s kind 24 hour realworld, hands down test. The exam is now proctored, what I personally really liked.  
+I personally think it´s just because of OffSec´s good reputation from the past, that it is so hyped. It was the first of it´s kind 24 hour realworld, hands on test. The exam is now proctored, what I personally really liked.  
 The course itself, besides methodology and basics, taught me very less I need in my current job. Not saying that I didn´t learn a lot of stuff, but I just don´t need it right now.   
 What it showed was my dedication to learn towards my colleagues, and this is what opened the door for me.  
 Offsec seems to also see a certain need to adopt to modern times. Right afterwards I finished, they extended the lab and course material to include some Active Directory scenarios and machines. No idea how close it is now to what you will face in reality though.  
