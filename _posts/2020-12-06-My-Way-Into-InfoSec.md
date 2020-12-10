@@ -101,7 +101,7 @@ One of the basics a lot of people are telling you are a must, is the right minds
 I neither think outside the box nor do I think like a hacker.  
 When doing web-pentests I focus on enumeration and try to find misconfigurations or outdated versions of software which might be or are exploitable. When I see things I stumbled upon during a HTB session or in one of the PentesterLab courses I try to replicate, but I am in no way creative.  
 When developing phishing-campaigns I think about what will most likely convince people to click a link or enter their credentials. I spent time to make things look legit. But does that corelate to thinking outside the box?  
-During internal pentests I mostly rely on the results of the vuln-scanner or some work of the awesome InfoSec people just published recently on twitter and stuff. There is a common toolset my colleagues use, and some things you check everytime like sensitive data in shares, passwords in AD descrption fields, NetBIOS turned on and so on. But again - no hacker or thinking outside of the box here.
+During internal pentests I mostly rely on the results of the vuln-scanner or some work of the awesome InfoSec people just published recently on twitter and stuff. There is a common toolset my colleagues use, and some things you check everytime like sensitive data in shares, passwords in AD description fields, NetBIOS turned on and so on. But again - no hacker or thinking outside of the box here.
 
 Maybe this is something that will come to you later on your journey, or people are born this way. I don´t know. But I personally don´t think that what a lot of people are saying is a must have to get you started in InfoSec.
 
