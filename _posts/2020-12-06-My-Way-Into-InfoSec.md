@@ -63,7 +63,7 @@ At this point I really want to thank my wife and apologize to my little girl. Th
 For some odd reason during this period our pentest-team decided to ask me how I would feel about joining them.  
 *Do what? Give me a pen, where do I need to sign. I told you to put me here. THIS IS SPARTA!!!*
 
-But for real. I think the dedication and absolute will that I showed during this time, made them even think about it. I had no practical background, am not the fastest learner, and as such this would mean a lot of time they would need to invest into me. They also had a team-member leaving the company, so I guess it was: Better him that no one :)  
+But for real. I think the dedication and absolute will that I showed during this time, made them even think about it. I had no practical background, am not the fastest learner, and as such this would mean a lot of time they would need to invest into me. They also had a team-member leaving the company, so I guess it was: Better him than no one :)  
 But honestly I am still very unsure if they believe to have made the right decision, nor if I am the right person for the job.  
 
 I was offered a one month trial works, which took place in August 2020. So both sides would be able to see if this is a feasible solution for all of us. Afterwards we would discuss about how a change of departments could be done and when.  
