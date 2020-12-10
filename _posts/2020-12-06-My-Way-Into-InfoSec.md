@@ -32,8 +32,8 @@ A few month later I had a new job. Only downside: They wanted me to staff up the
 
 ## The journey begins
 
-The pentest guys in my company where meeting once a month after work to do some [Hack The Box](https://www.hackthebox.eu/) machines, and just having a good time together.
-So I asked if I could join and just watch them do all the magic things. And allthough I didn´t even understand half the shit these crazy fuckers where doing, it felt great just hanging around with them and at least try to soak up some of their knowledge and be part of the gang.
+The pentest guys in my company were meeting once a month after work to do some [Hack The Box](https://www.hackthebox.eu/) machines, and just having a good time together.
+So I asked if I could join and just watch them do all the magic things. And although I didn´t even understand half the shit these crazy fuckers where doing, it felt great just hanging around with them and at least try to soak up some of their knowledge and be part of the gang.
 
 In parallel two of my colleagues, that where working in my team, prepared for their OSCP exam which the company was paying for, because they also liked to dig a little deeper into this world and the knowledge would also help the companies non-pentesters with their daily doings.
 
@@ -44,26 +44,26 @@ In parallel two of my colleagues, that where working in my team, prepared for th
 The company agreed and I was allowed to also take the course.  
 I didn´t want to start from scratch again when beginning the lab-phase of the OSCP, and so decided to do a 6 month selfpaced learning with the help of HTB, and when I felt confident enough start my lab-time.
 
-I began in June 2019, and read a lot of **OSCP like machines** posts on the internet. I solved about 30 boxes, retired and active ones. The biggest inspiration here where my colleagues and of course the infamous [ippsec](https://twitter.com/ippsec), who shares his knowledge like noone else. I wrote down anything that seemed to be of interest, so that I had everything in one place, organized to my needs.
+I began in June 2019, and read a lot of **OSCP like machines** posts on the internet. I solved about 30 boxes, retired and active ones. The biggest inspiration here were my colleagues and of course the infamous [ippsec](https://twitter.com/ippsec), who shares his knowledge like no one else. I wrote down anything that seemed to be of interest, so that I had everything in one place, organized to my needs.
 
 My 90 days of lab-time started in January 2020.  
 I decided to first go through all the materials and solve all tasks as well as documenting the pwnage of 10 unique machines in the lab, to get my 5 bonus points. That alone cost me 15 days of hard work. I didn´t touch any of the lab-machines until then.
 During my journey a colleague from the pentester-team was doing the labs as well. The two guys from my team had just passed their exam, and another guy from the pensters had finished his a few month ago. So I used every moment I (and probably they) had to have them explain things to me when I got stuck. I visited the pentest-team during my lunch breaks, and they helped me out, always trying to just push me in the right direction. We had a WhatsApp-Group where I was constantly asking questions, trying to understand even the last detail.  
 
-Together with these awesome people I was able to clear the whole lab about one week before my lab-time ended, and pass my exam on April 18th 2020, clearing 4/5 machines. I was completely lost with one of the medium-difficulty machines, beacuse I found no way in. All others where rooted.
+Together with these awesome people I was able to clear the whole lab about one week before my lab-time ended, and pass my exam on April 18th 2020, clearing 4/5 machines. I was completely lost with one of the medium-difficulty machines, beacuse I found no way in. All others were rooted.
 
-I wrote down every minute I spent leasrning during this journey, ending up with a total of 460 hours of learning effort, all done in my spare-time, after work and on weekends. 
+I wrote down every minute I spent learning during this journey, ending up with a total of 460 hours of learning effort, all done in my spare-time, after work and on weekends. 
 
 Afterwards I said to myself: *Dude that was it for this year, and also for the next 200 years. Time to get back to real-life.*
 
-At this point I really want to thank my wife and apologize to my little girl. These where some fucking hard month with very little time for my family. But they where supporting me the whole time, and without them having my back, I wouldn´t have done it.
+At this point I really want to thank my wife and apologize to my little girl. These were some fucking hard month with very litle time for my family. But they were supporting me the whole time, and without them having my back, I wouldn´t have done it.
 
 ## Welcome to the team
 
 For some odd reason during this period our pentest-team decided to ask me how I would feel about joining them.  
 *Do what? Give me a pen, where do I need to sign. I told you to put me here. THIS IS SPARTA!!!*
 
-But for real. I think the dedication and absolute will that I showed during this time, made them even think about it. I had no practical background, am not the fastest learner, and as such this would mean a lot of time they would need to invest into me. They also had a team-member leaving the company, so I guess it was: Better him that noone :)  
+But for real. I think the dedication and absolute will that I showed during this time, made them even think about it. I had no practical background, am not the fastest learner, and as such this would mean a lot of time they would need to invest into me. They also had a team-member leaving the company, so I guess it was: Better him that no one :)  
 But honestly I am still very unsure if they believe to have made the right decision, nor if I am the right person for the job.  
 
 I was offered a one month trial works, which took place in August 2020. So both sides would be able to see if this is a feasible solution for all of us. Afterwards we would discuss about how a change of departments could be done and when.  
@@ -73,9 +73,9 @@ Since October 2020 I work as a full-time pentester - mission completed. Thx to m
 
 ## Further steps and current situation
 
-As the team mainly puts me on web-pentests or mobile-pentests, I joined snyff´s PentesterLab´s with a pro subscription to help me understand the basics and also to provide some insight to more complexe scenarios. That was the best money I personally ever spent on an online-training. It gave me so much value regarding the price I payed for it.
+As the team mainly puts me on web-pentests or mobile-pentests, I joined snyff´s PentesterLab´s with a pro subscription to help me understand the basics and also to provide some insight to more complex scenarios. That was the best money I personally ever spent on an online-training. It gave me so much value regarding the price I payed for it.
 
-My new team decided that it was a good idea to do Rhasta Mouse´s RTO, just beacause they could.  
+My new team decided that it was a good idea to do Rasta Mouse´s RTO, just beacause they could.  
 *Me: Damn bastards. I´m out guys. You know the OSCP thing - enough for this year, maybe next time.  
 Also me: Woah this looks like the most awesome lab ever and Red Teaming is the shit <3. I´m in.*
 
@@ -123,8 +123,8 @@ I took the most out of the lab-times during all my online-courses. It gave me mu
 But maybe it´s comparable to an assessment. The fun part, where you will learn the most, is the one where you pull out the guns and shoot everything down. But what counts is your report, as this is the proof of your knowledge and value to the customer.
 
 The [OSCP](https://www.offensive-security.com/pwk-oscp/) was something like a prestige object. Everyone starting in InfoSec want´s to own it - and so did I.  
-I personally think it´s just because of OffSec´s good reputation from the past, that it is so hyped. It was the first of it´s kind 24 hour realworld, hands-down test. The exam is now proctored, what I personally really liked.  
-The course itself, besides methodology and basics, thought me very less I need in my current job. Not saying that I didn´t learn a lot of stuff, but I just don´t need it right now.   
+I personally think it´s just because of OffSec´s good reputation from the past, that it is so hyped. It was the first of it´s kind 24 hour realworld, hands down test. The exam is now proctored, what I personally really liked.  
+The course itself, besides methodology and basics, taught me very less I need in my current job. Not saying that I didn´t learn a lot of stuff, but I just don´t need it right now.   
 What it showed was my dedication to learn towards my colleagues, and this is what opened the door for me.  
 Offsec seems to also see a certain need to adopt to modern times. Right afterwards I finished, they extended the lab and course material to include some Active Directory scenarios and machines. No idea how close it is now to what you will face in reality though.  
 If you need a dooropener and have the money, go ahead.
@@ -133,10 +133,10 @@ If you need a dooropener and have the money, go ahead.
 Awesome course material, to which you will get lifetime access. It felt like reading a good book. I never had more fun following along.  
 You have to own a complete company, beginning with a phishing scenario and ending with the complete takeover of several domains.  
 This really is very beginner friendly. Everything is well explained, and if you don´t want to dig deeper into certain topics, you can just stick to the course material and will be totally able to earn your exam.  
-Only downside to me was, that in the labs as well as in the exam, certain things where not working as intended. You had to do the same thing like 20 times, and on the 20th attempt it would work. But Daniel just started his courses, and I think he is doing and absolute great job and will improve. Always helpful, up-to-date, and thrilling like hell. If you like Red-Teaming or even want to get into AD Security, you can´t go wrong here. I am currently not doing Red-Team assessments, but this helped me so much in understanding how things work together in the environments I face at our customers every day. Compared to what you get it is relatively cheap. If there where to be an RTO during my OSCP time, I´d go RTO all the way.
+Only downside to me was, that in the labs as well as in the exam, certain things where not working as intended. You had to do the same thing like 20 times, and on the 20th attempt it would work. But Daniel just started his courses, and I think he is doing an absolute great job and will improve. Always helpful, up-to-date, and thrilling like hell. If you like Red-Teaming or even want to get into AD Security, you can´t go wrong here. I am currently not doing Red-Team assessments, but this helped me so much in understanding how things work together in the environments I face at our customers every day. Compared to what you get it is relatively cheap. If there were to be an RTO during my OSCP time, I´d go RTO all the way.
 
 I also recommend [PentesterLab](https://pentesterlab.com/) to everyone who is starting in web-pentesting or who wants to understand a certain part of web-pentesting in detail. There is so much content you will get for your money. [snyff](https://twitter.com/snyff) like Rasta is very supportive and always willing to help. I like that there is no pressure on you. Take the time you need, earn your badges and everything is fine. If you want to pause for a month, no problem. If you are not in the need to showoff with certifications, this is the way to go.
-There´s tons of topics he covers, and he´s extending all the time. From simple web basics to very complexe scenarios. If you don´t find it here I don´t know where.  He´s one of the guys where I can´t believe that someone is capeable to have all that knowledge. Kudos to you Louis.
+There´s tons of topics he covers, and he´s extending all the time. From simple web basics to very complexe scenarios. If you don´t find it here I don´t know where.  He´s one of the guys where I can´t believe that someone is capable to have all that knowledge. Kudos to you Louis.
 
 ## FIN
 
