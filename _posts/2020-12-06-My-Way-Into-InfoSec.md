@@ -56,7 +56,7 @@ I wrote down every minute I spent learning during this journey, ending up with a
 
 Afterwards I said to myself: *Dude that was it for this year, and also for the next 200 years. Time to get back to real-life.*
 
-At this point I really want to thank my wife and apologize to my little girl. These were some fucking hard month with very litle time for my family. But they were supporting me the whole time, and without them having my back, I wouldn´t have done it.
+At this point I really want to thank my wife and apologize to my little girl. Those were some fucking hard month with very little time for my family. But they were supporting me the whole time, and without them having my back, I wouldn´t have done it.
 
 ## Welcome to the team
 
