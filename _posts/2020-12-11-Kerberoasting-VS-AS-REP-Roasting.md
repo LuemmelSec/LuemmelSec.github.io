@@ -186,4 +186,7 @@ If you are interested in further info, here are the links that helped me write t
 [https://redmondmag.com/articles/2012/02/01/understanding-the-essentials-of-the-kerberos-protocol.aspx](https://redmondmag.com/articles/2012/02/01/understanding-the-essentials-of-the-kerberos-protocol.aspx)  
 [https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc772815(v=ws.10)](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc772815(v=ws.10))  
 [https://medium.com/@robert.broeckelmann/kerberos-and-windows-security-kerberos-v5-protocol-b9c804e06479](https://medium.com/@robert.broeckelmann/kerberos-and-windows-security-kerberos-v5-protocol-b9c804e06479)  
-[https://medium.com/@robert.broeckelmann/kerberos-and-windows-security-history-252ccb510137](https://medium.com/@robert.broeckelmann/kerberos-and-windows-security-history-252ccb510137) 
+[https://medium.com/@robert.broeckelmann/kerberos-and-windows-security-history-252ccb510137](https://medium.com/@robert.broeckelmann/kerberos-and-windows-security-history-252ccb510137)  
+[https://stealthbits.com/blog/extracting-service-account-passwords-with-kerberoasting/](https://stealthbits.com/blog/extracting-service-account-passwords-with-kerberoasting/)  
+[https://pentestlab.blog/2018/06/12/kerberoast/](https://pentestlab.blog/2018/06/12/kerberoast/)  
+[https://www.secura.com/blog/kerberoasting-exploiting-kerberos-to-compromise-microsoft-active-directory](https://www.secura.com/blog/kerberoasting-exploiting-kerberos-to-compromise-microsoft-active-directory)  
