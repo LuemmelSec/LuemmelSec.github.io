@@ -11,7 +11,7 @@ I am neither a professional with years of experience nor a Kerberos guru. So if 
 ## Introduction
 
 Kerberos is a protocol used to authenticate parties with the help of tickets over a non-secure network.  
-It´s a really interesting topic and so I used our discussion as a starting point to dig a little deeper into both attacks and came up with this very high-level write-up comparing the two scenarios.  
+It´s a really interesting topic and so I used our discussion as a starting point to dig a little deeper into both attacks and came up with this very high-level write-up comparing the two scenarios. This is also aimed at helping me to understand the processes inside Kerberos in more detail.   
 The protocol (at least to me) is very complex, and the write-ups I found were never 100% accurate in terms of terminology and clarification of things. You may read that messages are partly signed with a secret-key or with a users password hash or even just with the password. To make things worse this might happen in one single article. So I am quite sure that there will be some mistakes here in my write-up as well, but the basics should be correct.  
 
 Although Kerberos is not a native Microsoft protocol, one will most likely find it in Windows Active Directory environments. As this blog is aiming at Microsoft AD pentests, I will stick to this scenario here, which also implies that all the extended Microsoft features like pre-authentication are present.  
@@ -81,11 +81,11 @@ I also want to thank the people who already did all the thinking and who wrote d
 [Will Schroeder](https://twitter.com/harmj0y)  
   
   
-If you are interested in further info, here are some links that might help:  
+If you are interested in further info, here are the links that helped me write this blog-post:  
+[https://m0chan.github.io/2019/07/31/How-To-Attack-Kerberos-101.html](https://m0chan.github.io/2019/07/31/How-To-Attack-Kerberos-101.html)  
+[https://adsecurity.org/](https://adsecurity.org/)  
+[https://www.harmj0y.net/blog/redteaming/kerberoasting-revisited/](https://www.harmj0y.net/blog/redteaming/kerberoasting-revisited/)    
+[https://www.harmj0y.net/blog/activedirectory/roasting-as-reps/](https://www.harmj0y.net/blog/activedirectory/roasting-as-reps/)  
 [https://zeroshell.org/kerberos/kerberos-operation/](https://zeroshell.org/kerberos/kerberos-operation/)  
 [https://www.qomplx.com/qomplx-knowledge-kerberoasting-attacks-explained/](https://www.qomplx.com/qomplx-knowledge-kerberoasting-attacks-explained/)  
-[https://www.harmj0y.net/blog/redteaming/kerberoasting-revisited/](https://www.harmj0y.net/blog/redteaming/kerberoasting-revisited/)  
-[https://www.harmj0y.net/blog/activedirectory/roasting-as-reps/](https://www.harmj0y.net/blog/activedirectory/roasting-as-reps/)    
-[https://m0chan.github.io/2019/07/31/How-To-Attack-Kerberos-101.html](https://m0chan.github.io/2019/07/31/How-To-Attack-Kerberos-101.html)  
-[https://iam.uconn.edu/the-kerberos-protocol-explained/](https://iam.uconn.edu/the-kerberos-protocol-explained/)  
-[https://adsecurity.org/](https://adsecurity.org/)  
+[https://iam.uconn.edu/the-kerberos-protocol-explained/](https://iam.uconn.edu/the-kerberos-protocol-explained/)    
