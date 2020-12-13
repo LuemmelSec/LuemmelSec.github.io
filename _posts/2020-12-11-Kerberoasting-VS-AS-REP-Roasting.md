@@ -161,7 +161,7 @@ If the **SPN** needs to be tied to a user rather than a computer account, make s
 
 **AS_REP roasting** is taking place at the very beginning of the Kerberos authentication procedure. An attacker would only need physical access to the network, but would also have to know the principal name of the account he want´s to ask a TGT for. The option **Do not require Kerberos preauthentication** for the object needs to be set and as such is less likely to be found during an assessment nowadays.
 
-**Kerberoasting** is abusing a normal (UMSCHREIBEN) function inside an environment that makes use of Kerberos, which is the fact that the service tickets are encrypted with the hash of the **SPNs** account. If this password is weak an attacker will most likely be able to recover it. As a prerequisit one needs to have valid credentials and a useraccount to ask the **KDC** for a **ST**.
+**Kerberoasting** is abusing a legit function inside an environment that makes use of Kerberos. The problem is that the service tickets are encrypted with the hash of the **SPNs** account and every account of the Active Directory can request such a ticket. If the password is weak an attacker will most likely be able to recover it. An attacker only needs to retrieve a valid user account and credentials.  
 
 
 So that´s it, a rather small blog-post about two Active Directory attack methods. I hope you liked it.  
