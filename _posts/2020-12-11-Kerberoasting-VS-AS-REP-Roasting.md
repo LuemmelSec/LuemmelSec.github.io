@@ -27,11 +27,11 @@ During the process of asking to access a service on the network, the **TGS** wil
 
 The following abreviations will be used along this article. If you need more detail I recommend looking at the [ldapwiki](https://ldapwiki.com/wiki).
 
-KDC: Key Distribution Center - The trusted 3rd party / the Domain Controller  
-TGS: Ticket Granting Server - A subset function of the KDC which issues Service Tickets  
-TGT: Ticket Granting Ticket - A userbased ticket used to authenticate to the KDC  
-ST:  Service Ticket - Used to authenticate against services  
-SPN: Service Principal Name - The name of a service on the network  
+[KDC](https://ldapwiki.com/wiki/Key%20Distribution%20Center): Key Distribution Center - The trusted 3rd party / the Domain Controller  
+[TGS](https://ldapwiki.com/wiki/Ticket%20Granting%20Service): Ticket Granting Server - A subset function of the KDC which issues Service Tickets  
+[TGT](https://ldapwiki.com/wiki/Ticket%20Granting%20Ticket): Ticket Granting Ticket - A userbased ticket used to authenticate to the KDC  
+[ST](https://ldapwiki.com/wiki/Service%20Ticket):  Service Ticket - Used to authenticate against services  
+[SPN](https://ldapwiki.com/wiki/ServicePrincipalName): Service Principal Name - The name of a service on the network  
 
 ## AS_REP roasting
 
@@ -49,12 +49,12 @@ This results in any user who has the correct name of that account to be able to 
 
 ## Kerberoasting
 
-**Kerberoasting** aims at asking for a [ST](https://ldapwiki.com/wiki/Service%20Ticket) for a service that is tied to a user account and will most likely contain a human generated password.
-Normally [SPNs](https://ldapwiki.com/wiki/ServicePrincipalName) are bound to computer accounts which have a random 128-character password that automatically gets changed every 30 days.
+**Kerberoasting** aims at asking for a **ST** for a service that is tied to a user account and will most likely contain a human generated password.
+Normally **SPNs** are bound to computer accounts which have a random 128-character password that automatically gets changed every 30 days.
 
 With a valid **TGT** in hand, an attacker may request a **ST** for every **SPN** on the network.
 The flow is as follows (involving the steps from the AS_REP roasting section):  
-1. With a valid **TGT** a [TGS_REQ](https://ldapwiki.com/wiki/TGS_REQ) request is send to the [TGS](https://ldapwiki.com/wiki/Ticket%20Granting%20Service)  
+1. With a valid **TGT** a [TGS_REQ](https://ldapwiki.com/wiki/TGS_REQ) request is send to the **TGS**  
 2. The **TGS** checks if the **SPN** is valid, opens the **TGT** and does some additional tests to it  
 3. If everything is okay it generates a **ST** which it encrypts with the service-accounts password hash and sends it back to the client as part of the [TGS_REP](https://ldapwiki.com/wiki/TGS_REP) response
 4. The client receives the response, extracts the **ST** and can forward it to the desired service to access it
