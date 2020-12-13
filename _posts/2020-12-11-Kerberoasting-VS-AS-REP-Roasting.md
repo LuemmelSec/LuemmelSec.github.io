@@ -70,16 +70,17 @@ The attacker can intercept or extract the ticket from memory, and crack the hash
 **Kerberoasting** is abusing a normal function inside an environment that makes use of Kerberos, which is the fact that the service tickets are encrypted with the hash of the **SPNs** account. If this password is weak an attacker will most likely be able to recover it. As a prerequisit one needs to have valid credentials and a useraccount to ask the **KDC** for a **ST**.
 
 
-If you think that I made mistakes, that things are still unlcear or you are missing things, please feel free to hit me up on [twitter](https://twitter.com/theluemmel).  
+So that´s it, a rather small blog-post about two Active Directory attack methods. I hope you liked it.  
+If you think that I made mistakes, that parts are still unclear or you are missing things, please feel free to hit me up on [twitter](https://twitter.com/theluemmel).  
 
-Special thanks to my awesome collegues [S3cur3Th1sSh1t](https://twitter.com/ShitSecure) and [0x23353435](https://twitter.com/0x23353435) for their input and support.  
+Special thanks to my awesome colleagues [S3cur3Th1sSh1t](https://twitter.com/ShitSecure) and [0x23353435](https://twitter.com/0x23353435) for their input and support.  
 
 I also want to thank the people who already did all the thinking and who wrote down and shared their knowledge:  
 [Aidan Preston](https://twitter.com/m0chan98)  
 [Sean Metcalf](https://twitter.com/PyroTek3)  
 [Will Schroeder](https://twitter.com/harmj0y)  
-
-
+  
+  
 If you are interested in further info, here are some links that might help:  
 [https://zeroshell.org/kerberos/kerberos-operation/](https://zeroshell.org/kerberos/kerberos-operation/)  
 [https://www.qomplx.com/qomplx-knowledge-kerberoasting-attacks-explained/](https://www.qomplx.com/qomplx-knowledge-kerberoasting-attacks-explained/)  
