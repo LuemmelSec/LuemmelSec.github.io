@@ -82,16 +82,42 @@ If for some reason an account needs to have it disabled, it all comes down to pa
 **Kerberoasting** aims at asking for a **ST** for a service that is tied to a user account and will most likely contain a human generated password.
 Normally **SPNs** are bound to computer accounts which have a random 128-character password that automatically gets changed every 30 days.
 
-With a valid **TGT** in hand, an attacker may request a **ST** for every **SPN** on the network. ADD EVERY USER ON DOMAIN CAN REQUEST A ST, ATtcket has gültige zugangsdaten
+Every valid account inside your domain may ask the **TGS** to access a service and will be given a corresponding **ST**. The decision of whether and how this account can access the service is the responsibility of that service and not the **TGS**.  
+
+With valid credentials for an account and as such a valid **TGT** in hand, an attacker may request a **ST** for every **SPN** on the network.  
 The flow is as follows (involving the steps from the AS_REP roasting section):  
 1. With a valid **TGT** a [TGS_REQ](https://ldapwiki.com/wiki/TGS_REQ) request is send to the **TGS**  
 2. The **TGS** checks if the **SPN** is valid, opens the **TGT** and does some additional tests to it  
-3. If everything is okay it generates a **ST** . Then it encrypts the **ST** with the service-accounts password hash and sends it back to the client as part of the [TGS_REP](https://ldapwiki.com/wiki/TGS_REP) response
+3. If everything is okay it generates a **ST**. Then it encrypts the **ST** with the service-accounts password hash and sends it back to the client as part of the [TGS_REP](https://ldapwiki.com/wiki/TGS_REP) response
 4. The client receives the response, extracts the **ST** and can forward it to the desired service to access it
 
-The problem here lies in the fact, that the **ST** is encrypted with the password hash of the **SPNs** account.  AND THAT EVERY ONE CAN REQUEST by design.
+The problem here lies in the fact, that the **ST** is encrypted with the password hash of the **SPNs** account, and that by design everyone inside the domain may request a ticket for that service.  
 The attacker can intercept or extract the ticket from memory, and crack the hash offline.  Verifizieren ob aus dem arbeitsspeicher? wenn ja wie?
 
+### Attack
+
+[Rubeus](https://github.com/GhostPack/Rubeus), [mimikatz](https://github.com/gentilkiwi/mimikatz) or [PowerView](https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1) can be used to fetch the tickets and extract the hashes for offline cracking.
+
+**Rubeus**  
+The following attack will try to roast all users on the current domain leaving us with a crackable format for hashcat:  
+
+````Rubeus.exe kerberoast /format:hashcat````
+
+**PowerView**  
+Get-DomainSPNTicket -SPN <spn> -OutputFormat hashcat
+
+
+t. 
+
+With the help of  we can get a list of all user accounts that have a **SPN** set:
+
+````Get-DomainUser -SPN````
+
+````kerberos::list /export````
+
+
+
+mimikatz is able to extract **STs** from memory, but we first need to identify valid **SPNs** and request a valid ticke
 
 ## Conclusion
 
