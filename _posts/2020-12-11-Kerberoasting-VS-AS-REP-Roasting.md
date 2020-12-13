@@ -57,9 +57,7 @@ This results in any user who has the correct name of that account to be able to 
 
 We can use [Rubeus](https://github.com/GhostPack/Rubeus) on a domain joined machine to find all accounts on that domain where **Do not require Kerberos preauthentication** is set and have it return the corresponding hashes. The **/format** option will directly give us output that is crackable with [hashcat](https://github.com/hashcat/hashcat).
 
-```javascript
-Rubeus.exe asreproast /format:hashcat
-```
+```Rubeus.exe asreproast /format:hashcat```
 
 The AS-REP hash can then be fed into hashcat for offline attacks i.e. with brute-force or wordlist attacks.
 
