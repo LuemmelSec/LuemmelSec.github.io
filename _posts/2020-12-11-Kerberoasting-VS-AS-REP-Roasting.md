@@ -194,3 +194,4 @@ If you are interested in further info, here are the links that helped me write t
 [https://www.secura.com/blog/kerberoasting-exploiting-kerberos-to-compromise-microsoft-active-directory](https://www.secura.com/blog/kerberoasting-exploiting-kerberos-to-compromise-microsoft-active-directory)  
 [https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/t1208-kerberoasting](https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/t1208-kerberoasting)  
 [https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc772815(v=ws.10)](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc772815(v=ws.10))  
+[https://swarm.ptsecurity.com/kerberoasting-without-spns/](https://swarm.ptsecurity.com/kerberoasting-without-spns/)  
