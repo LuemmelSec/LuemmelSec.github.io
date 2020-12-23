@@ -87,3 +87,6 @@ exclude:
   - CNAME
 
 theme: jekyll-theme-midnight
+
+plugins:
+  - jekyll-feed

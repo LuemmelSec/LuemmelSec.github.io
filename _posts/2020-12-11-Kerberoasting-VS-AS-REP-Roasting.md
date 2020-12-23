@@ -13,7 +13,7 @@ I am neither a professional with years of experience nor a Kerberos guru. So if 
 
 ## Introduction
 
-Kerberos is a authentication protocol for non-secure networks, which is build upon tickets.  
+Kerberos is an authentication protocol for non-secure networks, which is build upon tickets.  
 It´s a really interesting topic and so I used our discussion as a starting point to dig a little deeper into both attacks and came up with this very high-level write-up comparing the two scenarios.  
 As a sideeffect, this is helping me to understand the processes inside Kerberos in more detail.   
 The protocol (at least to me) is very complex, and the write-ups I found were never 100% accurate in terms of terminology and clarification of things. You may read that messages are partly signed with a secret-key or with a users password hash or even just with the password. To make things worse this might happen in one single article. So I am quite sure that there will be some mistakes here and there in my write-up as well, but the basics should be correct.  
@@ -33,10 +33,10 @@ The following abreviations will be used along this article. If you need more det
 
 ## TL;DR
 
-**AS_REP Roasting** is taking place during the initial authentication procedure within Kerberos. It´s abusing the fact, that for accounts with the option **Do not require Kerberos preauthentication** set, there is no need to send the (normally required) encrypted timestamp (with the users password hash) at the very beginning. Thus everyone on the network who knows the name of an affected account may ask the **KDC** to authenticate as that user and in response fetch a **AS_REP** response which partly is encrypted with the AS_REP roastable accounts password hash. Once obtained, an attacker can try to offline recover the cleartext credentials.  
+**AS_REP Roasting** is taking place during the initial authentication procedure within Kerberos. It´s abusing the fact, that for accounts with the option **Do not require Kerberos preauthentication** set, there is no need to send the (normally required) encrypted timestamp (with the users password hash) at the very beginning. Thus everyone on the network who knows the name of an affected account may ask the **KDC** to authenticate as that user and in return fetch a **AS_REP** response which partly is encrypted with the AS_REP roastable account´s password hash. Once obtained, an attacker can try to offline crack the hash and fetch the cleartext credentials.  
 
-**Kerberoasting** aims at asking for service tickets related to services on the network where the **SPNs** are tied to user accounts, rather than computer accounts. The background here is that if a person creates a user he will choose the password most likely according to human standards i.e. a phrase, a word mixed with numbers, etc. If that password is weakly chosen, then it is possible to recover the cleartext credentials.    
-During the process of asking to access a service on the network, the **TGS** will send a data package that contains a service ticket which is encrypted with the service-accounts password hash, that again like in the **AS_REP roasting** attack can be cracked offline.  
+**Kerberoasting** aims at asking for service tickets related to services on the network where the **SPNs** are tied to user accounts, rather than computer accounts. The background here is that if a person creates a user he will choose the password most likely according to human standards i.e. a phrase, a word mixed with numbers, etc. If that password is weakly chosen, then it is possible to crack the hash and get the cleartext credentials.    
+During the process of asking to access a service on the network, the **TGS** will send a data package that contains a service ticket which is encrypted with the service-account´s password hash, that again like in the **AS_REP roasting** attack can be cracked offline.  
 
 
 ## AS_REP roasting
@@ -47,15 +47,15 @@ The Kerberos authentication process looks like the following (high level - there
 3. **KDC** checks if he can:  
    a) decrypt the timestamp with the hash he has for that user in his database and  
    b) if the timestamp is within a certain period of time compared to the servers current time (5 minutes default)  
-4. If valid and within the allowed time period the **KDC** returns a [AS_REP](https://ldapwiki.com/wiki/AS_REP) response, which amongst others contains the **TGT** and an encrypted session-key, which can be decrypted with the users password hash.  
-5. Client decrypts the session-key and saves the TGT for later usage  
+4. If valid and within the allowed time period the **KDC** returns a [AS_REP](https://ldapwiki.com/wiki/AS_REP) response which, amongst others, contains the **TGT** and an encrypted session-key, which can be decrypted with the user´s password hash.  
+5. Client decrypts the session-key and saves the **TGT** for later usage  
 
 Now with the option **Do not require Kerberos preauthentication** set, the timestamp stuff is disabled for this account and only the default Kerberos cleartext message is needed to ask for a **TGT**.  
-This results in any user who has the correct name of that account to be able to request the **TGT**, which in return will be send as part of the **AS_REP** - again with parts encrypted with the users password hash we were asking for. This info can then be used to try to recover the cleartext password.  
+This results in any user who has the correct name of that account to be able to request the **TGT**, which in return will be send as part of the **AS_REP** - again with parts encrypted with the users password hash we were asking for. This info can then be used to try to crack the hash to get the cleartext password offline.  
 
 ### Attack
 
-We can use [Rubeus](https://github.com/GhostPack/Rubeus) on a domain joined machine to find all accounts on that domain where **Do not require Kerberos preauthentication** is set and have it return the corresponding hashes. The **/format** option will directly give us output that is crackable with [hashcat](https://github.com/hashcat/hashcat).
+We can use [Rubeus](https://github.com/GhostPack/Rubeus) on a domain joined machine (if we have valid credentials for a domain user we can also run all the stuff from a non domain joined machine with powershell´s **/runas** command or provide the missing parts directly to Rubeus) to find all accounts on that domain where **Do not require Kerberos preauthentication** is set and have it return the corresponding hashes. The **/format** option will directly give us output that is crackable with [hashcat](https://github.com/hashcat/hashcat).
 
 ```powershell
 Rubeus.exe asreproast /format:hashcat
@@ -70,19 +70,21 @@ hashcat64.exe -m 18200 '<AS_REP-hash>' -a 0 c:\wordlists\rockyou.txt
 
 ### Mitigation
 
-To check which accounts in you environment have pre-authentication disabled, you can use the following powershell cmdlet, which should be available by default on domain joined machines:
+To check which accounts in you environment have pre-authentication disabled, you can use the following powershell cmdlet, which is available when having the [RSAT](https://www.microsoft.com/en-us/download/details.aspx?id=45520) tools installed. The following works from Windows 10 1809 onwards:
 
 ```powershell
+Add-WindowsCapability –online –Name “Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0”
+Import-Module activedirectory
 get-aduser -filter * -properties DoesNotRequirePreAuth | where {$._DoesNotRequirePreAuth -eq "True" -and $_.Enabled -eq "True"} | select Name
 ```
 
-Or you might want to run [PowerView](https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1) in your powershell session and issue the Get-DomainUser cmdlet:
+Or you can import [PowerView](https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1) into your powershell session and issue the Get-DomainUser cmdlet:
 
 ```powershell
 Get-DomainUser -PreauthNotRequired -Properties distinguishedname -Verbose
 ```
 
-You should make sure that every account is using pre-authentication.  
+You should make sure that every account in your AD is using pre-authentication.  
 If for some reason an account needs to have it disabled, it all comes down to password complexity and length.
 
 ## Kerberoasting
@@ -96,13 +98,16 @@ With valid credentials for an account and as such a valid **TGT** in hand, an at
 The flow is as follows (involving the steps from the AS_REP roasting section):  
 1. With a valid **TGT** a [TGS_REQ](https://ldapwiki.com/wiki/TGS_REQ) request is send to the **TGS**  
 2. The **TGS** checks if the **SPN** is valid, opens the **TGT** and does some additional tests to it  
-3. If everything is okay it generates a **ST**. Then it encrypts the **ST** with the service-accounts password hash and sends it back to the client as part of the [TGS_REP](https://ldapwiki.com/wiki/TGS_REP) response
+3. If everything is okay it generates a **ST**. Then it encrypts the **ST** with the service-account´s password hash and sends it back to the client as part of the [TGS_REP](https://ldapwiki.com/wiki/TGS_REP) response
 4. The client receives the response, extracts the **ST** and can forward it to the desired service to access it
 
 The problem here lies in the fact, that the **ST** is encrypted with the password hash of the **SPNs** account, and that by design everyone inside the domain may request a ticket for that service.  
-The attacker can intercept or extract the ticket from memory, and crack the hash offline.  Verifizieren ob aus dem arbeitsspeicher? wenn ja wie?
+The attacker can intercept or extract the ticket from memory, and crack the hash offline.  
+According attacks can be performed even from non domain joined machines, as long as valid credentials for one user were obtained.  
 
 ### Attack
+
+All described scenarios were performed from a domain joined machine. But there are ways and commandline-arguments for all the tools to be run from non domain joined systems.  
 
 [Rubeus](https://github.com/GhostPack/Rubeus), [mimikatz](https://github.com/gentilkiwi/mimikatz) or [PowerView](https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1) can be used to fetch the tickets and extract the hashes for offline cracking.
 
@@ -129,7 +134,7 @@ Get-DomainSPNTicket -SPN <spn> -OutputFormat hashcat
 **mimikatz**  
 mimikatz can be used to extract **STs** from memory. But beforehand you will have to identify **SPNs** and ask for tickets for them.  
 Having a look at the PowerView section above we are already able to query the desired **SPNs**.  
-Next step is to query for the **ST** which can be done with two lines of powershell:
+Next step is to ask for the **ST** which can be done with two lines of powershell:
 
 ```powershell
 Add-Type –AssemblyName System.IdentityModel  
@@ -154,21 +159,23 @@ python tgsrepcrack.py c:\rockyou.txt c:\ticket.kirbi
 
 ### Mitigation
 
-Check which accounts in your environment are affected with PowerView´s Get-DomainUser cmdlet as explained above.  
+Check which accounts in your environment are affected with PowerView´s **Get-DomainUser** cmdlet as explained above.  
 If the **SPN** needs to be tied to a user rather than a computer account, make sure to make the password long and complex.  
 
 ## Conclusion
 
-**AS_REP roasting** is taking place at the very beginning of the Kerberos authentication procedure. An attacker would only need physical access to the network, but would also have to know the principal name of the account he want´s to ask a TGT for. The option **Do not require Kerberos preauthentication** for the object needs to be set and as such is less likely to be found during an assessment nowadays.
+**AS_REP roasting** is taking place at the very beginning of the Kerberos authentication procedure. An attacker would only need physical access to the network, but would also have to know the principal name (user name) of the account he wants to ask a **TGT** for. The option **Do not require Kerberos preauthentication** for the object needs to be set and as such is less likely to be found during an assessment nowadays.
 
-**Kerberoasting** is abusing a legit function inside an environment that makes use of Kerberos. The problem is that the service tickets are encrypted with the hash of the **SPNs** account and every account of the Active Directory can request such a ticket. If the password is weak an attacker will most likely be able to recover it. An attacker only needs to retrieve a valid user account and credentials.  
-
-
-So that´s it, a rather small blog-post about two Active Directory attack methods. I hope you liked it.  
+**Kerberoasting** is abusing a legit function inside an environment that makes use of Kerberos. The problem is that the service tickets are encrypted with the hash of the **SPNs** account and every account of the Active Directory can request such a ticket. If the password is weak an attacker will most likely be able to crack it. He therefore only needs to retrieve a valid user account and credentials.  
+  
+  
+So that´s it, a rather small blog-post about two Active Directory attack methods. I hope you liked it.   
 If you think that I made mistakes, that parts are still unclear or you are missing things, please feel free to hit me up on [twitter](https://twitter.com/theluemmel).  
-
+  
+  
 Special thanks to my awesome colleagues [S3cur3Th1sSh1t](https://twitter.com/ShitSecure) and [0x23353435](https://twitter.com/0x23353435) for their input and support.  
-
+  
+  
 I also want to thank the people who already did all the thinking and who wrote down and shared their knowledge:  
 [Aidan Preston](https://twitter.com/m0chan98)  
 [Sean Metcalf](https://twitter.com/PyroTek3)  
@@ -192,3 +199,4 @@ If you are interested in further info, here are the links that helped me write t
 [https://www.secura.com/blog/kerberoasting-exploiting-kerberos-to-compromise-microsoft-active-directory](https://www.secura.com/blog/kerberoasting-exploiting-kerberos-to-compromise-microsoft-active-directory)  
 [https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/t1208-kerberoasting](https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/t1208-kerberoasting)  
 [https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc772815(v=ws.10)](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc772815(v=ws.10))  
+[https://swarm.ptsecurity.com/kerberoasting-without-spns/](https://swarm.ptsecurity.com/kerberoasting-without-spns/)  
