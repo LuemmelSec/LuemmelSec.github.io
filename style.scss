@@ -110,14 +110,11 @@ img {
   max-width: 100%;
 }
 
-code {
-  font-weight: bold;
-  background-color: GreenYellow;
-}
-
+code {}
+ 
 pre > code {
-background-color: AliceBlue;
-color: Blue;
+background-color: rgb(8, 8, 8);
+color: white;
 }
 
 // Fixes images in popup boxes from Google Translate
