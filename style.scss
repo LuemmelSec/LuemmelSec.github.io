@@ -110,6 +110,16 @@ img {
   max-width: 100%;
 }
 
+code {
+  font-weight: bold;
+  background-color: GreenYellow;
+}
+
+pre > code {
+background-color: AliceBlue;
+color: Blue;
+}
+
 // Fixes images in popup boxes from Google Translate
 .gmnoprint img {
   max-width: none;
