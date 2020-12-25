@@ -1,79 +1,230 @@
+// https://github.com/chriskempson/tomorrow-theme
+// use theme: night
 
-.highlight {
-  background-color: #0a0a0a;
-  padding: 2px 2px 2px 2px;
-  overflow: scroll;
+@import "_variables";
+
+// theme: night
+$highlight-background: #1d1f21;
+$highlight-current-line: #282a2e;
+$highlight-selection: #373b41;
+$highlight-foreground: #c5c8c6;
+$highlight-comment: #969896;
+$highlight-red: #cc6666;
+$highlight-orange: #de935f;
+$highlight-yellow: #f0c674;
+$highlight-green: #b5bd68;
+$highlight-aqua: #8abeb7;
+$highlight-blue: #81a2be;
+$highlight-purple : #b294bb;
+
+// theme: night eighties
+$highlight-background: #2d2d2d;
+$highlight-current-line: #393939;
+$highlight-selection: #515151;
+$highlight-foreground: #cccccc;
+$highlight-comment: #999999;
+$highlight-red: #f2777a;
+$highlight-orange: #f99157;
+$highlight-yellow: #ffcc66;
+$highlight-green: #99cc99;
+$highlight-aqua: #66cccc;
+$highlight-blue: #6699cc;
+$highlight-purple: #cc99cc;
+
+.code-block {
+    background: $highlight-background;
+    //margin: 0 $article-padding * -1;
+    margin: 2ex 0;
+    padding: 1rem $article-padding;
+    border-style: solid;
+    border-color: #333;
+    border: 1px 0;
+    border-radius: 2px;
+    overflow: auto;
+    color: $highlight-foreground;
+    font-size: $font-size-code;
+    line-height: $line-height;
 }
 
-code {
-  font-family:'Bitstream Vera Sans Mono','Courier', monospace;
+.line-numbers {
+    color: #666;
+    font-size: $font-size-code;
 }
 
-.highlight .c { color: #586E75 } /* Comment */
-.highlight .err { color: #93A1A1 } /* Error */
-.highlight .g { color: #93A1A1 } /* Generic */
-.highlight .k { color: #859900 } /* Keyword */
-.highlight .l { color: #93A1A1 } /* Literal */
-.highlight .n { color: #93A1A1 } /* Name */
-.highlight .o { color: #859900 } /* Operator */
-.highlight .x { color: #CB4B16 } /* Other */
-.highlight .p { color: #93A1A1 } /* Punctuation */
-.highlight .cm { color: #586E75 } /* Comment.Multiline */
-.highlight .cp { color: #859900 } /* Comment.Preproc */
-.highlight .c1 { color: #586E75 } /* Comment.Single */
-.highlight .cs { color: #859900 } /* Comment.Special */
-.highlight .gd { color: #2AA198 } /* Generic.Deleted */
-.highlight .ge { color: #93A1A1; font-style: italic } /* Generic.Emph */
-.highlight .gr { color: #DC322F } /* Generic.Error */
-.highlight .gh { color: #CB4B16 } /* Generic.Heading */
-.highlight .gi { color: #859900 } /* Generic.Inserted */
-.highlight .go { color: #93A1A1 } /* Generic.Output */
-.highlight .gp { color: #93A1A1 } /* Generic.Prompt */
-.highlight .gs { color: #93A1A1; font-weight: bold } /* Generic.Strong */
-.highlight .gu { color: #CB4B16 } /* Generic.Subheading */
-.highlight .gt { color: #93A1A1 } /* Generic.Traceback */
-.highlight .kc { color: #CB4B16 } /* Keyword.Constant */
-.highlight .kd { color: #268BD2 } /* Keyword.Declaration */
-.highlight .kn { color: #859900 } /* Keyword.Namespace */
-.highlight .kp { color: #859900 } /* Keyword.Pseudo */
-.highlight .kr { color: #268BD2 } /* Keyword.Reserved */
-.highlight .kt { color: #DC322F } /* Keyword.Type */
-.highlight .ld { color: #93A1A1 } /* Literal.Date */
-.highlight .m { color: #2AA198 } /* Literal.Number */
-.highlight .s { color: #2AA198 } /* Literal.String */
-.highlight .na { color: #93A1A1 } /* Name.Attribute */
-.highlight .nb { color: #B58900 } /* Name.Builtin */
-.highlight .nc { color: #268BD2 } /* Name.Class */
-.highlight .no { color: #CB4B16 } /* Name.Constant */
-.highlight .nd { color: #268BD2 } /* Name.Decorator */
-.highlight .ni { color: #CB4B16 } /* Name.Entity */
-.highlight .ne { color: #CB4B16 } /* Name.Exception */
-.highlight .nf { color: #268BD2 } /* Name.Function */
-.highlight .nl { color: #93A1A1 } /* Name.Label */
-.highlight .nn { color: #93A1A1 } /* Name.Namespace */
-.highlight .nx { color: #555 } /* Name.Other */
-.highlight .py { color: #93A1A1 } /* Name.Property */
-.highlight .nt { color: #268BD2 } /* Name.Tag */
-.highlight .nv { color: #268BD2 } /* Name.Variable */
-.highlight .ow { color: #859900 } /* Operator.Word */
-.highlight .w { color: #93A1A1 } /* Text.Whitespace */
-.highlight .mf { color: #2AA198 } /* Literal.Number.Float */
-.highlight .mh { color: #2AA198 } /* Literal.Number.Hex */
-.highlight .mi { color: #2AA198 } /* Literal.Number.Integer */
-.highlight .mo { color: #2AA198 } /* Literal.Number.Oct */
-.highlight .sb { color: #586E75 } /* Literal.String.Backtick */
-.highlight .sc { color: #2AA198 } /* Literal.String.Char */
-.highlight .sd { color: #93A1A1 } /* Literal.String.Doc */
-.highlight .s2 { color: #2AA198 } /* Literal.String.Double */
-.highlight .se { color: #CB4B16 } /* Literal.String.Escape */
-.highlight .sh { color: #93A1A1 } /* Literal.String.Heredoc */
-.highlight .si { color: #2AA198 } /* Literal.String.Interpol */
-.highlight .sx { color: #2AA198 } /* Literal.String.Other */
-.highlight .sr { color: #DC322F } /* Literal.String.Regex */
-.highlight .s1 { color: #2AA198 } /* Literal.String.Single */
-.highlight .ss { color: #2AA198 } /* Literal.String.Symbol */
-.highlight .bp { color: #268BD2 } /* Name.Builtin.Pseudo */
-.highlight .vc { color: #268BD2 } /* Name.Variable.Class */
-.highlight .vg { color: #268BD2 } /* Name.Variable.Global */
-.highlight .vi { color: #268BD2 } /* Name.Variable.Instance */
-.highlight .il { color: #2AA198 } /* Literal.Number.Integer.Long */
+article {
+    pre, code {
+        font-family: $font-mono;
+    }
+
+    code {
+        background: $color-background;
+        text-shadow: 0 1px #fff;
+        padding: 0 0.3rem;
+    }
+
+    pre {
+        @extend .code-block;
+        code {
+            background: none;
+            text-shadow: none;
+            padding: 0;
+        }
+    }
+
+    .highlight {
+        @extend .code-block;
+
+        pre {
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+        table {
+            margin: 0;
+            width: auto;
+        }
+        td {
+            border: none;
+            padding: 0;
+        }
+        figcaption {
+            @extend .clearfix;
+            font-size: 0.85em;
+            color: $highlight-comment;
+            line-height: 1em;
+            margin-bottom: 1em;
+        }
+        a {
+            color: $highlight-aqua !important;
+            text-decoration: none;
+            float: right;
+            &:hover {
+                color: $highlight-blue !important;
+
+            }
+        }
+        .gutter pre {
+            @extend .line-numbers;
+            text-align: right;
+            padding-right: 20px;
+        }
+        .line {
+            height: $line-height;
+        }
+    }
+
+    .gist-not-used {
+        //margin: 0 $article-padding * -1;
+        margin: 0;
+        border-style: solid;
+        border-color: $color-border;
+        border-width: 1px 0;
+        background: $highlight-background;
+        padding: 1em $article-padding 1em 2px;
+        .gist-file {
+            border: none;
+            font-family: $font-mono;
+            margin: 0;
+            .gist-data {
+                background: none;
+                border: none;
+                .line-numbers {
+                    @extend .line-numbers;
+                    background: none;
+                    border: none;
+                    padding: 0 20px 0 0;
+                }
+                .line-data {
+                    padding: 0 !important;
+                }
+            }
+            .highlight {
+                margin: 0;
+                padding: 0;
+                border: none;
+            }
+            .gist-meta {
+                background: $highlight-background;
+                color: $highlight-comment;
+                font: 0.85em $font-sans;
+                text-shadow: 0 0;
+                padding: 0;
+                margin-top: 1em;
+                margin-left: $article-padding;
+                //
+            }
+            a {
+                color: $color-link;
+                font-weight: normal;
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+
+    // for jsfiddle
+    iframe {
+        border: 1px solid #CCC;
+    }
+}
+
+
+pre {
+    .comment,
+    .title {
+        color: $highlight-comment;
+    }
+    .variable,
+    .attribute,
+    .tag,
+    .regexp,
+    .ruby .constant,
+    .xml .tag .title,
+    .xml .pi,
+    .xml .doctype,
+    .html .doctype,
+    .css .id,
+    .css .class,
+    .css .pseudo {
+        color: $highlight-red;
+    }
+    .number,
+    .preprocessor,
+    .built_in,
+    .literal,
+    .params,
+    .constant {
+        color: $highlight-orange;
+    }
+    .class,
+    .ruby .class .title,
+    .css .rules .attribute {
+        color: $highlight-green;
+    }
+    .string,
+    .value,
+    .inheritance,
+    .header,
+    .ruby .symbol,
+    .xml .cdata {
+        color: $highlight-green;
+    }
+    .css .hexcolor{
+        color: $highlight-aqua;
+    }
+    .function,
+    .python .decorator,
+    .python .title,
+    .ruby .function .title,
+    .ruby .title .keyword,
+    .perl .sub,
+    .javascript .title,
+    .coffeescript .title {
+        color: $highlight-blue;
+    }
+    .keyword,
+    .javascript .function {
+        color: $highlight-purple;
+    }
+}
