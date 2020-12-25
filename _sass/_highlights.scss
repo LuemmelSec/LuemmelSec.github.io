@@ -1,12 +1,30 @@
+// theme: night
+$highlight-background: #1d1f21;
+$highlight-current-line: #282a2e;
+$highlight-selection: #373b41;
+$highlight-foreground: #c5c8c6;
+$highlight-comment: #969896;
+$highlight-red: #cc6666;
+$highlight-orange: #de935f;
+$highlight-yellow: #f0c674;
+$highlight-green: #b5bd68;
+$highlight-aqua: #8abeb7;
+$highlight-blue: #81a2be;
+$highlight-purple : #b294bb;
 
 .highlight {
+  background: $highlight-background;
   //margin: 0 $article-padding * -1;
   margin: 2ex 0;
+  padding: 1rem $article-padding;
   border-style: solid;
   border-color: #333;
   border: 1px 0;
   border-radius: 2px;
   overflow: auto;
+  color: $highlight-foreground;
+  font-size: $font-size-code;
+  line-height: $line-height;
 }
 
 code {
