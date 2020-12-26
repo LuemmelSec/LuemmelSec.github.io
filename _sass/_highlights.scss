@@ -25,6 +25,7 @@ $highlight-purple : #b294bb;
   border-radius: 2px;
   overflow: auto;
   color: $highlight-foreground;
+  max-width: auto ;
 }
 
 code {
