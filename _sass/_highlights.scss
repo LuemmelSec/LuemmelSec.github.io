@@ -15,8 +15,10 @@ $highlight-purple : #b294bb;
 .highlight {
   background: $highlight-background;
   //margin: 0 $article-padding * -1;
-  margin: 2ex 0;
-  padding: 1rem 0;
+  //margin: 2ex 0;
+  margin: auto;
+  padding: auto;
+  //padding: 1rem 0;
   border-style: solid;
   border-color: #333;
   border: 1px 0;
