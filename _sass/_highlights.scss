@@ -2,7 +2,7 @@
 $highlight-background:  rgb(8, 8, 8);
 $highlight-current-line: #282a2e;
 $highlight-selection: #373b41;
-$highlight-foreground: #c5c8c6;
+$highlight-foreground: white;
 $highlight-comment: #969896;
 $highlight-red: #cc6666;
 $highlight-orange: #de935f;
@@ -16,7 +16,7 @@ $highlight-purple : #b294bb;
   background: $highlight-background;
   //margin: 0 $article-padding * -1;
   margin: 2ex 0;
-  //padding: 1rem $article-padding;
+  padding: 1rem 0;
   border-style: solid;
   border-color: #333;
   border: 1px 0;
