@@ -60,7 +60,9 @@ namespace GruntStager
         {
             ExecuteStager();
 ```
-You can bet your ass that if some kind of AV sees the string ```GruntStager``` it will run amok.  
+You can bet your ass that if some kind of AV sees the string ```
+GruntStager
+``` it will run amok.  
 Having that code in our VisualStudio we can highlight the string we want to replace and hit ```ctrl + r``` and type the new name to rename it trough out the whole project. We will also apply this to the public class and all other suspicious sounding parts we find and will end up with something like this:
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/stager_rename.png "rename)  Grunt stager picture here
