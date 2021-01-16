@@ -29,7 +29,8 @@ $highlight-purple : #b294bb;
 }
 
 code {
-  font-family:'Bitstream Vera Sans Mono','Courier', monospace;
+  background: $highlight-background;
+  //margin: 0 $article-padding * -1;
   margin: 10px 10px 10px 10px;
   //margin: auto;
   padding: 2px 2px 2px 2px;
