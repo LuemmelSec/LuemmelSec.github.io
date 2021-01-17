@@ -244,7 +244,7 @@ The whole attack is carried out on a low priv account.
 
 We have seen that the Blue Team has lots of possibilities to make an attackers life much harder.  
 Keep your security products up to date, and implement them correctly.  
-Make use of all the nice features that your OS or security product provider is offering you.  
+Make use of all the nice features that your OS or security product provider is offering you. We often find customers using an AV-product with nearly all features disabled. These are the cases giving us the easiest bypass possibilities.   
 Play with the stuff you learned here to get a better understanding of your infrastructure and detect your weakpoints.  
 
 For the Red Team side I have shown you some of the ways to try to slip past these protection mechanisms.  
