@@ -169,7 +169,7 @@ Get-ApplockerPolicy -Effective -xml > c:\users\luemmel\Desktop\applocker.xml
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/applocker_allow_dll.png  "Allow dll")
 
-We can see that the **Everyone** group is allowed to run stuff from *C:\Program Files (x86)\hMailServer\*\*
+We can see that the **Everyone** group is allowed to run stuff from *C:\Program Files (x86)\hMailServer\\*\*
 
 We can further check the ACLs on that folder with the following PS cmdlet:  
 ```
