@@ -233,10 +233,9 @@ The whole attack is carried out on a low priv account.
 
     Upload to our Covenant server under /init.  
 
-    *Guns loaded - give em hell*  
-
     ![broken]({{ site.baseurl }}/images/2021-16-01/gunmeme.jpg  "guns loaded")
-
+    *Guns loaded - give em hell*  
+    
     ![broken]({{ site.baseurl }}/images/2021-16-01/guns_fired.png  "guns fired")
     ![broken]({{ site.baseurl }}/images/2021-16-01/grunt_incoming.png  "incoming")
     ![broken]({{ site.baseurl }}/images/2021-16-01/grunt_executes.png  "executing")
