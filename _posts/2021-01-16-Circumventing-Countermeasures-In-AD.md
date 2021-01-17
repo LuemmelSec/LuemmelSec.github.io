@@ -3,9 +3,9 @@ layout: post
 title: Sailing Past Security Measures In AD
 ---
 
-Today we´re going to talk a little about possible ways to circumvent some of the security measures one might face during an engagement in an Active Directory.  
+Today we´re going to talk a little about possible ways to circumvent some of the security measures one might face during an engagement in an Active Directory environment.  
 
-We as pentesters are heavily relying on our tools like [Bloodhound](https://github.com/BloodHoundAD/BloodHound), [Rubeus](https://github.com/GhostPack/Rubeus), [Mimikatz](https://github.com/gentilkiwi/mimikatz) and all the other fancy stuff. Be it for an internal assessment or a Red Team campaign.  
+We as pentesters are heavily relying on our tools like [Bloodhound](https://github.com/BloodHoundAD/BloodHound), [Rubeus](https://github.com/GhostPack/Rubeus), [mimikatz](https://github.com/gentilkiwi/mimikatz) and all the other fancy stuff. Be it for an internal assessment or a Red Team campaign.  
 
 But the Blue Team is not at sleep, trying to keep the bad guys outside with their newest *AI machine learning cyber tools*, to keep the bad guys outside.  
 
@@ -20,7 +20,10 @@ AMSI who?
 ## Introduction  
 
 During pentests or Red Team assessments, it all comes down to our beloved toolbox, containing all the usefull and naughty stuff of a pentester´s every day life. 
-The problem to us is that there are two kind of people outside there. The first group is abusing these tools to carry out attacks on governments, companies and people, and the second group is trying to keep up with the first group by developing and implementing detection mechanisms and countermeasures to defend the bad guys.  
+The problem to us is that there are three kind of people outside there.  
+The first group being the security researchers who develop and publish these tools with the goal of providing knowledge and to rise awareness.  
+The second group is (besides their own tools) using these tools and techniques to carry out attacks on governments, companies and people.   
+The last group is trying to keep up with the first two groups by developing and implementing detection mechanisms and countermeasures to defend against the *bad guys*.  
 
 In order to proof to our customers how good (or bad) they are at playing the defender game, we take the role of the attackers, mimicing their behaviour, toolsets and techniques, and see how far we can get.  
 
@@ -150,7 +153,7 @@ Just to try to avoid local detection when copied to disk.
 
 #### AppLocker & Constrained language bypass -> Powershell load script -> AMSI bypass -> Invoke-SharpLoader -> Encrypted Grunt
 
-If there wasn´t the AppLocker bypass needed, one could also run this completely from remote, i.e. in a phishing campaign starting with a .htm file or something liek this, which runs our loader script.  
+If there wasn´t the AppLocker bypass needed, one could also run this completely from remote, i.e. in a phishing campaign starting with a .htm file or something like this, which runs our loader script.  
 The whole attack is carried out on a low priv account.  
 
 1. Identify a way to bypass AppLocker and ConstrainedLanguage  
