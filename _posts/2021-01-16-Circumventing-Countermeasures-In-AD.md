@@ -109,7 +109,8 @@ Okay so let´s bypass Defender by not touching the disk and put our default Grun
 *Fuck! Something went wrong. Looks like we got catched by AMSI which detected a Covenant payload.*  
 
 We bypassed the signature based part of Defender for the filesystem stuff, but AMSI checked our script when we loaded it to memory, handed it over to Defender who then found the suspicious strings, flagging it as malicious.  
-A more precise explaination would be that the script itself didn´t get flagged, but the C# Grunt stager which is loaded via ```Assembly::load``` into powershell. Thanks to [s3cur3th1sh1t](https://twitter.com/ShitSecure) for the clarification at this point.  
+> A more precise explaination would be that the script itself didn´t get flagged, but the C# Grunt stager which is loaded via ```Assembly::load``` into powershell.  
+Thanks to [s3cur3th1sh1t](https://twitter.com/ShitSecure) for the clarification at this point.  
 
 If you would like to know more about how AMSI works - read this [post](https://s3cur3th1ssh1t.github.io/Bypass_AMSI_by_manual_modification/) about AMSI and how to bypass it.  
 
