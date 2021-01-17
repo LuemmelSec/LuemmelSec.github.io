@@ -123,7 +123,11 @@ We can verify that it was AMSI by issuing ~~one of the random bypasses from [ams
 I failed hard for several times with all the [amsi.fail](https://amsi.fail) bypasses for the Grunt payload. Talking to my boss (*you know the guy with the l33t name containing sh1t and stuff*) it turns out that for C# payloads - the 1st and 2nd stage of the Grunt payload which are written in C# - you need to have a bypass in C#. You can see that the Rasta Mouse´s bypass is loading C# code in PowerShell via the ```Add-Type $Win32``` statement at the beginning.  
 *Holy moly, but that´s how it is. Thank you sir.*   
 
-### Chaining the tricks 
+### Chaining the tricks  
+
+Time has come to combine some of the techniques discussed.  
+
+![broken]({{ site.baseurl }}/images/2021-16-01/hackermeme.jpg "hacker")  
 
 For obvious reasons I played with Nim, Invoke-SharpLoader, PEZor and all the other crazy stuff.  
 My attempts to combine the parts to chain a stealthy attack resulted in two approaches that look like the following:  
