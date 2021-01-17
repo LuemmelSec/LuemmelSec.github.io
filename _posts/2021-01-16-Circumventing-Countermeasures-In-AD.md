@@ -260,4 +260,4 @@ And last but not least: Don´t submit samples to Microsoft nor to VirusTotal if 
 
 That´s it for now folks. Hope you enjoyed and happy pentesting.  
 
-If you want to practice all the crazy stuff and want to learn more, I highly recommend you take [Rasta Mouse´s](https://twitter.com/_RastaMouse) RTO [course](https://www.zeropointsecurity.co.uk/red-team-ops) and exam.  
+If you want to practice all the crazy stuff and learn more, I highly recommend you take [Rasta Mouse´s](https://twitter.com/_RastaMouse) RTO [course](https://www.zeropointsecurity.co.uk/red-team-ops) and exam.  
