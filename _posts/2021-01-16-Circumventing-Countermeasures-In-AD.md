@@ -178,9 +178,9 @@ Get-Acl -path 'C:\Program Files (x86)\hMailServer\' | fl
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/acl_users_allowed.png  "Allowed users ACL")
 
-Which shows us that the **Users** group has write access to that specific folder. Perfect :)  
+Which shows us that the **Users** group has write access to that specific folder. *Perfect - someone fucked up here :)*  
 
-2. Bypass AppLocker and ContrainedLanguage  
+2. Bypass AppLocker and ContrainedLanguage mode
 So now that we know how - let´s get our hands dirty.  
 
 Compile [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy to client to **C:\Program Files (x86)\hMailServer\** and run it:  
