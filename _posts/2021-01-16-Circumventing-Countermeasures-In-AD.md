@@ -198,7 +198,7 @@ The whole attack is carried out on a low priv account.
   
    So now that we know how - let´s get our hands dirty.  
 
-   Compile [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy the dll to the client to **C:\Program Files (x86)\hMailServer\\*\* and run it:  
+   Compile [xP3nt4´s](https://twitter.com/xP3nt4) [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy the dll to the client to **C:\Program Files (x86)\hMailServer\\*\* and run it:  
    ```powershell
    rundll32 'C:\Program Files (x86)\hMailServer\PowerShdll.dll',main -w
    ```  
