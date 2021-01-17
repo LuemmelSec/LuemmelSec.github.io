@@ -63,16 +63,16 @@ namespace GruntStager
             ExecuteStager();
 ```
 You can bet your ass that if some kind of AV sees the string ```GruntStager``` it will fall into havoc.  
-Having that code in our VisualStudio we can highlight the string we want to replace and hit ```ctrl + r``` and type the new name to rename it trough out the whole project. We will also apply this to the public class and all other suspicious sounding parts we find and will end up with something like this:
+Having that code in our VisualStudio we can highlight the string we want to replace and hit ```ctrl + r``` and type the new name to rename it throughout the whole project. We will also apply this to the public class and all other suspicious sounding parts we find and will eventually end up with something like this:
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/stager_rename.png "rename")
 
-What we can also do is concatenating strings instead if replacing them. So that ```GruntStager``` becomes ```'Gru'+'ntS'+'ta'+'ger'```.  
-In several cases this is enough to fool AV.  
+What we can also do is concatenating strings instead of replacing them. So that ```GruntStager``` becomes ```'Gru'+'ntS'+'ta'+'ger'```.  
+In several cases this is enough to fool AV if done properly.  
 
-A usefull tool that comes in handy when you want to test your new code against Windows Defender or AMSI is [Raste Mouse´s][ThreatCheck](https://github.com/rasta-mouse/ThreatCheck). It will basically split you code into chunks of specific length and test it against the database of Windows Defender or AMSI, and tell you where in your code it gets flagged.
+A usefull tool that comes in handy when you want to test your new code against Windows Defender or AMSI signatures is [Raste Mouse´s](https://twitter.com/_RastaMouse)[ThreatCheck](https://github.com/rasta-mouse/ThreatCheck). It will basically split your code into chunks of specific length and test it against the database of Windows Defender or AMSI, and tell you where in your code it gets flagged.
 
-![broken]({{ site.baseurl }}/images/ThreatCheck.png "ThreatCheck")   
+![broken]({{ site.baseurl }}/images/2021-16-01/ThreatCheck.png "ThreatCheck")   
 
 There are tools out there, that will do the job for you. Feel free to have a look at the [obfuscation section](https://github.com/LuemmelSec/Pentest-Tools-Collection#obfuscation) of my github repo, or just do some creative googling.  
 
