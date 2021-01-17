@@ -153,7 +153,7 @@ PEzor.sh -sgn -unhook -antidebug -text -syscalls -sleep=10 /root/Desktop/Grunt_N
 If there wasn´t the AppLocker bypass needed, one could also run this completely from remote, i.e. in a phishing campaign starting with a .htm file or something liek this, which runs our loader script.  
 The whole attack is carried out on a low priv account.  
 
-1. Identify a way to bypass AppLocker and ConstrainedLanguage
+1. Identify a way to bypass AppLocker and ConstrainedLanguage  
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/everything_blocked.png  "All blocked")
 
