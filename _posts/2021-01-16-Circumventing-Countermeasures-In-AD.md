@@ -169,7 +169,7 @@ Get-ApplockerPolicy -Effective -xml > c:\users\luemmel\Desktop\applocker.xml
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/applocker_allow_dll.png  "Allow dll")
 
-We can see that the **Everyone** group is allowed to run stuff from **C:\Program Files (x86)\hMailServer\\**
+We can see that the **Everyone** group is allowed to run stuff from *C:\Program Files (x86)\hMailServer\*\*
 
 We can further check the ACLs on that folder with the following PS cmdlet:  
 ```
@@ -180,7 +180,7 @@ Get-Acl -path 'C:\Program Files (x86)\hMailServer\' | fl
 
 Which shows us that the **Users** group has write access to that specific folder. *Perfect - someone fucked up here :)*  
 
-2. Bypass AppLocker and ContrainedLanguage mode
+2. Bypass AppLocker and ContrainedLanguage  
 So now that we know how - let´s get our hands dirty.  
 
 Compile [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy to client to **C:\Program Files (x86)\hMailServer\** and run it:  
