@@ -7,7 +7,7 @@ Today we´re going to talk a little about possible ways to circumvent some of th
 
 We as pentesters are heavily relying on our tools like [Bloodhound](https://github.com/BloodHoundAD/BloodHound), [Rubeus](https://github.com/GhostPack/Rubeus), [mimikatz](https://github.com/gentilkiwi/mimikatz) and all the other fancy stuff. Be it for an internal assessment or a Red Team campaign.  
 
-But the Blue Team is not at sleep, trying to keep the bad guys outside with their newest *AI machine learning cyber tools*, to keep the bad guys outside.  
+But the Blue Team is not at sleep, trying to keep the bad guys outside with their newest *AI machine learning cyber tools*.  
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/nopass.jpg "meme")
 
