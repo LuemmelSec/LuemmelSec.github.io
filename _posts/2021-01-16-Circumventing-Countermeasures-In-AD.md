@@ -181,9 +181,10 @@ Get-Acl -path 'C:\Program Files (x86)\hMailServer\' | fl
 Which shows us that the **Users** group has write access to that specific folder. *Perfect - someone fucked up here :)*  
 
 2. Bypass AppLocker and ContrainedLanguage  
+  
 So now that we know how - let´s get our hands dirty.  
 
-Compile [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy to client to **C:\Program Files (x86)\hMailServer\** and run it:  
+Compile [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy to client to **C:\Program Files (x86)\hMailServer\\*\* and run it:  
 ```
 rundll32 'C:\Program Files (x86)\hMailServer\PowerShdll.dll',main -w
 ```  
