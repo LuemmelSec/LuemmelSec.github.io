@@ -40,6 +40,7 @@ BAMMM - deleted!
 ![broken]({{ site.baseurl }}/images/2021-16-01/rubeus_deleted.png "ciao rubeus")
 
 *Ciao Rubeus, nice to have met you.*  
+
 AV flagged our tool because it is known to do harmful stuff, and the bad guys tend to abuse it´s functionalities.  
 
 Well that´s just one of the possible situations you might run into. So let´s walk through some of the ones I faced during my work and (mostly) learning times in the next sections of this blog-post.  
