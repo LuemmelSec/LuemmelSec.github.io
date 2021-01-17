@@ -180,6 +180,7 @@ Get-Acl -path 'C:\Program Files (x86)\hMailServer\' | fl
 
 Which shows us that the **Users** group has write access to that specific folder. *Perfect - someone fucked up here :)*  
 
+{:start="2"}
 2. Bypass AppLocker and ContrainedLanguage  
   
 So now that we know how - let´s get our hands dirty.  
