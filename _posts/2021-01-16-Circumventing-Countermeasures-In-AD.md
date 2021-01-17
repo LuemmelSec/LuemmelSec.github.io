@@ -5,48 +5,50 @@ title: Sailing Past Security Measures In AD
 
 Today we´re going to talk a little about possible ways to circumvent some of the security measures one might face during an engagement in an Active Directory.  
 
-We as pentesters are heavily relying on our tools like [Bloodhound](https://), [Rubeus](), [Mimikatz] and all the other fancy shit. Be it for an internal assessment or a Red Team campaign.  
+We as pentesters are heavily relying on our tools like [Bloodhound](https://github.com/BloodHoundAD/BloodHound), [Rubeus](https://github.com/GhostPack/Rubeus), [Mimikatz](https://github.com/gentilkiwi/mimikatz) and all the other fancy stuff. Be it for an internal assessment or a Red Team campaign.  
 
-But the Blue Team is not at sleep, firing at us with their newest robot artificial hyper l33t intelligence features and software, to keep the bad guys outside.  
-
-So what can we do about it?
-How are we able to bypass AV?  
-What can we do against AppLocker?  
-What about PowerShell´s Constrained Language Mode?  
-AMSI who?  
+But the Blue Team is not at sleep, trying to keep the bad guys outside with their newest *AI machine learning cyber tools*, to keep the bad guys outside.  
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/nopass.jpg "meme")
 
+So how can we safely run our tools?  
+How are we able to bypass AV?  
+What can be done against AppLocker?  
+What about PowerShell´s ConstrainedLanguage Mode?  
+AMSI who?  
+
 ## Introduction  
 
-During pentests or Red Team assessments, it all comes down to our beloved toolbox, containing all the usefull and naughty stuff of a pentester´s every day life.  
-The problem is that there are two kind of other people outside there. The one group is abusing these tools to carry out attacks on companies and people, and the other group is trying to keep up with the first group by developing detection mechanisms and countermeasures to defend the bad guys.  
+During pentests or Red Team assessments, it all comes down to our beloved toolbox, containing all the usefull and naughty stuff of a pentester´s every day life. 
+The problem to us is that there are two kind of people outside there. The first group is abusing these tools to carry out attacks on governments, companies and people, and the second group is trying to keep up with the first group by developing and implementing detection mechanisms and countermeasures to defend the bad guys.  
 
-So in order to proof to our customers how good (or bad) they are at playing the defender game, we take the role of the attackers, involving their behaviour, their toolsets and techniques, and see how far we can get.  
+In order to proof to our customers how good (or bad) they are at playing the defender game, we take the role of the attackers, mimicing their behaviour, toolsets and techniques, and see how far we can get.  
 
-This blog-post will be all about (some of) the tools and tactics we can use to stay under the radar and have our software stay untouched from AV and co.
+This blog-post will be all about (*at least some of*) the tools and tactics we can use to stay under the radar and have our software stay untouched from AV and co.
 
 So let´s consider an on-site pentest. We arrive at the customer, pull out our sticker-bombed laptop to impress the IT-guys, and are handed over credentials for a low priv domain-account and eventually a domain joined test-machine from which we can start our work.  
 
-The next thing is we will most likely want to gather some intel, so we copy our Rubeus.exe to the USB-thumbstick and insert it into the test-machine.  
+The next thing is we will most likely want to gather some intel, so we copy our Rubeus.exe to the thumbdrive and plug it into the test-machine.  
 
-BÄMMM - deleted!
+BAMMM - deleted!
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/rubeus_deleted.png "ciao rubeus")
 
-Rubeus is malicious. Noooooo. AV flagged our tool because it is known to do harmful stuff, and the bad guys tend to abuse it´s functionalities.  
+*Ciao Rubeus, nice to have met you.*  
+AV flagged our tool because it is known to do harmful stuff, and the bad guys tend to abuse it´s functionalities.  
 
-Well that´s just one of the possible situations you might run into. So let´s walk through some of the ones I faced during my work and learning times in the next sections of this blog-post.  
+Well that´s just one of the possible situations you might run into. So let´s walk through some of the ones I faced during my work and (mostly) learning times in the next sections of this blog-post.  
 
 ## Bypassing AV  
 
-If we consider traditional anti virus software (and even today they work like this - at least in parts), they all have some kind of database which contains like hashes of known malicious files, strings that are known the be in evil software (hello *sekurlsa::logoncredentials*) and so on. So when ever AV is able to investigate filebased actions i.e. when you open a file and AV hooks in and does a check of the content inside, it will perform it´s tasks to evaluate what it sees against it database and as a resulst will give you thumbs up or down.  
+If we consider traditional anti virus software (and even today they work like this - at least in parts), they all have some kind of database which contains like hashes of known malicious files, strings that are known the be in evil software (hello *sekurlsa::logoncredentials*) and so on. These are updated as soon as the vendor is able to spot new threats and sold as Threat Intel.  
+So when ever AV is able to investigate filebased actions e.g. when you open a file and AV hooks in and does a check of the content inside, it will perform it´s tasks to evaluate what it sees against its database, and as a result will give you thumbs up or down.  
 
-So the option here is obvious:  
-Everything you use out of the box will sooner or later be flagged by the AV vendors by integrating detections mechanisms into their database.  
+So our option here is obvious:  
+Everything you use out of the box will sooner or later get flagged by the AV vendors by integrating according detection mechanisms into their database.  
 That´s where obfuscation comes into play. If you haven´t done so already, I highly recommend you take your time to read through some of [s3cur3th1sh1t´s](https://twitter.com/ShitSecure) [blog posts](https://s3cur3th1ssh1t.github.io) related to this topic.  
 
-Obfuscation can be as simple as doing string replacments or as complex as decrypting whole binaries.  
+Obfuscation can be as simple as doing string replacements or as complex as encrypting whole binaries that unfold at runtime.  
 
 ### String replacement  
 
@@ -63,7 +65,7 @@ namespace GruntStager
 You can bet your ass that if some kind of AV sees the string ```GruntStager``` it will fall into havoc.  
 Having that code in our VisualStudio we can highlight the string we want to replace and hit ```ctrl + r``` and type the new name to rename it trough out the whole project. We will also apply this to the public class and all other suspicious sounding parts we find and will end up with something like this:
 
-![broken]({{ site.baseurl }}/images/2021-16-01/stager_rename.png "rename)  Grunt stager picture here
+![broken]({{ site.baseurl }}/images/2021-16-01/stager_rename.png "rename")
 
 What we can also do is concatenating strings instead if replacing them. So that ```GruntStager``` becomes ```'Gru'+'ntS'+'ta'+'ger'```.  
 In several cases this is enough to fool AV.  
@@ -219,3 +221,6 @@ Upload to our Covenant server under /init.
 ![broken]({{ site.baseurl }}/images/2021-16-01/grunt_executes.png  "executing")
 
 As you can see Defender would really like to upload our sample for further analysis but - nahhhh.
+
+### Conclusion  
+
