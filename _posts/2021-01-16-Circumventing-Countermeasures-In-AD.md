@@ -39,7 +39,7 @@ BAMMM - deleted!
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/rubeus_deleted.png "ciao rubeus")
 
-*Ciao Rubeus, nice to have met you.*  
+![broken]({{ site.baseurl }}/images/2021-16-01/nomeme.jpg "no meme")  
 
 AV flagged our tool because it is known to do harmful stuff, and the bad guys tend to abuse it´s functionalities.  
 
