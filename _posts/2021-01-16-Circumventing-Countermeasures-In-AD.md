@@ -127,7 +127,7 @@ I failed hard for several times with all the [amsi.fail](https://amsi.fail) bypa
 
 Time has come to combine some of the techniques discussed.  
 
-<img src="/images/2021-16-01/hackermeme.jpg" alt="hacker" width="100"/>  
+<img src="/images/2021-16-01/hackermeme.jpg" alt="hacker" width="300"/>  
 
 For obvious reasons I played with Nim, Invoke-SharpLoader, PEZor and all the other crazy stuff.  
 My attempts to combine the parts to chain a stealthy attack resulted in two approaches that look like the following:  
