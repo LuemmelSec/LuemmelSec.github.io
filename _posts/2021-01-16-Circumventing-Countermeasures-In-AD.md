@@ -69,7 +69,7 @@ namespace GruntStager
             ExecuteStager();
 ```
 You can bet your ass that if some kind of AV sees the string ```GruntStager``` it will fall into havoc.  
-Having that code in our VisualStudio we can highlight the string we want to replace and hit ```ctrl + r``` to rename functions or variables or ```ctrl + alt + h``` to find and replace strings throughout the whole project. We will also apply this to the public class and all other suspicious sounding parts we find and will eventually end up with something like this:
+Having that code in our VisualStudio we can highlight the string we want to replace and hit ```ctrl + r``` to rename functions or variables or ```ctrl + shift + h``` to find and replace strings throughout the whole project. We will also apply this to the public class and all other suspicious sounding parts we find and will eventually end up with something like this:
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/stager_rename.png "rename")
 
