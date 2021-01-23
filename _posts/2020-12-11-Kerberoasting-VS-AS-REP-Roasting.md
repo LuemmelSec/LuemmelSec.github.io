@@ -162,6 +162,16 @@ python tgsrepcrack.py c:\rockyou.txt c:\ticket.kirbi
 Check which accounts in your environment are affected with PowerView´s **Get-DomainUser** cmdlet as explained above.  
 If the **SPN** needs to be tied to a user rather than a computer account, make sure to make the password long and complex.  
 
+In some circumstances, mainly when SPNs get registered manually with the help of the [setspn](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/cc731241(v=ws.11)) tool, or when the machine is not able to unregister SPNs for several reasons, you might have dead SPNs in your environment. This means you can check the ```services.msc``` but wont find the suspected account under the logon settings. In these cases have a closer look at the user object in the AD under the **Attribute Editor** tab and then under **servicePrincipalName**. You can manually delete it here if needed or use the **setspn** tool like so:  
+```powershell
+#to list SPNs associated with an account (user or computer)  
+setspn -l <accountname>    
+setspn -l sqlservice  
+
+#to remove an SPN from an account   
+setspn -d <SPN> <accountname>  
+setspn -d MSSQL/SQLSERVER1 sqlservice  
+```
 ## Conclusion
 
 **AS_REP roasting** is taking place at the very beginning of the Kerberos authentication procedure. An attacker would only need physical access to the network, but would also have to know the principal name (user name) of the account he wants to ask a **TGT** for. The option **Do not require Kerberos preauthentication** for the object needs to be set and as such is less likely to be found during an assessment nowadays.
