@@ -10,7 +10,7 @@ We as pentesters are heavily relying on our tools like [Bloodhound](https://gith
 But the Blue Team is not at sleep, trying to keep the bad guys outside with their newest *AI machine learning cyber tools*.  
 
 ![broken]({{ site.baseurl }}/images/2021-16-01/nopass.jpg "meme")
-
+<!--more-->
 So how can we safely run our tools?  
 How are we able to bypass AV?  
 What can be done against AppLocker?  
