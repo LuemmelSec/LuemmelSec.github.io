@@ -9,7 +9,15 @@ I am just a normal IT guy who is interested in InfoSec.
 
 I currently work as pentester at [r-tec](https://www.r-tec.net/home.html) in Germany.
 
-<a href="https://www.youracclaim.com/badges/47725ad5-c23c-470b-9e0e-ed08000bcc1b"><img src="/images/OSCP.png" width="45"/></a>  
+<a href="https://www.youracclaim.com/badges/47725ad5-c23c-470b-9e0e-ed08000bcc1b"><img src="/images/OSCP.png" width="45"/></a>
 <a href="https://eu.badgr.com/public/assertions/LbHY7ftfT0KCxyMcYfIa8Q"><img src="/images/CRTO.png" width="50"/></a> 
 
 
+<div class="row">
+  <div class="column">
+    <img src="/images/OSCP.png" alt="Snow" style="width:100%">
+  </div>
+  <div class="column">
+    <img src="/images/CRTO.png" alt="Forest" style="width:100%">
+  </div>
+</div>
