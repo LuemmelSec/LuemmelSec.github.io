@@ -14,7 +14,7 @@ I currently work as pentester at [r-tec](https://www.r-tec.net/home.html) in Ger
 
 <figure class="half" style="display:flex">
     <img style="width:190px" src="/images/OSCP.png">
-    <img style="width:200px" src="/images/CRTO.png">
+    <img style="width:100px" src="/images/CRTO.png">
     <figcaption>Caption describing these two images.</figcaption>
 </figure>
 
@@ -23,7 +23,7 @@ I currently work as pentester at [r-tec](https://www.r-tec.net/home.html) in Ger
   <table>
     <tr>
       <td>
-        <img style="width:190px;" src="/images/OSCP.png">
+        <img style="width:100px;" src="/images/OSCP.png">
       </td>
       <td>
         <img style="width:200px;" src="/images/CRTO.png">
