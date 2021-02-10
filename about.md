@@ -17,3 +17,18 @@ I currently work as pentester at [r-tec](https://www.r-tec.net/home.html) in Ger
     <img style="width:200px" src="/images/CRTO.png">
     <figcaption>Caption describing these two images.</figcaption>
 </figure>
+
+
+<figure class="half">
+  <table>
+    <tr>
+      <td>
+        <img style="width:200px;" src="/images/OSCP.png">
+      </td>
+      <td>
+        <img style="width:200px;" src="/images/CRTO.png">
+      </td>
+    </tr>
+  </table>
+  <figcaption>Caption describing these two images.</figcaption>
+</figure>
