@@ -13,8 +13,8 @@ I currently work as pentester at [r-tec](https://www.r-tec.net/home.html) in Ger
 <a href="https://eu.badgr.com/public/assertions/LbHY7ftfT0KCxyMcYfIa8Q"><img align="middle" src="/images/CRTO.png" width="200"/></a> 
 
 <figure class="half" style="display:flex">
-    <img style="width:190px" src="/images/OSCP.png">
-    <img style="width:100px" src="/images/CRTO.png">
+    <img style="width:18%" src="/images/OSCP.png">
+    <img style="width:20%" src="/images/CRTO.png">
     <figcaption>Caption describing these two images.</figcaption>
 </figure>
 
