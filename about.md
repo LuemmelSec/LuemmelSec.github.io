@@ -15,9 +15,9 @@ I currently work as pentester at [r-tec](https://www.r-tec.net/home.html) in Ger
 
 <div class="row">
   <div class="column">
-    <img src="/images/OSCP.png" alt="Snow" style="width:100%">
+    <img src="/images/OSCP.png" alt="Snow" style="width:10%">
   </div>
   <div class="column">
-    <img src="/images/CRTO.png" alt="Forest" style="width:100%">
+    <img src="/images/CRTO.png" alt="Forest" style="width:10%">
   </div>
 </div>
