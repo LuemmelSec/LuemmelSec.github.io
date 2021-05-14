@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Evil Logitech
+title: Evil Logitech - erm I ment USB cable
 ---
 
 What´s up peeps?
@@ -119,7 +119,7 @@ If everything went well, you should have paired devices now. I had to do some of
 Next you want to store the settings inside LOGITacker:  
 
 ```devices storage save (Tab to autocomplete)```  
- 
+
 <img src="/images/2021-05-15/13.png">
 
 That´s it. We can now proceed to the fun part.  
