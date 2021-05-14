@@ -107,12 +107,16 @@ That´s it. We can now proceed to the fun part.
 
 ## Attacking stuff  
 
-Whenever you fire up your LOGITacker, you need to load a device to connect to from storage:  
-Device storage load (Tab to autocomplete)
+Whenever you fire up your LOGITacker, you need to load a device to connect to from storage: 
+
+```Device storage load (Tab to autocomplete)```
+
 <img src="/images/2021-05-15/14.png">
 
 To start injecting, we need to specify a target - the device loaded from storage:  
+
 ```Inject target (Tab to autocomplete)```  
+
 <img src="/images/2021-05-15/15.png">
 
 But what to inject??? Well we can use the LOGITacker interface to write, save and load scripts.  
