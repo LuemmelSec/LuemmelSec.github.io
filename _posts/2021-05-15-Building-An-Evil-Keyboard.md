@@ -3,7 +3,7 @@ layout: post
 title: Evil Logitech - erm I ment USB cable
 ---
 
-What´s up peeps?
+Did you ever want to have your own, handmade, remote controlled USB implant but didn´t want to sell your soul for it?  Well then this is just for you :)  
 I recently stumbled upon some great articles from [LucaBongiorni](https://twitter.com/LucaBongiorni), who does some awesome shit with HID & Mousejack attacks.
 The two ones I am referring in special can be found [here](https://infosecwriteups.com/usbsamurai-a-remotely-controlled-malicious-usb-hid-injecting-cable-for-less-than-10-ebf4b81e1d0b) and [here](https://lucabongiorni.medium.com/usbsamurai-for-dummies-4bd47abf8f87).  
 When I red those lines, I also wanted a USB cable that would still be able to charge a phone, but also could be used to inject keystrokes into the victims systems or even give me a remote shell. I already own a DSTIKE WiFi Duck, but pluggin this thing into someones computer is far more suspicious than a black USB cable.  
