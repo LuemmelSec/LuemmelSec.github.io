@@ -62,18 +62,18 @@ Next we want to get the UNIFY receiver ready with the lightspeed firmware. This 
 ```
 git clone https://github.com/RoganDawes/munifying  
 ./install_libusb.sh
-```
+```  
 <img src="/images/2021-05-15/5.png">
 
-```go build``` 
+```go build```   
 <img src="/images/2021-05-15/6.png">
 
 We can now run the info option of munifying to make sure we can see the UNIFY receiver and read it:  
-```./munifying info```
+```./munifying info```  
 <img src="/images/2021-05-15/7.png">
 
 When all is good to go, we flash the new firmware:  
-```./munifying flash -f /root/Downloads/RQR39.06_B0040.shex```
+```./munifying flash -f /root/Downloads/RQR39.06_B0040.shex```  
 <img src="/images/2021-05-15/8.png">
 
 Info should now show the correct flashed firmware:  
@@ -82,8 +82,8 @@ Info should now show the correct flashed firmware:
 ## Let the party begin
 
 Next we want to pair our devices, so that they can talk to each other. LOGITacker has a build in option for that, and munifying can help us on the UNIFY side.  
-We first need to set the LOGITacker device to lightspeed mode, in order to be able to communicate with the unify receiver:
-```Options global workmode lightspeed```
+We first need to set the LOGITacker device to lightspeed mode, in order to be able to communicate with the unify receiver:  
+```Options global workmode lightspeed```  
 <img src="/images/2021-05-15/10.png">
 
 Next set it to pair mode:  
@@ -94,13 +94,13 @@ For the UNIFY side, we first unpair all associated devices (just in case, as the
 ```
 ./munifying unpairall
 ./munifying pair
-```
+```  
 <img src="/images/2021-05-15/12.png">
 
 If everything went well, you should have paired devices now. I had to do some of the above mentioned steps more than once, and replug the devices several times.  
 
 Next you want to store the settings inside LOGITacker:  
-```devices storage save (Tab to autocomplete)```
+```devices storage save (Tab to autocomplete)```  
 <img src="/images/2021-05-15/13.png">
 
 That´s it. We can now proceed to the fun part.  
@@ -112,7 +112,7 @@ Device storage load (Tab to autocomplete)
 <img src="/images/2021-05-15/14.png">
 
 To start injecting, we need to specify a target - the device loaded from storage:  
-```Inject target (Tab to autocomplete)```
+```Inject target (Tab to autocomplete)```  
 <img src="/images/2021-05-15/15.png">
 
 But what to inject??? Well we can use the LOGITacker interface to write, save and load scripts.  
