@@ -7,7 +7,7 @@ What´s up peeps?
 I recently stumbled upon some great articles from [LucaBongiorni](https://twitter.com/LucaBongiorni), who does some awesome shit with HID & Mousejack attacks.
 The two ones I am referring in special can be found [here](https://infosecwriteups.com/usbsamurai-a-remotely-controlled-malicious-usb-hid-injecting-cable-for-less-than-10-ebf4b81e1d0b) and [here](https://lucabongiorni.medium.com/usbsamurai-for-dummies-4bd47abf8f87).  
 When I red those lines, I also wanted a USB cable that would still be able to charge a phone, but also could be used to inject keystrokes into the victims systems or even give me a remote shell. I already own a DSTIKE WiFi Duck, but pluggin this thing into someones computer is far more suspicious than a black USB cable.  
-
+<!--more-->
 MENTION LOGITACKER / MUNIFYING
 
 As I followed along the lines of Luca, I went into some problems - hence this short writeup, which is not more or less the same you can find from the original author.  
@@ -18,7 +18,7 @@ But I you like to tinker a little bit and are on a budget, you can pretty much g
 
 We need a delivering and a receiving end in terms of hardware. We as attacker pretend to "be" a Logitech Keyboard, and the altered cable will contain a UNIFY receiver.
 As the recommended hardware is no longer available, i opted for the "MakerDiary MDK Dongle" (one of the 4 compatible devices listed at https://github.com/RoganDawes/LOGITacker).  
-As for the UNIFY receiver, I sticked to the 2nd article from Luca, and bought the recommended U-C0012 one.  
+As for the UNIFY receiver, I sticked to the 2nd article from Luca, and bought the recommended C-U0012 one.  
 If you don´t have an old USB cable lying around, you can get yourself a cheap one from whereever you want. During my journey I destroyed one receiver and two cables, ending up with buying a set of DIY USB plugs.  
 
 Buyinglist:  
@@ -54,54 +54,54 @@ The MDK-Dongle now is 4 devices, one of them being a serial device on a COM port
 <img src="/images/2021-05-15/2.png"> 
 
 To which we can now connect via putty:  
-<img src="/images/2021-05-15/3.png">
+<img src="/images/2021-05-15/3.png">  
 <img src="/images/2021-05-15/4.png">
 
 Next we want to get the UNIFY receiver ready with the lightspeed firmware. This will allow us to inject keystrokes much faster, aswell as having our communication encrypted.  
 
-```git clone https://github.com/RoganDawes/munifying```
-<img src="/images/2021-05-15/5.png"
+```git clone https://github.com/RoganDawes/munifying```  
+<img src="/images/2021-05-15/5.png">
 
 ```./install_libusb.sh```
-<img src="/images/2021-05-15/6.png"
+<img src="/images/2021-05-15/6.png">
 
 ```go build``` 
-<img src="/images/2021-05-15/7.png"
+<img src="/images/2021-05-15/7.png">
 
 We can now run the info option of munifying to make sure we can see the UNIFY receiver and read it:  
 ```./munifying info```
-<img src="/images/2021-05-15/8.png"
+<img src="/images/2021-05-15/8.png">
 
 When all is good to go, we flash the new firmware:  
 ```./munifying flash -f /root/Downloads/RQR39.06_B0040.shex```
-<img src="/images/2021-05-15/9.png"
+<img src="/images/2021-05-15/9.png">
 
 Info should now show the correct flashed firmware:  
-<img src="/images/2021-05-15/10.png"
+<img src="/images/2021-05-15/10.png">
 
 ## Let the party begin
 
 Next we want to pair our devices, so that they can talk to each other. LOGITacker has a build in option for that, and munifying can help us on the UNIFY side.  
 We first need to set the LOGITacker device to lightspeed mode, in order to be able to communicate with the unify receiver:
 ```Options global workmode lightspeed```
-<img src="/images/2021-05-15/11.png"
+<img src="/images/2021-05-15/11.png">
 
 Next set it to pair mode:  
 ```pair device run```  
-<img src="/images/2021-05-15/12.png"
+<img src="/images/2021-05-15/12.png">
 
 For the UNIFY side, we first unpair all associated devices (just in case, as the lightspeed firmware can only pair one device at a time, and then set it to pair mode:  
 ```
 ./munifying unpairall
 ./munifying pair
 ```
-<img src="/images/2021-05-15/13.png"
+<img src="/images/2021-05-15/13.png">
 
 If everything went well, you should have paired devices now. I had to do some of the above mentioned steps more than once, and replug the devices several times.  
 
 Next you want to store the settings inside LOGITacker:  
 ```devices storage save (Tab to autocomplete)```
-<img src="/images/2021-05-15/14.png"
+<img src="/images/2021-05-15/14.png">
 
 That´s it. We can now proceed to the fun part.  
 
@@ -109,10 +109,10 @@ That´s it. We can now proceed to the fun part.
 
 Whenever you fire up your LOGITacker, you need to load a device to connect to from storage:  
 Device storage load (Tab to autocomplete)
-<img src="/images/2021-05-15/15.png"
+<img src="/images/2021-05-15/15.png">
 
 To start injecting, we need to specify a target - the device loaded from storage:  
 ```Inject target (Tab to autocomplete)```
-<img src="/images/2021-05-15/timeforactionmeme.png"
+<img src="/images/2021-05-15/timeforactionmeme.png">
 
 But what to inject??? Well we can use the LOGITacker interface to write, save and load scripts.  
