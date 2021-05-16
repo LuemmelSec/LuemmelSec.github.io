@@ -209,10 +209,6 @@ To see the speed of the injected characters I made a small video:
     <source src="/images/2021-05-15/inject.mp4" type="video/mp4">
 </video>
 
-<video width="600" controls="controls">
-  <source src="/images/2021-05-15/inject.mp4">
-</video>
-
 One of the cool features of LOGITacker is the ```covert_channel``` option, which will give you a remote shell on a Windows box.  
 One first has to deploy the shell to a target and then connect to the shell in the next step:  
 
@@ -224,3 +220,9 @@ However to be honest I do not fully understand what is happening. The part that 
 ```covert_channel connect YOUR_TARGET```
 
 <img src="/images/2021-05-15/shell.png">
+
+The rest is up to you guys.
+I hope you enjoyed the read, and are now making your own evil cable.
+
+Cheers
+Luemmel
