@@ -2,6 +2,7 @@
 layout: post
 title: Evil Logitech - erm I ment USB cable
 ---
+New series: You don´t need it - but you want it.  
 
 Did you ever want to have your own, handmade, remote controlled, stealthy USB implant / HID injector, but didn´t want to sell your soul for it?  Well then this one is for you :)  
 I already heared about something like this in the past, which reminded me of the expensive O.MG cable from HAK5 or the USB Ninja.  
