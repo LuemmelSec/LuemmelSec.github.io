@@ -54,7 +54,9 @@ usb.generic.allowHID = "TRUE"
 usb.generic.allowLastHID = "TRUE"
 ``` 
 
-You can now selectively attach the stuff to your VM.  
+You can now selectively attach the stuff to your VM:  
+
+<img src="/images/2021-05-15/usb.png">
 
 The MDK Dongle in my case was already shipped with the newest UF2 bootloader, which will just present you with a flash drive when started in flash mode, to which you can copy the uf2 file. Any further info can be found [here](https://wiki.makerdiary.com/nrf52840-mdk-usb-dongle/programming/).   
 To start the flashmode, hold down the small black button of the device, holding it down while plugging it in. The flashing red light indicates you´re in flashmode.  
