@@ -84,7 +84,7 @@ git clone https://github.com/RoganDawes/munifying
 
 <img src="/images/2021-05-15/6.png">
 
-We can now run the info option of munifying to make sure we can see the UNIFY receiver and read it:  
+We can now run the ```info``` option of munifying to make sure we can see the UNIFY receiver and read it:  
 
 ```./munifying info```  
 
@@ -96,7 +96,7 @@ When all is good to go, we flash the new firmware:
 
 <img src="/images/2021-05-15/8.png">
 
-Info should now show the correct flashed firmware:  
+```Info``` should now show the correct flashed firmware:  
 
 <img src="/images/2021-05-15/9.png">
 
@@ -153,3 +153,7 @@ To start injecting, we need to specify a target - the device loaded from storage
 <img src="/images/2021-05-15/15.png">
 
 But what to inject??? Well we can use the LOGITacker interface to write, save and load scripts.  
+
+<video muted autoplay controls>
+    <source src="/images/2021-05-15/inject.mp4" type="video/mp4">
+</video>
