@@ -221,8 +221,8 @@ However to be honest I do not fully understand what is happening. The part that 
 
 <img src="/images/2021-05-15/shell.png">
 
-The rest is up to you guys.
+The rest is up to you guys.  
 I hope you enjoyed the read, and are now making your own evil cable.
 
-Cheers
+Cheers  
 Luemmel
