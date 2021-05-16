@@ -152,7 +152,20 @@ To start injecting, we need to specify a target - the device loaded from storage
 
 <img src="/images/2021-05-15/15.png">
 
-But what to inject??? Well we can use the LOGITacker interface to write, save and load scripts.  
+But what to inject??? Well we can use the LOGITacker interface to write, save and load scripts. All of this can be done with the ```script``` menu:  
+
+<img src="/images/2021-05-15/16.png">
+
+First things first: In my case I need a german keyboard layout - otherwise things might get skrewed up.  
+We can achive this by:  
+
+```options inject language de```
+
+And verify with:  
+```options show```
+
+<img src="/images/2021-05-15/17.png">
+
 
 <video muted autoplay controls>
     <source src="/images/2021-05-15/inject.mp4" type="video/mp4">
