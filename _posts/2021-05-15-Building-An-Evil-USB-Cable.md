@@ -208,7 +208,8 @@ One first has to deploy the shell to a target and then connect to the shell in t
 
 ```covert_channel deploy YOUR_TARGET```
 
-This will, as far as I understood, deploy posh funcionality (SSH for Powershell) to the attacked device and lets you connect 
+This will, as far as I understood, deploy posh funcionality (SSH for Powershell) to the attacked device and lets you connect to it.  
+However to be honest I do not fully understand what is happening. The part that is responsible for that feature can be found in the [logitacker_cli.c](https://github.com/RoganDawes/LOGITacker/blob/master/logitacker/logitacker_cli.c) beginning at line 39.   
 
 ```covert_channel connect YOUR_TARGET```
 
