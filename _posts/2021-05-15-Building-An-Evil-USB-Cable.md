@@ -148,6 +148,8 @@ My current WIP looks like this:
 
 <img src="/images/2021-05-15/usbcable.png">
 
+Now off to the fun part :)  
+
 ## Attacking stuff  
 
 Whenever you fire up your LOGITacker, you need to load a device to connect to from storage: 
