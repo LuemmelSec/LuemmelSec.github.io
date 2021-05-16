@@ -66,12 +66,10 @@ Just copy the uf2 file to the device and it will flash itself.
 
 The MDK-Dongle now is 4 devices, one of them being a serial device on a COM port:  
 <img src="/images/2021-05-15/doge.png">  
-<img src="/images/2021-05-15/2.png"> 
 
 To which we can now connect via putty:  
-
+<img src="/images/2021-05-15/2.png">  
 <img src="/images/2021-05-15/3.png">  
-<img src="/images/2021-05-15/4.png">
 
 Next we want to get the UNIFY receiver ready with the lightspeed firmware. This will allow us to inject keystrokes much faster, aswell as having our communication encrypted.  
 
