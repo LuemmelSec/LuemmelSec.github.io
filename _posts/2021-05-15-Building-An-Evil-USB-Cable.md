@@ -62,8 +62,6 @@ To start the flashmode, hold down the small black button of the device, holding 
 
 Just copy the uf2 file to the device and it will flash itself.  
 
-<img src="/images/2021-05-15/doge.png"> 
-
 The MDK-Dongle now is 4 devices, one of them being a serial device on a COM port:  
 
 <img src="/images/2021-05-15/2.png"> 
