@@ -146,7 +146,7 @@ That´s it. We can now proceed to the fun part - NOT.
 Well yes, it somehow was fun, but cost me more than 30 bucks in the end. It´s up to you how to build the cable.  
 My current WIP looks like this:  
 
-<img src="/images/2021-05-15/usbcable.png">
+<img src="/images/2021-05-15/usbcable.jpg">
 
 Now off to the fun part :)  
 
