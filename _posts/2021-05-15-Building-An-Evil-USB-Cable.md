@@ -157,3 +157,7 @@ But what to inject??? Well we can use the LOGITacker interface to write, save an
 <video muted autoplay controls>
     <source src="/images/2021-05-15/inject.mp4" type="video/mp4">
 </video>
+
+<video width="600" controls="controls">
+  <source src="/images/2021-05-15/inject.mp4">
+</video>
