@@ -2,7 +2,7 @@
 layout: post
 title: Evil Logitech - erm I ment USB cable
 ---
-New series: You don´t need it - but you want it!!!  
+New series: Things you don´t need - but will probably want!  
 
 Did you ever want to have your own, handmade, remote controlled, stealthy USB implant / HID injector, but didn´t want to sell your soul for it?  Well then this one is for you :)  
 I already heared about something like this in the past, which reminded me of the expensive O.MG cable from HAK5 or the USB Ninja.  
@@ -61,7 +61,8 @@ You can now selectively attach the stuff to your VM:
 The MDK Dongle in my case was already shipped with the newest UF2 bootloader, which will just present you with a flash drive when started in flash mode, to which you can copy the uf2 file. Any further info can be found [here](https://wiki.makerdiary.com/nrf52840-mdk-usb-dongle/programming/).   
 To start the flashmode, hold down the small black button of the device, holding it down while plugging it in. The flashing red light indicates you´re in flashmode.  
 
-<img src="/images/2021-05-15/0.png">
+<img src="/images/2021-05-15/0.png">  
+
 <img src="/images/2021-05-15/1.png">  
 
 Just copy the uf2 file to the device and it will flash itself.  
@@ -138,7 +139,14 @@ Next you want to store the settings inside LOGITacker, so you don´t have to do 
 
 <img src="/images/2021-05-15/13.png">
 
-That´s it. We can now proceed to the fun part.  
+That´s it. We can now proceed to the fun part - NOT.
+
+## Building the cable  
+
+Well yes, it somehow was fun, but cost me more than 30 bucks in the end. It´s up to you how to build the cable.  
+My current WIP looks like this:  
+
+<img src="/images/2021-05-15/usbcable.png">
 
 ## Attacking stuff  
 
