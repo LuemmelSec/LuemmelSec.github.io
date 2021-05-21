@@ -22,7 +22,7 @@ The two ones I am referring in special can be found [here](https://infosecwriteu
 
 The others persons to mention at this point are [Rogan Dawes](https://twitter.com/RoganDawes) and [Marcus Mengs](https://twitter.com/mame82) with their awesome projects like [LOGITacker](https://github.com/RoganDawes/LOGITacker) and [munifying](https://github.com/RoganDawes/munifying ), which we will need in the course of this blog post.    
 
-As I followed along the lines of Luca, I went into some problems - hence this short writeup, which is more or less the same you can find from the original author. Maybe a little bit more step by step and a little more up to date. But credits go to the all the people mentioned above.     
+As I followed along the lines of Luca, I went into some problems - hence this short writeup, which is more or less the same you can find from the original author. Maybe a little bit more step by step and a little more up to date. But credits go to all the people mentioned above.     
 
 ## Stuff needed  
 
