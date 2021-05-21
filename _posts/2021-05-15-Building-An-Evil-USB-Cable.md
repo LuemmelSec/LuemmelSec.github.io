@@ -154,7 +154,7 @@ Now off to the fun part :)
 
 Whenever you fire up your LOGITacker, you need to load a device to connect to from storage: 
 
-```Device storage load (Tab to autocomplete)```
+```Devices storage load (Tab to autocomplete)```
 
 <img src="/images/2021-05-15/14.png">
 
