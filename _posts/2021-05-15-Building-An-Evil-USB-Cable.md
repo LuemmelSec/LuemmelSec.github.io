@@ -217,6 +217,8 @@ One first has to deploy the shell to a target and then connect to the shell in t
 This will, as far as I understood, deploy posh funcionality (SSH for Powershell) to the attacked device and lets you connect to it.  
 However to be honest I do not fully understand what is happening. The part that is responsible for that feature can be found in the [logitacker_cli.c](https://github.com/RoganDawes/LOGITacker/blob/master/logitacker/logitacker_cli.c) beginning at line 39.   
 
+UPDATE: Well it turned out, after having talked to Marcus, that he build his own kind of a bridge, which will forward traffic from and to the output of the spawned cmd.exe process via the HID RAW channel. How fucking awesome is this :)  
+
 ```covert_channel connect YOUR_TARGET```
 
 <img src="/images/2021-05-15/shell.png">
