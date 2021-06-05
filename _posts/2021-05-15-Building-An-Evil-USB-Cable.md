@@ -22,7 +22,7 @@ The two ones I am referring in special can be found [here](https://infosecwriteu
 
 The others persons to mention at this point are [Rogan Dawes](https://twitter.com/RoganDawes) and [Marcus Mengs](https://twitter.com/mame82) with their awesome projects like [LOGITacker](https://github.com/RoganDawes/LOGITacker) and [munifying](https://github.com/RoganDawes/munifying ), which we will need in the course of this blog post.    
 
-As I followed along the lines of Luca, I went into some problems - hence this short writeup, which is more or less the same you can find from the original author. Maybe a little bit more step by step and a little more up to date. But credits go to the all the people mentioned above.     
+As I followed along the lines of Luca, I went into some problems - hence this short writeup, which is more or less the same you can find from the original author. Maybe a little bit more step by step and a little more up to date. But credits go to all the people mentioned above.     
 
 ## Stuff needed  
 
@@ -154,7 +154,7 @@ Now off to the fun part :)
 
 Whenever you fire up your LOGITacker, you need to load a device to connect to from storage: 
 
-```Device storage load (Tab to autocomplete)```
+```Devices storage load (Tab to autocomplete)```
 
 <img src="/images/2021-05-15/14.png">
 
@@ -216,6 +216,8 @@ One first has to deploy the shell to a target and then connect to the shell in t
 
 This will, as far as I understood, deploy posh funcionality (SSH for Powershell) to the attacked device and lets you connect to it.  
 However to be honest I do not fully understand what is happening. The part that is responsible for that feature can be found in the [logitacker_cli.c](https://github.com/RoganDawes/LOGITacker/blob/master/logitacker/logitacker_cli.c) beginning at line 39.   
+
+UPDATE: Well it turned out, after having talked to Marcus, that he build his own kind of a bridge, which will forward traffic from and to the output of the spawned cmd.exe process via the HID RAW channel. How fucking awesome is this :)  
 
 ```covert_channel connect YOUR_TARGET```
 
