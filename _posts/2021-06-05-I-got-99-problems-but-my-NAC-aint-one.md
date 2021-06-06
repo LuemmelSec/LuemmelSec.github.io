@@ -5,6 +5,7 @@ title: I got 99 problems but my NAC ain´t one
 This post will be all about Network Access Control (NAC) solutions and how they might lull you into a sense of security.  
 Designed to keep rouge devices out of your network, I´ll show you ways around it, as well as ways to protect yourself.  
 From a pentester´s or red teamer´s perspective this might come in handy when customers protect their networks with these kinds of tools.  
+   
 <img src="/images/2021-06-05/dog_meme.png">
 
 <!--more-->
@@ -13,8 +14,8 @@ From a pentester´s or red teamer´s perspective this might come in handy when c
 A [NAC](https://en.wikipedia.org/wiki/Network_Access_Control) acts as a kind of a gatekeeper to your local network infrastructure. Its purpose is to keep unwanted devices out of it - or at least only allow restricted access to certain resources. This can be accomplished by several measures, amongst them comparison of MAC addresses, authentication through username and password or certificates, fingerprinting, host-checks and many more.  
 There are also several scenarios from which such a tool can / wants to protect you. These can be employees with their private internetradio, or a technician in your OT who plugged in a router for remote access or an attacker trying to intrude your network.  
 If you are more the video or slides guy, I highly recommend checking out [Skip´s](https://twitter.com/passingthehash) talk "A Bridge Too Far" from DEFCON 19:  
-Video: https://www.youtube.com/watch?v=rurYRDlf1Bo  
-Slides: https://www.defcon.org/images/defcon-19/dc-19-presentations/Duckwall/DEFCON-19-Duckwall-Bridge-Too-Far.pdf  
+Video: [https://www.youtube.com/watch?v=rurYRDlf1Bo](https://www.youtube.com/watch?v=rurYRDlf1Bo) 
+Slides: [https://www.defcon.org/images/defcon-19/dc-19-presentations/Duckwall/DEFCON-19-Duckwall-Bridge-Too-Far.pdf](https://www.defcon.org/images/defcon-19/dc-19-presentations/Duckwall/DEFCON-19-Duckwall-Bridge-Too-Far.pdf) 
 
 # Basics  
 
@@ -24,7 +25,7 @@ There are 3 parties involved:
 2. The authenticator - the device that acts as the gatekeeper and to which the clients connects - most likely a switch.  
 3. The authentication server - something in the background that validates the requests and grants or denies access to the supplicant.  
 
-By default the ports are in an unauthorized state and will only allow to transmit and receive Extensible Authentication Protocol Over LAN ([EAPOL](https://www.vocal.com/secure-communication/eapol-extensible-authentication-protocol-over-lan/)) frames - which basically is encapsulated [EAP](https://en.wikipedia.org/wiki/Extensible_Authentication_Protocol). These frames are forwarded from the client desiring access to the network to the switch which unpacks the EAPOL and forwards the EAP packet to an authentication server - which in most cases will be a radius server. From there everything goes vice versa.  
+By default the ports are in an unauthorized state and will only allow to transmit and receive Extensible Authentication Protocol Over LAN ([EAPOL](https://www.vocal.com/secure-communication/eapol-extensible-authentication-protocol-over-lan/)) frames - which basically is encapsulated [EAP](https://en.wikipedia.org/wiki/Extensible_Authentication_Protocol). These frames are forwarded from the client desiring access to the network to the switch which unpacks the EAPOL and forwards the EAP packet to an authentication server - which in most cases will be a RADIUS server. From there everything goes vice versa.  
 The flow looks like this:  
 <figure>
   <img src="/images/2021-06-05/eapol_flow.png">
@@ -33,17 +34,20 @@ The flow looks like this:
 
 When all checks are passed, the port will be switched to authorized and thus allow the normal network traffic.  
 
-For all this stuff to be able to happen you need an infrastructure that is capable of talking 802.1x - this is your clients and your switches. And you also need something to authenticate against e.g. a [RADIUS](https://en.wikipedia.org/wiki/RADIUS) server. To manage the whole stuff, most people will rely on one of the many NAC solutions out there, which will provide you with a nice GUI from which one can manage all the rules, devices, workflows and stuff. A short overview can be found at gartner: https://www.gartner.com/reviews/market/network-access-control  
+For all this stuff to be able to happen you need an infrastructure that is capable of talking 802.1x - this is your clients and your switches. And you also need something to authenticate against e.g. a [RADIUS](https://en.wikipedia.org/wiki/RADIUS) server. To manage the whole stuff, most people will rely on one of the many NAC solutions out there, which will provide you with a nice GUI from which one can manage all the rules, devices, workflows and stuff. A short overview can be found at gartner: [https://www.gartner.com/reviews/market/network-access-control](https://www.gartner.com/reviews/market/network-access-control)  
 
 # I got 99 problems but my NAC ain´t one  
 
-It´s like every time with security tools that pretend to help you. There are some cases where a NAC comes in handy and will help you protect your network and there are other cases where it just can´t do shit.  
+It´s like every time with security tools that pretend to help. There are some cases where a NAC comes in handy and will help you protect your network and there are other cases where it just can´t do shit.  
+
+<img src="/images/2021-06-05/drevil_meme.png">  
+
 To play a fair game at this point: We have to differentiate between solutions < 802.1x-2010 and > 802.1x-2010, the latter one bringing [MACSec / IEEE 802.1AE](https://en.wikipedia.org/wiki/IEEE_802.1AE) and as such implementing Layer 2 encryption between the supplicant and the authenticator - which will render mostly all of the following attacks useless. However to be able to distribute MACSec you´ll have to have your whole infrastructure compatible with this standard. As it is not broadly deployed and available outside in real life, chances are low you will ever see such an implementation.  
 Just for the sake of completeness: If you are looking for ways to bypass MACSec, you can have a look at the work of [s0lst1c3](https://twitter.com/s0lst1c3):  
-https://github.com/s0lst1c3/silentbridge   
+[https://github.com/s0lst1c3/silentbridge](https://github.com/s0lst1c3/silentbridge)  
 It is however heavily relying on stolen auth creds (at least that´s what I read from a first quick glimpse at the paper) and from my point of view very hypothetical, but maybe worth a try.  
 
-So let´s dig into it...  
+<img src="/images/2021-06-05/dig_meme.png">    
 
 ## Hax0r´s arsenal  
 
