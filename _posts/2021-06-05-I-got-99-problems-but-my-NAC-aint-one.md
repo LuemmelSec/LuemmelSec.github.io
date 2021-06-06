@@ -8,7 +8,7 @@ From a pentester´s or red teamer´s perspective this might come in handy when c
 <img src="/images/2021-06-05/dog_meme.png">
 
 <!--more-->
-## Introduction  
+# Introduction  
 
 A [NAC](https://en.wikipedia.org/wiki/Network_Access_Control) acts as a kind of a gatekeeper to your local network infrastructure. It´s purpose is to keep unwanted devices out of it - or at least only allow restricted access to certain ressources. This can be accomplished by several measures, amongst them comparison of MAC addresses, authentication through username and password or certificates, fingerprinting, host-checks and many more.  
 There are also several scenarios from which such a tool can / wants to protect you. These can be employees with their privat internetradio, or a technicion in your OT who plugged in a router for remote access or an attacker trying to intrude your network.  
@@ -16,7 +16,7 @@ If you are more the video or slides guy, I highly recommend checking out [Skip´
 Video: https://www.youtube.com/watch?v=rurYRDlf1Bo  
 Slides: https://www.defcon.org/images/defcon-19/dc-19-presentations/Duckwall/DEFCON-19-Duckwall-Bridge-Too-Far.pdf  
 
-## Basics  
+# Basics  
 
 Most commonly your NAC solution will be based on [802.1x](https://en.wikipedia.org/wiki/IEEE_802.1X) which is a standard for portbased network access. It will interact with your switches (most likely and mainly via SNMP) and allow or block ports based on the rules you define.  
 There are 3 parties involved:  
@@ -35,7 +35,7 @@ When all checks are passed, the port will be switched to authorized and thus all
 
 For all this stuff to be able to happen, you need an infrastructure that is capable of talking 802.1x - this is your clients and your switches. And you also need something to authenticate against e.g. a [RADIUS](https://en.wikipedia.org/wiki/RADIUS) server. To manage the whole stuff, most people will rely on one of the many NAC solutions out there, which will provide you with a nice GUI from which one can manage all the rules, devices, workflows and stuff. A short overview can be found at gartner: https://www.gartner.com/reviews/market/network-access-control  
 
-## I got 99 problems but my NAC ain´t one  
+# I got 99 problems but my NAC ain´t one  
 
 It´s like everytime with security tools that pretend to help you. There are some cases where a NAC comes in handy and will help you protect your network and there are other cases where it just can´t do shit.  
 To play a fair game at this point: We have to diffirentiate between solutions < 802.1x-2010 and > 802.1x-2010, the latter one bringing [MACSec / IEEE 802.1AE](https://en.wikipedia.org/wiki/IEEE_802.1AE) and as such implementing Layer 2 encryption between the supplicant and the authenticator - which will render mostly all of the following attacks useless. However to be able to distribute MACSec you´ll have to have your whole infrastructure compatible with this standard. As it is not broadly deployed and available outside in reallife, chances are low you will ever see such an implementation.  
@@ -43,9 +43,9 @@ Just for the sake of completeness: If you are looking for ways to bypass MACSec,
 https://github.com/s0lst1c3/silentbridge   
 It is however heavily relying on stolen auth creds (at least that´s what I read from a first quick glimpse at the paper) and from my point of view very hypothetical, but maybe worth a try.  
 
-So let´s dig into stuff...  
+So let´s dig into it...  
 
-### Hax0r stuff  
+## Hax0r´s arsenal  
 
 As I wanted a small dropbox to carry out such attacks, I decided to buy a Raspberry Pi 4 with some goodies:  
 
@@ -56,9 +56,9 @@ As I wanted a small dropbox to carry out such attacks, I decided to buy a Raspbe
 [Keyboard](https://www.amazon.de/offizielle-Raspberry-Pi-Tastatur-Layout/dp/B07QHM4L2D)  
 [SD Card](https://www.amazon.de/SanDisk-Extreme-microSDXC-Speicherkarte-SD-Adapter/dp/B07FCMBLV6)  
 
-To be even more mobile, you could also get a powerbank. For external pwnage one could extend the setup with a LTE modem. And do stay more stealthy, we could leave the display and stuff away.   
+To be even more mobile, you could also get a powerbank. For external pwnage one could extend the setup with a LTE modem. And to stay more stealthy, we could leave the display and stuff away.   
 
-The Raspberry can be flushed with the official ARM image of Kali: https://www.kali.org/get-kali/#kali-arm  
+The Raspberry can be flushed with the official ARM image of Kali: [https://www.kali.org/get-kali/#kali-arm](https://www.kali.org/get-kali/#kali-arm)  
 
 As I am getting older and my eyes worse, I wanted to be able to connect via SSH over WiFi, so I would be able to work from my normal notebook and not relying on the 3.5" display on longer testings, leaving it for troubleshooting purposes.    
 So I also set up a DHCP server via [isc-dhcp-server](https://www.isc.org/dhcp/) and WiFi via [hostapd](https://wiki.gentoo.org/wiki/Hostapd).  
@@ -105,18 +105,18 @@ ieee80211n=1
 wme_enabled=1
 ```
 
-Lastly configure SSH to your needs and we are good to go, ending with e setup like this:  
+Lastly configure SSH to your needs and we are good to go, ending with a setup like this:  
 <img src="/images/2021-06-05/pi.png">
 
-### Scenarios
+## Scenarios
 
 I´d like to split the whole attack part into several scenarios, shedding some light on different points of view.  
 
-#### MAC address used as only "authentication" feature  
+### MAC address used as only "authentication" feature  
 
 <img src="/images/2021-06-05/onedoesnot_meme.png">
 
-Companies will have devices that are not able to speak 802.1x. Amongst them can be printers, IP telephones, cameras and stuff like that.  
+This one is a quick win for attackers. Companies will have devices that are not able to speak 802.1x. Amongst them can be printers, IP telephones, cameras and stuff like that.  
 This is where [MAC Authentication Bypass(MAB)](https://networklessons.com/cisco/ccie-routing-switching-written/mac-authentication-bypass-mab) comes into play. The port will first check if the attached device can speak 802.1x. If not it will ask the authentication server if the MAC of that device is allowed without authentication, and if yes open the port.  
 
 All an attacker would have to do here is to spoof the MAC address. Regarding the affected devices you can get your hands on this info by:  
@@ -130,8 +130,8 @@ We can than use macchanger to spoof the original system´s MAC address and swap 
 
 Where:  
 ```-m``` tells macchanger we want to manually assing a MAC address.  
-```00:AB:01:CD:XY:AB``` is the MAC address from the attacked device.
-```eth0``` is the interface of our dropbox that we want to connect to the network.
+```00:AB:01:CD:XY:AB``` is the MAC address from the attacked device.  
+```eth0``` is the interface of our dropbox that we want to connect to the network.  
 
 macchanger might tell you, that it can´t change addresses right now. In these cases bring down the interface, change the MAC, and bring it up again:  
 ```
@@ -140,4 +140,69 @@ macchanger -m 00:AB:01:CD:XY:AB eth0
 ifup eth0
 ```
 
-#### MAC address used as only "authentication" feature
+### MAC address needs to be known and authentication is needed  
+
+This is the case you´ll most probably stumble upon. The MAC is known to the NAC solution and a device / user will also have to authenticate against the auth server.  
+
+Again the first part is trivial, but we don´t have a cert or credentials to do the authentication stuff. So what now?  
+Well there´s two things we could do now:  
+1. Dig out our old dusty Hub, switch our MAC address to the victim ones, connect our dropbox and the victim to the same ethernet port. The "real" device will do the auth stuff for us, putting the port into authorized mode, and allow both devices to connect to the network. As both have the same MAC, the switch will only have one entry in its ARP / SAT table, not raising suspicion.  
+But there is a downside to this method. As long as we use stateless protocols like UDP, we and the victim can communicate just fine. However when it comes to using stateful protocols like TCP, we will for certain run into issues, as one device behind the Hub will be the first to receive and drop or answer a package e.g. in the 3-way-handshake. This leaves us with option ...  
+2. Using a transparent bridge. This is the implementation of Skip´s idea, which involves a device that - simply spoken - in a first instance just lets all the traffic traverse it by means of forwarding rules, being totally transparent to the network and all the participants. Next it does some tcpdump magic to sniff traffic like ARP, NetBIOS but also Kerberos, Active Directory, web etc., extracting the needed infos to spoof the victim and the networks gateway to stay under the radar. With these info the needed rules in ebtables, iptables etc. are automatically created, and will allow an attacker to interact with the network mimicing the victim.  
+
+At this point I want to thank [Michael Schneider](https://twitter.com/0x6d69636b) for writing [this](https://www.scip.ch/?labs.20190207) blog post about bypassing 802.1x. Everything regarding this topic started with his post and the [nac_bypass](https://github.com/scipag/nac_bypass) tool he wrote. I am using his tool on engagements, and it is awesome :) Thanks buddy.  
+
+During my research I found several other tools that implement the same features. You can find a list of them at the very end of this blog post.   
+  
+So to get started you first need to find a device you want to attack.  
+Next we start the nac_bypass script and put the dropbox between the switch (eth0) and the victim device (eth1).  
+```./nac_bypass_setup.sh```  
+If you want to manually specify the interfaces you can do so with the ```-1``` and ```-2```switches.  
+<img src="/images/2021-06-05/nac_bypass.png">  
+ 
+The script asks you to wait some time, so it is able to dump the needed info from the network traffic, and then to hit any key.  
+<img src="/images/2021-06-05/nac_bypass1.png">  
+<img src="/images/2021-06-05/nac_bypass2.png">  
+
+As you can see, it grabbed my MAC address, my IP address and the gateway´s MAC address, just a Skip described it.  
+You can now proceed and for instance do an nmap scan on the network, start MitM attacks, or just watch and analyze the traffic passing by.  
+
+As for Responder: I am not 100% sure how things are intended to work.  
+I looked up the iptables rules like so: ```iptables -t nat -L```  
+I was able to run Responder with the ```-I ALL -i victim-IP```, but couldn´t get MitM stuff like NetBIOS / LLMNR poisoning working.  
+<img src="/images/2021-06-05/responder_all.png">  
+<img src="/images/2021-06-05/responder_all1.png">  
+
+I guess the intented way is to have Responder listen on the bridge interface, however I am not sure how the poisoning stuff should work from here.  
+
+As you can see, it only worked when I directly entered the victims IP e.g. to connect via SMB, and the iptables rules would redirect my request to the bridge forwarding the incoming SMB traffic.  
+
+# Defence  
+In general a 802.1x implementation will prevent employees or service providers from connecting rogue devices to your network.  
+To a certain extend it may also block script kiddies.  
+For someone who is willed and has the needed knowledge, the attacks will most likely be successful, rendering NAC (at least if < 802.1x-2010)useless.  
+
+So here´s some general advice I can provide in order to keep things as secure as possible:  
+- If you have devices that get authenticated by MAC only -> seperate them. Put them in a seperate VLAN or do microsegmentation and be 100% sure to reduce allowed ressources to an absolute minimum. Keep these systems up-to-date, as they are easier to reach by an attacker, so to keep the attack surface as low as possible. If you are able to, get rid of devices that can´t to 802.1x. Also if possible use fingerprinting options inside your NAC, so that the MAC address is not the only criteria, but also open ports, stack fingerprints etc.
+- If possible stick to MACSec. This will at least make it much harder for an attacker to gather the needed infos to play MitM.  
+- If you can´t do MACSec, it´ll be all about what can happen and what you see after an attacker is inside your network. Use triggers like:  
+  - Uncommon link up/downs on your switch  
+  - Speed / duplex changes  
+  - Changes in framesizes (e.g. Windows vs Linux)  
+  - Changed TTLs  
+  - Access to systems and services that normally don´t get accessed (firewall logs)  
+  - Monitor your networks traffic and detect attacks / unknown patterns (IDS/IPS/SIEM)  
+- Seperate your devices as much as possible  
+- Restrict access to the systems. If someone is not able to get inbetween, he can´t carry out attacks  
+- Awareness - Train your employees to ask questions and inform you, when they see a suspicious device hanging from printer or stuff like that.  
+
+# References
+
+Tools:  
+- [https://github.com/p292/NACKered](https://github.com/p292/NACKered)  
+- [https://www.gremwell.com/marvin-mitm-tapping-dot1x-links](https://www.gremwell.com/marvin-mitm-tapping-dot1x-links)   
+  If I remember right, I gave marvin a try, but it wouldn´t run on ARM. 
+- [https://github.com/Orange-Cyberdefense/fenrir-ocd](https://github.com/Orange-Cyberdefense/fenrir-ocd)  
+- [https://github.com/nccgroup/phantap](https://github.com/nccgroup/phantap)  
+- [https://github.com/s0lst1c3/silentbridge](https://github.com/s0lst1c3/silentbridge)  
+- [https://github.com/SySS-Research/Lauschgeraet](https://github.com/SySS-Research/Lauschgeraet)
