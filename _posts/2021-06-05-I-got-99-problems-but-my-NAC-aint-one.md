@@ -148,7 +148,7 @@ macchanger -m 00:AB:01:CD:XY:AB eth0
 ifup eth0
 ```
 
-### MAC address needs to be known and authentication required  
+### MAC address needs to be authorized and authentication required  
 
 This is the case you´ll most probably stumble upon. The MAC is known to the NAC solution and a device / user will also have to authenticate against the auth server (doesn´t matter by what means to an attacker).  
 
@@ -190,7 +190,7 @@ To a certain extend it may also block script kiddies.
 For someone who is willed and has the needed knowledge, the attacks will most likely be successful, rendering NAC (at least if < 802.1x-2010) useless.  
 
 So here´s some general advice I can provide in order to keep things as secure as possible:  
-- If you have devices that get authenticated by MAC only -> separate them. Put them in a different VLAN or do microsegmentation and be 100% sure to reduce allowed resources to an absolute minimum. Keep these systems up-to-date, as they are easier to reach by an attacker, so to keep the attack surface as low as possible. If you are able to, get rid of devices that can´t to 802.1x. Also if possible use fingerprinting options inside your NAC, so that the MAC address is not the only criteria, but also open ports, stack fingerprints etc.
+- If you have devices that get authenticated by MAC only -> separate them. Put them in a different VLAN or do microsegmentation and be 100% sure to reduce allowed resources to an absolute minimum. Keep these systems up-to-date, as they are easier to reach by an attacker, so to keep the attack surface as low as possible. If you are able to, get rid of devices that can´t do 802.1x. Also if possible use fingerprinting options inside your NAC, so that the MAC address is not the only criteria, but also open ports, stack fingerprints etc.
 - If possible stick to MACSec. This will at least make it much harder for an attacker to gather the needed info to play MitM.  
 - If you can´t do MACSec, it´ll be all about what can happen and what you see after an attacker is inside your network. Use triggers like:  
   - Uncommon link up/downs on your switch  
@@ -202,7 +202,7 @@ So here´s some general advice I can provide in order to keep things as secure a
 - Separate your devices as much as possible  
 - Don´t expose unneeded ports. Pull the cables in the rack for not in use ports, or disable them switch wise  
 - Restrict access to the systems. If someone is not able to get in between, he can´t carry out attacks  
-- Awareness - Train your employees to ask questions and inform you, when they see a suspicious device hanging from printer or stuff like that.  
+- Awareness - Train your employees to ask questions and inform you, when they see a suspicious device hanging from a printer or stuff like that.  
 
 # References
 
