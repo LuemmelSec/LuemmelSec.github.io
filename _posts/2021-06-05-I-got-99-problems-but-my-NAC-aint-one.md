@@ -60,7 +60,7 @@ As I wanted a small dropbox to carry out such attacks, I decided to buy a Raspbe
 [Keyboard](https://www.amazon.de/offizielle-Raspberry-Pi-Tastatur-Layout/dp/B07QHM4L2D)  
 [SD Card](https://www.amazon.de/SanDisk-Extreme-microSDXC-Speicherkarte-SD-Adapter/dp/B07FCMBLV6)  
 
-To be even more mobile, you could also get a powerbank. For external pwnage one could extend the setup with a LTE modem. And to stay stealthier, we could leave the display and stuff away.   
+To be even more mobile, you could also get a powerbank. For external pwnage one could extend the setup with an LTE modem. And to stay stealthier, we could leave the display and stuff away.   
 
 The Raspberry can be flushed with the official ARM image of Kali: [https://www.kali.org/get-kali/#kali-arm](https://www.kali.org/get-kali/#kali-arm)  
 
@@ -116,6 +116,10 @@ Lastly configure SSH to your needs and we are good to go, ending with a setup li
 
 I´d like to split the whole attack part into several scenarios, shedding some light on different points of view.  
 
+### No NAC at all
+
+Yeah I know, that was stupid :) Move along.  
+
 ### MAC address used as only "authentication" feature  
 
 <img src="/images/2021-06-05/onedoesnot_meme.png">
@@ -144,31 +148,30 @@ macchanger -m 00:AB:01:CD:XY:AB eth0
 ifup eth0
 ```
 
-### MAC address needs to be known and authentication is needed  
+### MAC address needs to be known and authentication required  
 
-This is the case you´ll most probably stumble upon. The MAC is known to the NAC solution and a device / user will also have to authenticate against the auth server.  
+This is the case you´ll most probably stumble upon. The MAC is known to the NAC solution and a device / user will also have to authenticate against the auth server (doesn´t matter by what means to an attacker).  
 
-Again the first part is trivial, but we don´t have a cert or credentials to do the authentication stuff. So what now?  
-Well there´s two things we could do now:  
+Again the first part is trivial, but we don´t have a cert or credentials for the second step to do the authentication stuff. So what now?  
+Well there´s two things we could do:  
 1. Dig out our old dusty Hub, switch our MAC address to the victim ones, connect our dropbox and the victim to the same ethernet port. The "real" device will do the auth stuff for us, putting the port into authorized mode, and allow both devices to connect to the network. As both have the same MAC, the switch will only have one entry in its ARP / SAT table, not raising suspicion.  
 But there is a downside to this method. As long as we use stateless protocols like UDP, we and the victim can communicate just fine. However when it comes to using stateful protocols like TCP, we will for certain run into issues, as one device behind the Hub will be the first to receive and drop or answer a package e.g. in the 3-way-handshake. This leaves us with option ...  
 2. Using a transparent bridge. This is the implementation of Skip´s idea, which involves a device that - simply spoken - in a first instance just lets all the traffic traverse it by means of forwarding rules, being totally transparent to the network and all the participants. Next it does some tcpdump magic to sniff traffic like ARP, NetBIOS but also Kerberos, Active Directory, web etc., extracting the needed info to spoof the victim and the networks gateway to stay under the radar. With this info the needed rules in ebtables, iptables etc. are automatically created, and will allow an attacker to interact with the network mimicking the victim.  
 
 At this point I want to thank [Mick Schneider](https://twitter.com/0x6d69636b) for writing [this](https://www.scip.ch/?labs.20190207) blog post about bypassing 802.1x. Everything regarding this topic started with his post and the [nac_bypass](https://github.com/scipag/nac_bypass) tool he wrote. I am using his tool on engagements, and it is awesome :) Thanks buddy.  
-
 During my research I found several other tools that implement the same features. You can find a list of them at the very end of this blog post.   
   
-So to get started you first need to find a device you want to attack.  
+So to get started you first need to find a device you want to attack. We might hide our dropbox under a desk, or abuse a public terminal or install an implant on a printer on the hallway.   
 Next we start the nac_bypass script and put the dropbox between the switch (eth0) and the victim device (eth1).  
 ```./nac_bypass_setup.sh```  
-If you want to manually specify the interfaces you can do so with the ```-1``` and ```-2```switches.  
+If you want to manually specify the interfaces you can do so with the ```-1``` and ```-2```switches. By default it will treat the lower device as switch side, and the next one as victim facing interface. I nearly never used these options.   
 <img src="/images/2021-06-05/nac_bypass.png">  
  
 The script asks you to wait some time, so it is able to dump the needed info from the network traffic, and then to hit any key.  
 <img src="/images/2021-06-05/nac_bypass1.png">  
 <img src="/images/2021-06-05/nac_bypass2.png">  
 
-As you can see, it grabbed my MAC address, my IP address and the gateway´s MAC address, just a Skip described it.  
+As you can see, it grabbed my MAC address, my IP address and the gateway´s MAC address, just a Skip described it to be the only needed info for the bridge attack.  
 You can now proceed and for instance do an nmap scan on the network, start MitM attacks, or just watch and analyze the traffic passing by.  
 
 As for Responder: Things got a little confusing for me at first. So I reached out to Mick directly who replied to me within minutes. I really love this community and how helpful people are. So thank you again Mick for your kind support.  
@@ -184,7 +187,7 @@ And tada, I am in your network:
 # Defense  
 In general an 802.1x implementation will prevent employees or service providers from connecting rogue devices to your network.  
 To a certain extend it may also block script kiddies.  
-For someone who is willed and has the needed knowledge, the attacks will most likely be successful, rendering NAC (at least if < 802.1x-2010)useless.  
+For someone who is willed and has the needed knowledge, the attacks will most likely be successful, rendering NAC (at least if < 802.1x-2010) useless.  
 
 So here´s some general advice I can provide in order to keep things as secure as possible:  
 - If you have devices that get authenticated by MAC only -> separate them. Put them in a different VLAN or do microsegmentation and be 100% sure to reduce allowed resources to an absolute minimum. Keep these systems up-to-date, as they are easier to reach by an attacker, so to keep the attack surface as low as possible. If you are able to, get rid of devices that can´t to 802.1x. Also if possible use fingerprinting options inside your NAC, so that the MAC address is not the only criteria, but also open ports, stack fingerprints etc.
@@ -197,6 +200,7 @@ So here´s some general advice I can provide in order to keep things as secure a
   - Access to systems and services that normally don´t get accessed (firewall logs)  
   - Monitor your networks traffic and detect attacks / unknown patterns (IDS/IPS/SIEM)  
 - Separate your devices as much as possible  
+- Don´t expose unneeded ports. Pull the cables in the rack for not in use ports, or disable them switch wise  
 - Restrict access to the systems. If someone is not able to get in between, he can´t carry out attacks  
 - Awareness - Train your employees to ask questions and inform you, when they see a suspicious device hanging from printer or stuff like that.  
 
