@@ -137,7 +137,7 @@ We can then use macchanger to spoof the original system´s MAC address and swap 
 ```macchanger -m 00:AB:01:CD:XY:AB eth0```
 
 Where:  
-```-m``` tells macchanger we want to manually assing a MAC address.  
+```-m``` tells macchanger we want to manually assign a MAC address.  
 ```00:AB:01:CD:XY:AB``` is the MAC address from the attacked device.  
 ```eth0``` is the interface of our dropbox that we want to connect to the network.  
 
@@ -155,7 +155,7 @@ This is the case you´ll most probably stumble upon. The MAC is known to the NAC
 Again the first part is trivial, but we don´t have a cert or credentials for the second step to do the authentication stuff. So what now?  
 Well there´s two things we could do:  
 1. Dig out our old dusty Hub, switch our MAC address to the victim ones, connect our dropbox and the victim to the same ethernet port. The "real" device will do the auth stuff for us, putting the port into authorized mode, and allow both devices to connect to the network. As both have the same MAC, the switch will only have one entry in its ARP / SAT table, not raising suspicion.  
-But there is a downside to this method. As long as we use stateless protocols like UDP, we and the victim can communicate just fine. However when it comes to using stateful protocols like TCP, we will for certain run into issues, as one device behind the Hub will be the first to receive and drop or answer a package e.g. in the 3-way-handshake. This leaves us with option ...  
+But there is a downside to this method. As long as we use stateless protocols like UDP, we and the victim can communicate just fine. However when it comes to using stateful protocols like TCP, we will for certain run into issues, as one device behind the Hub will be the first to receive and drop or answer a package e.g. in the 3-way-handshake. We could unplug the original device after it opened the port for us and have a fully capable device inside their network, but this might very quickly raise alarms, when the device is somewhat monitored and will kick us off the network when the next authentication needs to be done. This leaves us with option ...  
 2. Using a transparent bridge. This is the implementation of Skip´s idea, which involves a device that - simply spoken - in a first instance just lets all the traffic traverse it by means of forwarding rules, being totally transparent to the network and all the participants. Next it does some tcpdump magic to sniff traffic like ARP, NetBIOS but also Kerberos, Active Directory, web etc., extracting the needed info to spoof the victim and the networks gateway to stay under the radar. With this info the needed rules in ebtables, iptables etc. are automatically created, and will allow an attacker to interact with the network mimicking the victim.  
 
 At this point I want to thank [Mick Schneider](https://twitter.com/0x6d69636b) for writing [this](https://www.scip.ch/?labs.20190207) blog post about bypassing 802.1x. Everything regarding this topic started with his post and the [nac_bypass](https://github.com/scipag/nac_bypass) tool he wrote. I am using his tool on engagements, and it is awesome :) Thanks buddy.  
@@ -200,7 +200,8 @@ Do your homework. Know what you are exposing, and how much security you gain by 
 
 Here´s some general advice I can provide in order to keep things as secure as possible:  
 - If you have devices that get authenticated by MAC only -> separate them. Put them in a different VLAN or do microsegmentation and be 100% sure to reduce allowed resources to an absolute minimum. Keep these systems up-to-date, as they are easier to reach by an attacker, so to keep the attack surface as low as possible. If you are able to, get rid of devices that can´t do 802.1x. Also if possible use fingerprinting options inside your NAC, so that the MAC address is not the only criteria, but also open ports, stack fingerprints etc.
-- If possible stick to MACSec. This will at least make it much harder for an attacker to gather the needed info to play MitM.  
+- To minimize the Hub scenario, set up your environment to ask for re-authentication in smaller timeframes. Leaving ports open after a      successful 802.1x authentication for an hour will pose you to a much higher risk than 5 minutes.
+- If possible stick to MACSec. This will at least make it much harder for an attacker to gather the needed info to play MitM.   
 - If you can´t do MACSec, it´ll be all about what can happen and what you see after an attacker is inside your network. Use triggers like:  
   - Uncommon link up/downs on your switch  
   - Speed / duplex changes  
@@ -212,6 +213,16 @@ Here´s some general advice I can provide in order to keep things as secure as p
 - Don´t expose unneeded ports. Pull the cables in the rack for not in use ports, or disable them switch wise  
 - Restrict access to the systems. If someone is not able to get in between, he can´t carry out attacks  
 - Awareness - Train your employees to ask questions and inform you, when they see a suspicious device hanging from a printer or stuff like that.  
+- I heard people say to use a per client VPN solution. However I am not quite sure if this will work. All the juicy info still needs to be plain text, so that routers are able - well - to route the packets. So an attacker will still be able to set up the transparent bridge. He will however not be able to reach the "other side" of the VPN. This again would need you to have ALL devices being capable of doing VPN and that´s not going to happen.  
+
+# Closing words  
+
+So that´s it folks. I hope you enjoyed this blog post.  
+If you have 802.1x in place to secure your network, you should by now know that it is not that secure at all.  
+If you know of further attacks or mitigations please let me know. Also feel free to correct my mistakes. You can reach me on twitter [@LuemmelSec](https://twitter.com/theluemmel).  
+
+Happy hacking  
+LuemmelSec  
 
 # References
 
