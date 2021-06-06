@@ -186,7 +186,7 @@ And tada, I am in your network:
 
 <img src="/images/2021-06-05/mitm.png">
 
-Again fetching your hashes:  
+Again fetching your hashes (more wizardry in my other blog [post](https://luemmelsec.github.io/Relaying-101/)):  
 
 <img src="/images/2021-06-05/hashwizard.png">  
 
