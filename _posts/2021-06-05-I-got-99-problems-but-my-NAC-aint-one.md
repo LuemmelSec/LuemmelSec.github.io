@@ -13,9 +13,9 @@ From a pentester´s or red teamer´s perspective this might come in handy when c
 
 A [NAC](https://en.wikipedia.org/wiki/Network_Access_Control) acts as a kind of a gatekeeper to your local network infrastructure. Its purpose is to keep unwanted devices out of it - or at least only allow restricted access to certain resources. This can be accomplished by several measures, amongst them comparison of MAC addresses, authentication through username and password or certificates, fingerprinting, host-checks and many more.  
 There are also several scenarios from which such a tool can / wants to protect you. These can be employees with their private internetradio, or a technician in your OT who plugged in a router for remote access or an attacker trying to intrude your network.  
-If you are more the video or slides guy, I highly recommend checking out [Skip´s](https://twitter.com/passingthehash) talk "A Bridge Too Far" from DEFCON 19:  
-Video: [https://www.youtube.com/watch?v=rurYRDlf1Bo](https://www.youtube.com/watch?v=rurYRDlf1Bo) 
-Slides: [https://www.defcon.org/images/defcon-19/dc-19-presentations/Duckwall/DEFCON-19-Duckwall-Bridge-Too-Far.pdf](https://www.defcon.org/images/defcon-19/dc-19-presentations/Duckwall/DEFCON-19-Duckwall-Bridge-Too-Far.pdf) 
+If you are more the video or slides guy, I highly recommend checking out [Skip´s](https://twitter.com/passingthehash) talk "A Bridge Too Far" from DEFCON 19:   
+Video: [https://www.youtube.com/watch?v=rurYRDlf1Bo](https://www.youtube.com/watch?v=rurYRDlf1Bo)  
+Slides: [https://www.defcon.org/images/defcon-19/dc-19-presentations/Duckwall/DEFCON-19-Duckwall-Bridge-Too-Far.pdf](https://www.defcon.org/images/defcon-19/dc-19-presentations/Duckwall/DEFCON-19-Duckwall-Bridge-Too-Far.pdf)  
 
 # Basics  
 
@@ -189,7 +189,7 @@ And tada, I am in your network:
 Again fetching your hashes:  
 
 <img src="/images/2021-06-05/hashwizard.png">  
-<img src="/images/2021-06-05/responder_all.png">  
+
 <img src="/images/2021-06-05/responder_all2.png">  
 
 # Defense  
