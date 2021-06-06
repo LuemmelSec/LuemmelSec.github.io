@@ -25,7 +25,7 @@ There are 3 parties involved:
 2. The authenticator - the device that acts as the gatekeeper and to which the clients connects - most likely a switch.  
 3. The authentication server - something in the background that validates the requests and grants or denies access to the supplicant.  
 
-By default the ports are in an unauthorized state and will only allow to transmit and receive Extensible Authentication Protocol Over LAN ([EAPOL](https://www.vocal.com/secure-communication/eapol-extensible-authentication-protocol-over-lan/)) frames - which basically is encapsulated [EAP](https://en.wikipedia.org/wiki/Extensible_Authentication_Protocol). These frames are forwarded from the client desiring access to the network to the switch which unpacks the EAPOL and forwards the EAP packet to an authentication server - which in most cases will be a RADIUS server. From there everything goes vice versa.  
+By default the ports are in an unauthorized state and will only allow to transmit and receive Extensible Authentication Protocol Over LAN ([EAPOL](https://www.vocal.com/secure-communication/eapol-extensible-authentication-protocol-over-lan/)) frames - which basically is encapsulated [EAP](https://en.wikipedia.org/wiki/Extensible_Authentication_Protocol). These frames are forwarded from the client desiring access to the network to the switch which unpacks the EAPOL and forwards the EAP packet to an authentication server - which in most cases will be a RADIUS server. From there everything goes vice versa. As EAP is more a framework than a protocol, it contains several EAP methods that allow you to choose how to authenticate. The most commonly known variants are EAP-TLS, EAP-MD5, EAP-PSK and EAP-IKEv2, allowing to authenticate by e.g. preshared keys, passwords or certificates.   
 The flow looks like this:  
 <figure>
   <img src="/images/2021-06-05/eapol_flow.png">
@@ -186,6 +186,11 @@ And tada, I am in your network:
 
 <img src="/images/2021-06-05/mitm.png">
 
+Again fetching your hashes:  
+
+<img src="/images/2021-06-05/hashwizard.png">  
+<img src="/images/2021-06-05/responder_all.png">  
+<img src="/images/2021-06-05/responder_all2.png">  
 
 # Defense  
 In general an 802.1x implementation will prevent employees or service providers from connecting rogue devices to your network.  
