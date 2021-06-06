@@ -165,13 +165,15 @@ So to get started you first need to find a device you want to attack. We might h
 Next we start the nac_bypass script and put the dropbox between the switch (eth0) and the victim device (eth1).  
 ```./nac_bypass_setup.sh```  
 If you want to manually specify the interfaces you can do so with the ```-1``` and ```-2```switches. By default it will treat the lower device as switch side, and the next one as victim facing interface. I nearly never used these options.   
+
 <img src="/images/2021-06-05/nac_bypass.png">  
  
 The script asks you to wait some time, so it is able to dump the needed info from the network traffic, and then to hit any key.  
+
 <img src="/images/2021-06-05/nac_bypass1.png">  
 <img src="/images/2021-06-05/nac_bypass2.png">  
 
-As you can see, it grabbed my MAC address, my IP address and the gateway´s MAC address, just a Skip described it to be the only needed info for the bridge attack.  
+As you can see, it grabbed my MAC address, my IP address and the gateway´s MAC address, just as Skip described it to be the only needed info for the bridge attack.  
 You can now proceed and for instance do an nmap scan on the network, start MitM attacks, or just watch and analyze the traffic passing by.  
 
 As for Responder: Things got a little confusing for me at first. So I reached out to Mick directly who replied to me within minutes. I really love this community and how helpful people are. So thank you again Mick for your kind support.  
@@ -181,6 +183,7 @@ So Responder needs to bet set up to listen on the bridge interface, but change t
 ```./Responder.py -I br0 -e victim.ip```  
 
 And tada, I am in your network:  
+
 <img src="/images/2021-06-05/mitm.png">
 
 
@@ -188,8 +191,9 @@ And tada, I am in your network:
 In general an 802.1x implementation will prevent employees or service providers from connecting rogue devices to your network.  
 To a certain extend it may also block script kiddies.  
 For someone who is willed and has the needed knowledge, the attacks will most likely be successful, rendering NAC (at least if < 802.1x-2010) useless.  
+Do your homework. Know what you are exposing, and how much security you gain by implementing NAC.
 
-So here´s some general advice I can provide in order to keep things as secure as possible:  
+Here´s some general advice I can provide in order to keep things as secure as possible:  
 - If you have devices that get authenticated by MAC only -> separate them. Put them in a different VLAN or do microsegmentation and be 100% sure to reduce allowed resources to an absolute minimum. Keep these systems up-to-date, as they are easier to reach by an attacker, so to keep the attack surface as low as possible. If you are able to, get rid of devices that can´t do 802.1x. Also if possible use fingerprinting options inside your NAC, so that the MAC address is not the only criteria, but also open ports, stack fingerprints etc.
 - If possible stick to MACSec. This will at least make it much harder for an attacker to gather the needed info to play MitM.  
 - If you can´t do MACSec, it´ll be all about what can happen and what you see after an attacker is inside your network. Use triggers like:  
