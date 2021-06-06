@@ -150,7 +150,7 @@ Well there´s two things we could do now:
 But there is a downside to this method. As long as we use stateless protocols like UDP, we and the victim can communicate just fine. However when it comes to using stateful protocols like TCP, we will for certain run into issues, as one device behind the Hub will be the first to receive and drop or answer a package e.g. in the 3-way-handshake. This leaves us with option ...  
 2. Using a transparent bridge. This is the implementation of Skip´s idea, which involves a device that - simply spoken - in a first instance just lets all the traffic traverse it by means of forwarding rules, being totally transparent to the network and all the participants. Next it does some tcpdump magic to sniff traffic like ARP, NetBIOS but also Kerberos, Active Directory, web etc., extracting the needed infos to spoof the victim and the networks gateway to stay under the radar. With these info the needed rules in ebtables, iptables etc. are automatically created, and will allow an attacker to interact with the network mimicing the victim.  
 
-At this point I want to thank [Michael Schneider](https://twitter.com/0x6d69636b) for writing [this](https://www.scip.ch/?labs.20190207) blog post about bypassing 802.1x. Everything regarding this topic started with his post and the [nac_bypass](https://github.com/scipag/nac_bypass) tool he wrote. I am using his tool on engagements, and it is awesome :) Thanks buddy.  
+At this point I want to thank [Mick Schneider](https://twitter.com/0x6d69636b) for writing [this](https://www.scip.ch/?labs.20190207) blog post about bypassing 802.1x. Everything regarding this topic started with his post and the [nac_bypass](https://github.com/scipag/nac_bypass) tool he wrote. I am using his tool on engagements, and it is awesome :) Thanks buddy.  
 
 During my research I found several other tools that implement the same features. You can find a list of them at the very end of this blog post.   
   
@@ -167,15 +167,15 @@ The script asks you to wait some time, so it is able to dump the needed info fro
 As you can see, it grabbed my MAC address, my IP address and the gateway´s MAC address, just a Skip described it.  
 You can now proceed and for instance do an nmap scan on the network, start MitM attacks, or just watch and analyze the traffic passing by.  
 
-As for Responder: I am not 100% sure how things are intended to work.  
-I looked up the iptables rules like so: ```iptables -t nat -L```  
-I was able to run Responder with the ```-I ALL -i victim-IP```, but couldn´t get MitM stuff like NetBIOS / LLMNR poisoning working.  
-<img src="/images/2021-06-05/responder_all.png">  
-<img src="/images/2021-06-05/responder_all1.png">  
+As for Responder: Things got a little confusing for me at first. So I reached out to Mick directly who replied to me within minutes. I really love this community and how helpful people are. So thank you again Mick for your kind support.  
+You can look up the iptables rules like so to see what is going on: ```iptables -t nat -L```  
+This script will put rules in place, that reroute all traffic intended for the client on lets say port 445 to your bridge.  
+So Responder needs to bet set up to listen on the bridge interface, but change the answering IP adderess to the one of the victim:  
+```./Responder.py -I br0 -e victim.ip```  
 
-I guess the intented way is to have Responder listen on the bridge interface, however I am not sure how the poisoning stuff should work from here.  
+And tada, I am in your network:  
+<img src="/images/2021-06-05/mitm.png">
 
-As you can see, it only worked when I directly entered the victims IP e.g. to connect via SMB, and the iptables rules would redirect my request to the bridge forwarding the incoming SMB traffic.  
 
 # Defence  
 In general a 802.1x implementation will prevent employees or service providers from connecting rogue devices to your network.  
