@@ -200,7 +200,7 @@ Do your homework. Know what you are exposing, and how much security you gain by 
 
 Here´s some general advice I can provide in order to keep things as secure as possible:  
 - If you have devices that get authenticated by MAC only -> separate them. Put them in a different VLAN or do microsegmentation and be 100% sure to reduce allowed resources to an absolute minimum. Keep these systems up-to-date, as they are easier to reach by an attacker, so to keep the attack surface as low as possible. If you are able to, get rid of devices that can´t do 802.1x. Also if possible use fingerprinting options inside your NAC, so that the MAC address is not the only criteria, but also open ports, stack fingerprints etc.
-- To minimize the Hub scenario, set up your environment to ask for re-authentication in smaller timeframes. Leaving ports open after a      successful 802.1x authentication for an hour will pose you to a much higher risk than 5 minutes.
+- To minimize the Hub scenario, set up your environment to ask for re-authentication in smaller timeframes. Leaving ports open after a successful 802.1x authentication for an hour will pose you to a much higher risk than 5 minutes.
 - If possible stick to MACSec. This will at least make it much harder for an attacker to gather the needed info to play MitM.   
 - If you can´t do MACSec, it´ll be all about what can happen and what you see after an attacker is inside your network. Use triggers like:  
   - Uncommon link up/downs on your switch  
@@ -209,9 +209,10 @@ Here´s some general advice I can provide in order to keep things as secure as p
   - Changed TTLs  
   - Access to systems and services that normally don´t get accessed (firewall logs)  
   - Monitor your networks traffic and detect attacks / unknown patterns (IDS/IPS/SIEM)  
-- Separate your devices as much as possible  
-- Don´t expose unneeded ports. Pull the cables in the rack for not in use ports, or disable them switch wise  
-- Restrict access to the systems. If someone is not able to get in between, he can´t carry out attacks  
+- Separate your devices as much as possible.  
+- Don´t expose unneeded ports. Pull the cables in the rack for not in use ports, or disable them switch wise.  
+- Don´t expose unneeded info. Stickers with IP / MAC addresses will make it much easier for an attacker. Same goes for access to IP phone or printer menus to gather network  intel. Restrict them as much as possible.  
+- Restrict access to the systems. If someone is not able to get in between, he can´t carry out attacks.  
 - Awareness - Train your employees to ask questions and inform you, when they see a suspicious device hanging from a printer or stuff like that.  
 - I heard people say to use a per client VPN solution. However I am not quite sure if this will work. All the juicy info still needs to be plain text, so that routers are able - well - to route the packets. So an attacker will still be able to set up the transparent bridge. He will however not be able to reach the "other side" of the VPN. This again would need you to have ALL devices being capable of doing VPN and that´s not going to happen.  
 
