@@ -175,7 +175,7 @@ Next we fire up Logic 2. Here we need to prepare a few things.
 
    Select the BitLocker Key Extractor Extension  
 2. Under the device settings select:  
-   Correct Voltage (this cost me hours of troubleshooting as I first didn't pay attention here, and let it at 1.8V which gave nothing but bullshit)  
+   Correct Voltage (this cost me hours of troubleshooting as I first didn't pay attention here, and let it at 1.2V which gave nothing but bullshit)  
    Enough RAM for buffering, I used 4GB  
    An according sample rate. The rule here is to use at least 4 times the rate than the actual signal, which in this case is running at a max of 33MHz, so we should at least select 125MS/s, but I went with 250MS/s  
 3. Setup the SPI decoder, so that we have the correct lines assigned and also have Channel Select on active high. The reason here is, that we 
@@ -213,4 +213,17 @@ docker build -t bitlocker-spi-toolkit .
 
 From here it is trivial for an attacker to carry out further stuff, e.g. add a local administrator or reset the local admin password, search for sensitive files and so on.  
 
+## Mitigation  
 
+Well that's fairly easy. If you want to have it secure, use an additional factor during the boot process.  
+Microsoft runs an excellent blog for all the scenarios [here](https://docs.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-countermeasures).  
+It doesn´t matter if you just bother your users, or implement a 3rd party solution or switch over to another product that offers MFA at the preboot phase together with SSO.  
+
+## Conclusion  
+
+So that's it.  
+We successfully stole the VMK from a device we had physical access to.  
+I disagree with the Dolosgroup people to a certain extend, that these attacks can be carried out in a short amount off time - they say less than 30 minutes. The problem I see is, you probably won't run into a situation where you exactly know the device. The usecase might be during a red team engagement to get hold of a device, tore it appart, do all the attack stuff to backdoor it, and put it back into place. But the info gathering phase will take you way more than 30 minutes. If you have all the info beforehand and know exactly what to open, where to hook etc., then it might be possible to carry out everything in under 30 minutes though.  
+
+I hope you enjoyed the read.  
+Yours faithfully - LuemmelSec.  
