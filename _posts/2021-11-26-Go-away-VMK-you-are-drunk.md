@@ -99,7 +99,7 @@ This was the point when [Tim](https://twitter.com/time_reyes) from Saleae reache
 
 Let's now head over and get our hands dirty.  
 
-MEME HERE  
+<img src="/images/2021-11-26/attack.png"> 
 
 ### Things I used  
 
@@ -112,17 +112,17 @@ MEME HERE
 ### Recon  
 
 The first thing we need to know is what TPM chip is installed, which bus it is using and which other components might be connected to that bus, if we can't or don't want to connect to the TPM directly.  
-I started by disassembling the whole notebook ([the official](https://data2.manualslib.com/pdf4/91/9048/904783-dell/latitude_e5450.pdf?867f5d1c34658fb0b6639866c645e1cf) guide was a real help]), reading the marks on the mainboard and do some googling. This eventually led me here:  
+I started by disassembling the whole notebook ([the official](https://data2.manualslib.com/pdf4/91/9048/904783-dell/latitude_e5450.pdf?867f5d1c34658fb0b6639866c645e1cf) guide was a real help), reading the marks on the mainboard and do some googling. This eventually led me here:  
 
 <img src="/images/2021-11-26/mainboard.png">
 
 Googling ```ZAM70``` gave me these technical details: [https://www.hisahtech.com/wp-content/uploads/2020/05/ZAM70-LA-A901P-r03-Dell-Latitude-E5450.pdf](https://www.hisahtech.com/wp-content/uploads/2020/05/ZAM70-LA-A901P-r03-Dell-Latitude-E5450.pdf)  
 
-So on the first page we can see that we have an Atmel AT97SC3205 TPM chip running on the SPI bus, which is also connected to two flash chips W25Q64CVSSIQ & W25Q32BVSSIQ:  
+So on the first page we can see that we have an Atmel AT97SC3205 TPM chip running on the SPI bus, to which two flash chips W25Q64CVSSIQ & W25Q32BVSSIQ are also connected:  
 
 <img src="/images/2021-11-26/diagramm.png">
 
-On the site with the TPM in detail, we can see which pins are connected to which lines and that it is running on 3.3V, which should become a crucial part later on.  
+On the site with the TPM in detail, we can see which pins are connected to which lines and that it is running on 3.3V, which should become a crucial detail later on.  
 
 <img src="/images/2021-11-26/TPM Diagramm.png">
 
@@ -143,7 +143,7 @@ Selecting the chip will give us all pins and the according lines they are connec
 
 <img src="/images/2021-11-26/UZ1.png">
 
-When we follow e.g. pin 23, which is the ```SPI_DOTPM```, we can also see that it is connected to the ```JSPI1``` module on the backside of the mainboard, which in the end leads us the ```UC2``` chip that happens to be one of the two flash chips connected to the SPI bus. These flash chips are in SOIC8 format, and much easier to access with our probes than the TPM itself.
+When we follow e.g. pin 23, which is the ```SPI_DOTPM```, we can also see that it is connected to the ```JSPI1``` module on the backside of the mainboard, which in the end leads us to the ```UC2``` chip that happens to be one of the two flash chips connected to the SPI bus. These flash chips are in SOIC8 format, and much easier to access with our probes than the TPM itself.
 
 ### Wiring things up  
 
@@ -154,10 +154,10 @@ In order to be able to decode the SPI signals, we need a clock signal, MISO, MOS
 
 In this case we have:  
 Pin 6 ```SPI_CLK64``` is the clock signal  
-Pin 5 ```SPI_DO64``` is ```MOSI```
-Pin 2 ```SPI_DIN64``` is ```MISO```
-Pin 1 ```SPI_PCH_CS0#_R``` is Channel Select
-Pin 4 ```GND``` is ground (we need that in order to not mess up with the signals)
+Pin 5 ```SPI_DO64``` is ```MOSI```  
+Pin 2 ```SPI_DIN64``` is ```MISO```  
+Pin 1 ```SPI_PCH_CS0#_R``` is Channel Select  
+Pin 4 ```GND``` is ground (we need that in order to not mess up with the signals)  
 
 <img src="/images/2021-11-26/BV UC2.png">
 
@@ -185,7 +185,7 @@ Next we fire up Logic 2. Here we need to prepare a few things.
 
 Now things are getting serious. With everything in place it's time to start the logging process and fire up our notebook. We should see lots of SPI messages coming in. In regards to the TPM stuff, we are only interested in READ messages from the register TPM_DATA_FIFO_0, which acts as a buffer for exchanged messages on the SPI bus. BitLocker only makes use of the locality 0, which brings everything down to the before mentioned register, where the VMK will be transferred. Henri’s HLA will just look at this register for the BitLocker VMK structures, that are defined as follows (and can be found [here](https://github.com/libyal/libbde/blob/main/documentation/BitLocker%20Drive%20Encryption%20(BDE)%20format.asciidoc)):  
 
-The header data will start with this 2c000[0-6]000[1-9]000[0-1]000[0-5]200000
+The header data will start with this ´´´2c000[0-6]000[1-9]000[0-1]000[0-5]200000´´´
 
 <img src="/images/2021-11-26/BitLocker start.png">
 
