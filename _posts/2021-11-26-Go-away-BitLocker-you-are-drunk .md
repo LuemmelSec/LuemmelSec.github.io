@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Go away VMK, you´re drunk
+title: Go away BitLocker, you´re drunk
 ---
 This time we want to try to do some hardware hackery stuff and attack BitLocker encrypted drives where TPM is used but no additional factor like a PIN or password.    
    
