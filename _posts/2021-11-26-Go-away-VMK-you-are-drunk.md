@@ -11,7 +11,7 @@ This time we want to try to do some hardware hackery stuff and extract BitLocker
 
 During the last couple of months I stumbled upon a few articles and tweets where people where extracting cryptographic keys for BitLocker directly from the bus the TPM was talking on. They did so by hooking up a logic analyzer directly to the TPM or some other chip connected to the according bus.  
 
-https://pulsesecurity.co.nz/articles/TPM-sniffing  by [Denis Andzakovic](https://twitter.com/0x446f49)
+(https://pulsesecurity.co.nz/articles/TPM-sniffing)  by [Denis Andzakovic](https://twitter.com/0x446f49)
 https://twitter.com/SecurityJon/status/1445020885472235524 by [Jon Aubrey](https://twitter.com/SecurityJon)  
 https://dolosgroup.io/blog/2021/7/9/from-stolen-laptop-to-inside-the-company-network by [DolosGroup](https://twitter.com/DolosGroup)  
 https://labs.f-secure.com/blog/sniff-there-leaks-my-bitlocker-key/ by [Henri Nurmi](https://twitter.com/HenriNurmi)
