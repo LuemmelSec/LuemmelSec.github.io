@@ -171,7 +171,7 @@ Next we fire up Logic 2. Here we need to prepare a few things.
    Git clone or download the [repo](https://github.com/FSecureLABS/bitlocker-spi-toolkit)  
    Add a custom extension: Extensions -> Load Existing Extension  
 
-   <img src="/images/2021-11-26/logic_2.png">
+   <img src="/images/2021-11-26/logic_1.png">
 
    Select the BitLocker Key Extractor Extension  
 2. Under the device settings select:  
