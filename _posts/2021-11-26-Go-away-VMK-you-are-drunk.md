@@ -2,21 +2,22 @@
 layout: post
 title: Go away VMK, you´re drunk
 ---
-This time we want to try to do some hardware hackery stuff and extract BitLocker VMKs directly from the TPM when communicating over the SPI bus with the help of a logic analyzer.  
+This time we want to try to do some hardware hackery stuff and attack BitLocker encrypted drives where TPM is used but no additional factor like a PIN or password.    
    
 <img src="/images/2021-11-26/wizard.png">
 
 <!--more-->
 # Introduction  
 
-During the last couple of months I stumbled upon a few articles and tweets where people where extracting cryptographic keys for BitLocker directly from the bus the TPM was talking on. They did so by hooking up a logic analyzer directly to the TPM or some other chip connected to the according bus.  
+During the last couple of months I stumbled upon a few articles and tweets where people were extracting cryptographic keys for BitLocker directly from the bus the TPM was talking on. They did so by hooking up a logic analyzer directly to the TPM or some other chip connected to the according bus.  
 
-[https://pulsesecurity.co.nz/articles/TPM-sniffing](https://pulsesecurity.co.nz/articles/TPM-sniffing)  by [Denis Andzakovic](https://twitter.com/0x446f49)  
+This is the stuff that made me write this blog post:  
+[https://pulsesecurity.co.nz/articles/TPM-sniffing](https://pulsesecurity.co.nz/articles/TPM-sniffing) by [Denis Andzakovic](https://twitter.com/0x446f49)  
 [https://twitter.com/SecurityJon/status/1445020885472235524](https://twitter.com/SecurityJon/status/1445020885472235524) by [Jon Aubrey](https://twitter.com/SecurityJon)  
 [https://dolosgroup.io/blog/2021/7/9/from-stolen-laptop-to-inside-the-company-network](https://dolosgroup.io/blog/2021/7/9/from-stolen-laptop-to-inside-the-company-network) by [DolosGroup](https://twitter.com/DolosGroup)  
 [https://labs.f-secure.com/blog/sniff-there-leaks-my-bitlocker-key/](https://labs.f-secure.com/blog/sniff-there-leaks-my-bitlocker-key/) by [Henri Nurmi](https://twitter.com/HenriNurmi)
 
-All credits go to you guys, thanks for sharing :)  
+All credits go to you guys, thanks for sharing your knowledge :)  
 
 As I thought to myself that this is really cool shit and I wanted to see it with my own eyes, the journey began.
 
@@ -24,9 +25,11 @@ As I thought to myself that this is really cool shit and I wanted to see it with
 
 [BitLocker](https://en.wikipedia.org/wiki/BitLocker) is Microsoft's full volume encryption feature build into Windows since Vista.  
 One can run it in three modes:
-1. Transparent operation mode: The decryption keys are sealed inside a TPM and released during the boot proces when several checks are passed regarding tampered boot files.  
+```
+1. Transparent operation mode: The decryption keys are sealed inside a TPM and released during the boot proces when several checks are passed regarding tampered boot files and stuff.  
 2. User authentication mode: Here a user needs to provide some sort of additional authentication during the boot process, e.g. a PIN or password.  
 3. USB key mode: The decryption keys are stored on a USB device, which needs to be present in order to decrypt and boot the system.  
+```
 
 This leaves us with the following possible combinations to run BitLocker:  
 TPM only  
