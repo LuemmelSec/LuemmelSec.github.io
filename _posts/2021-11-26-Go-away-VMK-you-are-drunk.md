@@ -19,7 +19,7 @@ This is the stuff that made me write this blog post:
 
 All credits go to you guys, thanks for sharing your knowledge :)  
 
-As I thought to myself that this is really cool shit and I wanted to see it with my own eyes, the journey began.
+As I thought to myself that this is really cool shit and I wanted to see it with my own eyes, I hesitated no longer and plunged into the adventure.  
 
 # Basics  
 
