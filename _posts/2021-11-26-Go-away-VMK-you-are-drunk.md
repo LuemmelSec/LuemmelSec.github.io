@@ -54,7 +54,7 @@ The attack I'll describe only works when no preboot authentication is in place, 
 
 An this is where good ol' MS is telling you that users can have a nice SSO experience by using TPM only and that you should try to avoid bothering them!
 
-MEME HERE
+<img src="/images/2021-11-26/facepalm.jpg">
 
 "This protection should not be cumbersome to users. One undesirable and previously commonplace situation is when the user is prompted for input during preboot, and then again during Windows logon. Challenging users for input more than once should be avoided. Windows 11 and Windows 10 can enable a true SSO experience from the preboot environment on modern devices and in some cases even on older devices when robust information protection configurations are in place."  
 [https://docs.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-device-encryption-overview-windows-10 ](https://docs.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-device-encryption-overview-windows-10)  
@@ -64,16 +64,16 @@ MEME HERE
 I´ll be honest with you. In first place I just partly red the articles referenced in the intro section. The only thing that got me and what I understood was: You can buy an [ICEStick](https://www.latticestore.com/searchresults/tabid/463/searchid/1/searchvalue/ice40hx1k-stick-evn/default.aspx) for 40$ and make it read all the VMKs, when reading Denis blog.  
 How dumb I was.
 
-MEME HERE  
+<img src="/images/2021-11-26/dumb.png">
 
 So I bought the ICEStick which now is more like 80$ instead of 40$ (thanks chip shortage you lil' asshole), had a really hard time getting all the tools and stuff working (there are million ways of doing the same stuff), only to find out that the config Denis wrote for it, was only capable of reading LPC messages and extracting the VMK out of them.  
 Guess what - the test notebook I had was using SPI. Fuck. There goes my dream of a 40$ tool that's doing all the magic stuff to the TPM, no matter what device you throw it at. I spent some hours searching for solutions to make it talk and read SPI, but gave up as this is too deep down the rabbit hole for me.  
 
 So off to plan B. Denis also describes how he used a [DSLogic Plus](https://www.dreamsourcelab.com/shop/logic-analyzer/dslogic-plus/) to do all the stuff on a TPM 1.2.  
-Great I thought to myself, they tell you something about refunds if not satisfied and 150$ is okay. So the device arrives, I head over to Denis blog again aaaaaaaand - yes this variant was using the LPC bus.  
+Great I thought to myself, they tell you something about refunds if not satisfied and 150$ is okay. So the device arrives, I head over to Denis blog again aaaaaaaand - yes this variant was using the LPC bus aswell.  
 Goddammit you stupid sucker.  
 
-MEME HERE  
+<img src="/images/2021-11-26/nopls.jpg">
 
 But wait, there is also a High Level Analyzer for the sigrok project available for [TPM 2.0 and SPI](https://pythonawesome.com/libsigrok-stacked-protocol-decoder-for-tpm-2-0-transactions-from-an-spi-bus/). The problem with the DSLogic is, that it only has very little memory to buffer data, and for stream mode it only supports USB 2.0, which would allow us to catch some seconds on 4 channels with 100MHz.  
 Let me quickly check that. I need 5 channels. Frustration is rising.  
@@ -83,14 +83,13 @@ I was able to do the same, hack together the data, and finally had everything I 
 Mission complete one would guess. But not for me.  
 I did like 100000000000000000 testruns capturing data and clock. Sometimes the SPI decoder got me readable data, sometimes it didn´t. What never gave me data was the VMK extractor. I tried with DSView as well as PulseView - no chance.  
 I thought okay, write the nice people from DSLogic, that you would like to send back the device and have a refund.  
-No answer.  
 
-HEUBALLEN MEME  
+<img src="/images/2021-11-26/tumblweed1.png">
 
 I even thought about buying the larger U3Pro16 device for 300$, which has more memory and can stream over USB 3.0. I offered them to do some colab on this blog and asked if they would offer me a discount for that.  
 No answer.  
 
-HEUBALLEN AGAIN  
+<img src="/images/2021-11-26/support.png">
 
 This. ladies and gentlemen, is how bad customer support looks like, thanks for nothing.  
 In parallel I struggled to buy the [Saleae Logic Pro 8](https://eur.saleae.com/products/saleae-logic-pro-8?variant=10963960496171), because it´s the most expensive one, but was used in some of the other writeups successfully. I asked on twitter if someone had a used device, willing to sell it to me, but got no response.  
