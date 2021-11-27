@@ -26,19 +26,21 @@ As I thought to myself that this is really cool shit and I wanted to see it with
 [BitLocker](https://en.wikipedia.org/wiki/BitLocker) is Microsoft's full volume encryption feature build into Windows since Vista.  
 One can run it in three modes:
 ```
-1. Transparent operation mode: The decryption keys are sealed inside a TPM and released during the boot proces when several checks are passed regarding tampered boot files and stuff.  
+1. Transparent operation mode: The decryption keys are sealed inside a TPM
+and released during the boot proces when several checks are passed regarding tampered boot files and stuff.  
 2. User authentication mode: Here a user needs to provide some sort of additional authentication during the boot process, e.g. a PIN or password.  
 3. USB key mode: The decryption keys are stored on a USB device, which needs to be present in order to decrypt and boot the system.  
 ```
 
 This leaves us with the following possible combinations to run BitLocker:  
+```
 TPM only  
 TPM + PIN  
 TPM + PIN + USB Key  
 TPM + USB Key  
 USB Key (only with changes to GPOs)  
 Password (only with changes to GPOs)  
-
+```
 The Trusted Platfrom Module [TPM](https://en.wikipedia.org/wiki/Trusted_Platform_Module) is a cryptoprocessor bound to a specific device. It is capable of holding cryptographic keys, and so BitLocker can be used with keys stored in this module. When no form pre boot authentication is in place, the TPM will release the keys during the boot process, in order to decrypt the disk automatically. Depending on the TPM device itself and regarding to the official [documentation](https://trustedcomputinggroup.org/wp-content/uploads/PC-Client-Specific-Platform-TPM-Profile-for-TPM-2p0-v1p05p_r14_pub.pdf), it will communicate over the [LPC](https://en.wikipedia.org/wiki/Low_Pin_Count), [SPI](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface) or [I2C](https://en.wikipedia.org/wiki/I²C) bus. 
 
 The Volume Master Key [VMK]() is BitLockers cryptographic key held by the TPM. However it is only used to decrypt the Full Volume Encryption Key [FVEK]() which is responsible for actually decrypting the data. "The addition of the volume master key allows the system to be re-keyed easily when keys upstream in the trust chain are lost or compromised. This ability to re-key the system saves the expense of decrypting and encrypting the entire volume again." More on this [here](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc732774%28v=ws.10%29).  
