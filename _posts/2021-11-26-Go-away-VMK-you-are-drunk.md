@@ -185,7 +185,7 @@ Next we fire up Logic 2. Here we need to prepare a few things.
 
 Now things are getting serious. With everything in place it's time to start the logging process and fire up our notebook. We should see lots of SPI messages coming in. In regards to the TPM stuff, we are only interested in READ messages from the register TPM_DATA_FIFO_0, which acts as a buffer for exchanged messages on the SPI bus. BitLocker only makes use of the locality 0, which brings everything down to the before mentioned register, where the VMK will be transferred. Henri’s HLA will just look at this register for the BitLocker VMK structures, that are defined as follows (and can be found [here](https://github.com/libyal/libbde/blob/main/documentation/BitLocker%20Drive%20Encryption%20(BDE)%20format.asciidoc)):  
 
-The header data will start with this ´´´2c000[0-6]000[1-9]000[0-1]000[0-5]200000´´´
+The header data will start with this ```2c000[0-6]000[1-9]000[0-1]000[0-5]200000```  
 
 <img src="/images/2021-11-26/BitLocker start.png">
 
