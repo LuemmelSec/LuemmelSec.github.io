@@ -66,7 +66,7 @@ I´ll be honest with you. In first place I just partly red the articles referenc
 
 <img src="/images/2021-11-26/dumb.png">
 
-So I bought the ICEStick which now is more like 80$ instead of 40$ (thanks chip shortage you lil' asshole), had a really hard time getting all the tools and stuff working (there are millions ways of doing the same stuff), only to find out that the config Denis wrote for it, was only capable of reading LPC messages and extracting the VMK out of them.  
+So I bought the ICEStick which now is more like 80$ instead of 40$ (thanks chip shortage you lil' asshole), had a really hard time getting all the tools and stuff working (there are a million ways of doing the same stuff), only to find out that the config Denis wrote for it, was only capable of reading LPC messages and extracting the VMK out of them.  
 Guess what - the test notebook I had was using SPI. Fuck. There goes my dream of a 40$ tool that's doing all the magic stuff to the TPM, no matter what device you throw it at. I spent some hours searching for solutions to make it talk and read SPI, but gave up as this is too deep down the rabbit hole for me.  
 
 So off to plan B. Denis also describes how he used a [DSLogic Plus](https://www.dreamsourcelab.com/shop/logic-analyzer/dslogic-plus/) to do all the stuff on a TPM 1.2.  
