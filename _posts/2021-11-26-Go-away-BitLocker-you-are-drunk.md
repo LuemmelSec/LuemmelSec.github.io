@@ -161,9 +161,9 @@ Pin 4 ```GND``` is ground (we need that in order to not mess up with the signals
 
 <img src="/images/2021-11-26/BV UC2.png">
 
-Now we can attach the probes from the logic analyzer to the flash chip, which is accessible by just removing the back cover of the notebook.  
+Now we can attach the probes from the logic analyzer to the flash chip, which is accessible by just removing the back cover of the notebook. I always found it usefull to have some bigger points of orientation to find the correct chips. In this case the two RAM slots were of great help.  
 
-<img src="/images/2021-11-26/attach.jpg">
+<img src="/images/2021-11-26/attach.png">
 <img src="/images/2021-11-26/attach2.jpg">  
 
 Next we fire up Logic 2. Here we need to prepare a few things.  
