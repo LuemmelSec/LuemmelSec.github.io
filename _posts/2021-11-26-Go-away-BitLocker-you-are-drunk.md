@@ -179,7 +179,7 @@ Next we fire up Logic 2. Here we need to prepare a few things.
    Enough RAM for buffering, I used 4GB  
    An according sample rate. The rule here is to use at least 4 times the rate than the actual signal, which in this case is running at a max of 33MHz, so we should at least select 125MS/s, but I went with 250MS/s  
 
-<img src="/images/2021-11-26/logic_2.png">   
+   <img src="/images/2021-11-26/logic_2.png">   
 
 3. Setup the SPI decoder, so that we have the correct lines assigned and also have Channel Select on active high. The reason here is, that we 
    are on the Channel Select line of the flash chip, and not the one of the TPM. As such we have a Channel Select for the TPM in the opposite way, although we will also catch the signals for the 2nd flash chip, but this is no problem.  
