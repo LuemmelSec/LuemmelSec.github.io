@@ -184,6 +184,8 @@ Next we fire up Logic 2. Here we need to prepare a few things.
 3. Setup the SPI decoder, so that we have the correct lines assigned and also have Channel Select on active high. The reason here is, that we 
    are on the Channel Select line of the flash chip, and not the one of the TPM. As such we have a Channel Select for the TPM in the opposite way, although we will also catch the signals for the 2nd flash chip, but this is no problem.  
 
+   <img src="/images/2021-11-26/spiset.png">  
+
 ### The actual attack  
 
 Now things are getting serious. With everything in place it's time to start the logging process and fire up our notebook. We should see lots of SPI messages coming in. In regards to the TPM stuff, we are only interested in READ messages from the register TPM_DATA_FIFO_0, which acts as a buffer for exchanged messages on the SPI bus. BitLocker only makes use of the locality 0, which brings everything down to the before mentioned register, where the VMK will be transferred. Henri’s HLA will just look at this register for the BitLocker VMK structures, that are defined as follows (and can be found [here](https://github.com/libyal/libbde/blob/main/documentation/BitLocker%20Drive%20Encryption%20(BDE)%20format.asciidoc)):  
