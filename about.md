@@ -2,7 +2,7 @@
 layout: page
 title: About
 permalink: /about/
-<meta property="og:image" name="image" content="https://goalenvisiontest.blob.core.windows.net/images/7_large_image.jpg">
+<meta property="og:image" name="image" content="https://github.com/LuemmelSec/LuemmelSec.github.io/blob/main/images/bloodhound.png">
 ---
 
 Hey fellas, my name is Daniel and I am just a normal IT guy who is interested in InfoSec.  
