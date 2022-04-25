@@ -3,9 +3,11 @@ layout: page
 title: About
 permalink: /about/
 <meta name="image" property="og:image" content="https://github.com/LuemmelSec/LuemmelSec.github.io/blob/main/images/bloodhound.png">
+<meta prefix="og: http://ogp.me/ns#" property="og:image" content="https://github.com/LuemmelSec/LuemmelSec.github.io/blob/main/images/bloodhound.png?raw=true" />
 ---
 <head>
-<meta name="image" property="og:image" content="https://github.com/LuemmelSec/LuemmelSec.github.io/blob/main/images/bloodhound.png?raw=true">  
+<meta name="image" property="og:image" content="https://github.com/LuemmelSec/LuemmelSec.github.io/blob/main/images/bloodhound.png?raw=true">
+<meta prefix="og: http://ogp.me/ns#" property="og:image" content="https://github.com/LuemmelSec/LuemmelSec.github.io/blob/main/images/bloodhound.png?raw=true" />
 </head>
 
 Hey fellas, my name is Daniel and I am just a normal IT guy who is interested in InfoSec.  
