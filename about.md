@@ -2,6 +2,7 @@
 layout: page
 title: About
 permalink: /about/
+<meta property="og:image" name="image" content="https://goalenvisiontest.blob.core.windows.net/images/7_large_image.jpg">
 ---
 
 Hey fellas, my name is Daniel and I am just a normal IT guy who is interested in InfoSec.  
