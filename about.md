@@ -2,9 +2,9 @@
 layout: page
 title: About
 permalink: /about/
-<meta property="og:image" name="image" content="https://github.com/LuemmelSec/LuemmelSec.github.io/blob/main/images/bloodhound.png">
+<meta name="image" property="og:image" content="https://github.com/LuemmelSec/LuemmelSec.github.io/blob/main/images/bloodhound.png">
 ---
-
+<meta name="image" property="og:image" content="https://github.com/LuemmelSec/LuemmelSec.github.io/blob/main/images/bloodhound.png">  
 Hey fellas, my name is Daniel and I am just a normal IT guy who is interested in InfoSec.  
 
 This is my blog that I run and maintain in my sparetime.  
