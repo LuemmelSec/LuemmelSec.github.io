@@ -5,7 +5,6 @@ permalink: /about/
 ---
 
 Hey fellas, my name is Daniel and I am just a normal IT guy who is interested in InfoSec.  
-I currently work as a pentester at [r-tec](https://www.r-tec.net/home.html) in Germany pwning the world :)  
 
 This is my blog that I run and maintain in my sparetime.  
 It´s intention is to help me build, deepen and share knowledge.  
