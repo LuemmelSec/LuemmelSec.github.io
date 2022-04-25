@@ -6,8 +6,8 @@ permalink: /about/
 <meta prefix="og: http://ogp.me/ns#" property="og:image" content="https://github.com/LuemmelSec/LuemmelSec.github.io/blob/main/images/bloodhound.png?raw=true" />
 ---
 <head>
-<meta name="image" property="og:image" content="https://github.com/LuemmelSec/LuemmelSec.github.io/blob/main/images/bloodhound.png?raw=true">
-<meta prefix="og: http://ogp.me/ns#" property="og:image" content="https://github.com/LuemmelSec/LuemmelSec.github.io/blob/main/images/bloodhound.png?raw=true" />
+<meta name="image" property="og:image" content="https://avatars1.githubusercontent.com/u/58529760?s=460&v=4">
+<meta prefix="og: http://ogp.me/ns#" property="og:image" content="https://avatars1.githubusercontent.com/u/58529760?s=460&v=4" />
 </head>
 
 Hey fellas, my name is Daniel and I am just a normal IT guy who is interested in InfoSec.  
