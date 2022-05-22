@@ -68,7 +68,7 @@ The ```TGT``` of that user automagically gets cached. We can use [Rubeus](https:
 Rubeus.exe monitor /interval:10 /targetuser:lowpriv
 ``` 
 
-<img src="/images/2022-05-19/saved_TGT.png">  
+<img src="/images/2022-05-19/saved_tgt.png">  
 
 ```
 Rubeus.exe triage
