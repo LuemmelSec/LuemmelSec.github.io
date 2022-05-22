@@ -419,6 +419,8 @@ Just be aware of the consequences a (mis)configuration of delegations might have
 So I once again hope you enjoyed the read.  
 Stay safe and happy hacking.  
 
+If you happen to have any technical questions, please directly contact the people from the "Thank you" section :)
+
 Luemmel  
 
 # Thanks to
