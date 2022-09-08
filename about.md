@@ -15,4 +15,4 @@ If you have any suggestions, think that I am terribly wrong at some point or cou
 <a href="https://eu.badgr.com/public/assertions/LbHY7ftfT0KCxyMcYfIa8Q"><img src="/images/CRTO.png" height="100"/></a> 
 <a href="https://www.credential.net/e33b655d-0ceb-4c95-9315-f4cfbe1595f4"><img src="/images/CRTP.png" height="100"/></a> 
 <img src="https://tryhackme-badges.s3.amazonaws.com/LuemmelSec.png" alt="TryHackMe" height="100">
-[ ![f1b0nacc1](https://www.hackthebox.eu/badge/image/55531)](https://www.hackthebox.eu/home/users/profile/55531)
+[ ![f1b0nacc1](https://www.hackthebox.com/home/users/profile/151978)](https://www.hackthebox.com/home/users/profile/151978)
