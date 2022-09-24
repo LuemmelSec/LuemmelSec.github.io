@@ -247,11 +247,11 @@ This did not work in my environment. Shortening the query a bit, at least narrow
 Get-ADObject -LDAPFilter '(&(objectclass=pkicertificatetemplate)(pkiextendedkeyusage=2.5.29.37.0))' -SearchBase 'CN=Configuration,DC=mcafeelab,DC=local' 
 ```
 
-<img src="/images/2022-09-16/esc2_enum2.png">  
+<img src="/images/2022-09-16/ESC2_enum2.png">  
 
 But you can still just use the before mentioned tools and search for the according attribute:  
 
-<img src="/images/2022-09-16/esc2_enum1.png">  
+<img src="/images/2022-09-16/ESC2_enum1.png">  
 
 
 ## ESC3
@@ -262,9 +262,9 @@ For this to work, we obviously need to meet two conditions:
 
 ### What it looks like in AD  
 
-<img src="/images/2022-09-16/esc3_info1.png">  
+<img src="/images/2022-09-16/ESC3_info1.png">  
 
-<img src="/images/2022-09-16/esc3_info3.png">  
+<img src="/images/2022-09-16/ESC3_info3.png">  
 
 ### Recon
 
@@ -273,7 +273,7 @@ Look out for the afore mentioned prerequisits. However Certify and Certipy did n
 ```
 Get-ADObject -LDAPFilter '(&(objectclass=pkicertificatetemplate)(msPKI-RA-Application-Policies=1.3.6.1.4.1.311.20.2.1)(pkiextendedkeyusage=1.3.6.1.5.5.7.3.2))' -SearchBase 'CN=Configuration,DC=mcafeelab,DC=local'
 ```  
-<img src="/images/2022-09-16/esc3_enum2.png">  
+<img src="/images/2022-09-16/ESC3_enum2.png">  
 
 I opened a [pull request](https://github.com/GhostPack/Certify/pull/22) for Certify. Could also quickly be done for Certipy I guess, but man I have to get this blog post rolling.  
 Please be aware that, due to some code changes (not related to my PR, as this also happens without it), the output is mangled up:  
@@ -288,7 +288,7 @@ Please be aware that, due to some code changes (not related to my PR, as this al
 
  ``/vulnerable`` would give me the first template, the 2nd one however did not pop up, which makes no sense, as it won't be abusable if not both templates are available.  
 
- <img src="/images/2022-09-16/esc3_info4.png">  
+ <img src="/images/2022-09-16/ESC3_info4.png">  
 
 #### Certipy  
 
