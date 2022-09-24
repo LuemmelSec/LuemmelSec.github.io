@@ -424,7 +424,7 @@ If you happen to have any technical questions, please directly contact the peopl
 Luemmel  
 
 # Thanks to
-all the great people that i learnt from by reading their stuff or doing trainings they provide  
+all the great people that I learnt from by reading their stuff or doing trainings they provide  
 
 [Daniel Duggan](https://twitter.com/_RastaMouse)  
 [Charlie Bromberg](https://twitter.com/_nwodtuhs)  
