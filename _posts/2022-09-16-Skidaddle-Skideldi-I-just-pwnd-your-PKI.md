@@ -231,7 +231,7 @@ secretsdump.py -just-dc -hashes 'aad3b435b514...:...f7207931' 'mcafeelab.local/A
 <img src="/images/2022-09-16/ESC1_exploit3.png">  
 
 ## ESC2  
-No matter how oftern I red through all the stuff I found regarding ESC2, I can't wrap my head around it completely.  
+No matter how often I red through all the stuff I found regarding ESC2, I can't wrap my head around it completely.  
 It describes the case, where there is either the ``Any purpose`` SKU set, or no SKU at all (which would be called a SubCA cert), which utlimately would allow the cert to be used for anything we like. Also low priv users need enrollment rights and no manager approval is in place.  
 It is however not abusable like ESC1, if we can't specifiy the SAN.  
 A cert with no SKU could additionally be used to sign other certs. Unfortunately these can't be used for domain auth by default, as the ``NTAuthCertificates``(see p. 14 of the whitepaper) object won't trust them.  
