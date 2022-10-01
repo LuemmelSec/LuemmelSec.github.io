@@ -5,7 +5,10 @@ title: My Way Into InfoSec
 
 This is my very first blog post ever, which I am trying to use to get a little into github (pages), and because I was in the mood to write something.  
 As I am fairly new into being a fulltime InfoSec guy, I´ll be writing about how I got into it and how I landed my current job as a pentester.  
-This will also reflect my point of view regarding **the right mindset** and **certifications** that might get you started.
+This will also reflect my point of view regarding **the right mindset** and **certifications** that might get you started.  
+
+![broken]({{ site.baseurl }}/images/myway.png "myway")  
+
 <!--more-->
 ## A little introduction
  
