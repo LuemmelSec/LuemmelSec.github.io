@@ -407,12 +407,12 @@ UPDATE: Well, again I was wrong, and Oliver added a standalone approach:
 certipy template -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -template 'ESC4_1'
 ```
 
-<img src="/images/2022-09-16/ESC4_exploit99.png">  
+<img src="/images/2022-09-16/esc4_exploit99.png">  
 
 This will make the template vulnerable to [ESC1](#esc1)  
 Before and after Certipy pwnage:  
 
-<img src="/images/2022-09-16/ESC4_exploit100.png">   
+<img src="/images/2022-09-16/esc4_exploit100.png">   
 
 If you are on an engeagement, you might want to use the ``-safe-old`` switch to save the before-version and preserve teh ability to roll back the settings, once you have abused the template.  
 More on this on Oliver`s [blog](https://research.ifcr.dk/certipy-2-0-bloodhound-new-escalations-shadow-credentials-golden-certificates-and-more-34d1c26f0dc6).  
