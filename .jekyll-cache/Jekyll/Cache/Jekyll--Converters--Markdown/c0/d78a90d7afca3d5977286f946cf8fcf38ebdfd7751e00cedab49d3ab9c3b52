@@ -1,0 +1,10 @@
+I"�<p>Hello fellas, or as we say in Germany: “Hallo Freunde der fettfreien Leberwurst.”</p>
+
+<p>In today’s blog-post we´ll be talking about relaying attacks, or more precisely about NTLM relaying attacks. So let´s get started.</p>
+
+<p>As you already know I am new to the pentest field and as such we´re not going to deep dive here, but instead I am trying to give you an overview of what, why and when, mixed with some practical examples in regards to relaying attacks. Wherever applicable I´ll provide you with links for further reading.</p>
+
+<p>There´s nothing new here, just a short overview of the different types of attacks. All the hard work has been done beforehand by awesome people like <a href="https://twitter.com/_dirkjan">Dirk-jan Mollema</a>, <a href="https://twitter.com/PythonResponder">Laurent Gaffie</a>, <a href="https://twitter.com/byt3bl33d3r">byt3bl33der</a> and all the crazy people behind <a href="https://github.com/SecureAuthCorp/impacket">impacket</a>, <a href="https://github.com/lgandx/Responder">responder</a>, <a href="https://github.com/fox-it/mitm6">mitm6</a> and <a href="https://github.com/bettercap/bettercap">bettercap</a>.</p>
+
+<p><img src="/images/2021-02-02/relay.png" /></p>
+:ET
