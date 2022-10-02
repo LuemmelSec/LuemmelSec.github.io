@@ -17,6 +17,8 @@ If you have any suggestions, think that I am terribly wrong at some point or cou
 
 Please enjoy my writeups as much as I do.  
 
+If you are more into shorter pieces of info with more recent updates, go follow me on Twitter.  
+
 Cheers, Dan.  
      
 <a href="https://www.youracclaim.com/badges/47725ad5-c23c-470b-9e0e-ed08000bcc1b"><img src="/images/OSCP.png" height="100"/></a>
