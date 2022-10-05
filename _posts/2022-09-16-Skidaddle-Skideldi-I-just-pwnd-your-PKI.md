@@ -169,13 +169,14 @@ certipy find -u 'lowpriv@mcafeelab.local' -p 'low' -dc-ip '10.55.0.2' -stdout -v
 We can simply abuse this manually the GUI way with the help of ``certmgr.msc``:  
 <img src="/images/2022-09-16/ESC1_5.png">  
 
-Specify our CN and as alternative name the UPN of the ``Administrator`` user:  
-<img src="/images/2022-09-16/ESC1_6.png">
+Specify our CN and as alternative name the UPN of the ``Administrator@mcafeelab.local`` user:  
+<img src="/images/2022-09-16/ESC1_certreq.png">  
 
 We now have a cert with ``Administrator`` as the SAN:  
 <img src="/images/2022-09-16/ESC1_7.png">
 
-Export the cert as pfx.  
+Export the cert as pfx:  
+<img src="/images/2022-09-16/ESC1_certexport.png">  
 
 Nicely ask the DC for a TGT with Rubeus and do a pass the ticket attack:  
 
