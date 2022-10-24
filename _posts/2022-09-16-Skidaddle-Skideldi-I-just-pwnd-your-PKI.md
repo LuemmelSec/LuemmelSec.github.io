@@ -13,7 +13,7 @@ Prepare yourself for a shitload of pictures, memes, usefull as well as meaningle
 <!--more-->
 # Introduction  
 
-If you have not already done so, go and read the fundamental work which this blog relies on: [Certified Pre-Owned](https://specterops.io/assets/resources/Certified_Pre-Owned.pdf).  
+If you have not already done so, go and read the fundamental work which this blog relies on: [Certified Pre-Owned](https://specterops.io/wp-content/uploads/sites/3/2022/06/Certified_Pre-Owned.pdf).  
 It is the research from the SpecterOps guys [Will Schroeder](https://twitter.com/harmj0y) and [Lee Christensen](https://twitter.com/tifkin_) in the field of ADCS abuses and their mitigations.  
 
 If you are just here to pwn stuff, you can directly jump to your desired section:  
