@@ -959,6 +959,9 @@ Thx to all the others I forgot to mention, but which's info, tools and writeups 
 
 ## All the stuff I used for my "research" in absolutely chaotic order:  
 
+UPDATE 10.11.2022:  
+SpecterOps released a new blog taking several scenarios with abuse cases and MS patchtes into cosideration -> https://posts.specterops.io/certificates-and-pwnage-and-patches-oh-my-8ae0f4304c1d  
+
 https://ppn.snovvcrash.rocks/pentest/infrastructure/ad/ad-cs-abuse/esc1  
 https://github.com/GhostPack/Certify  
 https://github.com/ly4k/Certipy  
