@@ -426,7 +426,7 @@ You want to sandwich your tag, PM3 and reader to get the best results, because w
 <img src="/images/2023-01-14/pm3_sandwich.png"> 
 <img src="/images/2023-01-14/pm3_sandwich2.png"> 
 
-As you can see, I unscrewed the LF antenna as well as the two "front" screws, so I can place the tag "underneath" the HF antenna and approach the reader as close as possible.
+As you can see, I unscrewed the LF antenna as well as the two "front" screws, so I can place the tag closer to the HF antenna and approach the reader as close as possible.
 
 ```
 hf 14a sniff -rc
