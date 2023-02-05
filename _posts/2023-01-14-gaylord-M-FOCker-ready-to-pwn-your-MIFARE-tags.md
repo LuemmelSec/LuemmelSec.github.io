@@ -124,6 +124,29 @@ You should now end up with something that looks like this:
 
 You can lastely start the ``pm3.bat`` to interact with your device.  
 
+## Tips & Tricks
+
+During my hacking attempts, I needed several attempts to get things right. Troubleshooting was not easy, as I didn't know exactly what I was doing - but ultimately persistence payed off.  
+So when you first examine a tag, make sure that you for 100% know what exactly you are dealing with.  
+Your initial command should be (in case of HF) ``hf search``.  
+
+<img src="/images/2023-01-14/tip1.png"> 
+
+Looking at the output, it looks like we are dealing with a MIFARE Classic type. And that is what I assumed as well. Only thign striking is PRNG = Hard.  
+Now running ``autopwn`` suggest that if found a hardened ``EV1`` version, which is strange as normally ``hf search`` should already have been able to give this info, which it didn't.  
+
+<img src="/images/2023-01-14/tip2.png"> 
+
+This is when I stumbled upon the ``Plus`` version of tags, which can operate in different ``S``ecurity ``L``evels. You can find a really good overview [here](https://tech.springcard.com/2011/mifare-plus-in-a-nutshell/).  
+In ``SL 1``, a Plus tag operates / emulates a normal Classic tag. But, and now it get's weired, these tags can also come in a 2k version, despite the Clasic tags that only are 1k or 4k.  
+To see if you are dealing with a Plus tag use ``hf mfp info``.  
+
+<img src="/images/2023-01-14/tip3.png"> 
+
+Indeed, we are dealing with a Plus 2k tag. 
+Every command I tried beforehand was always without any flag set in regards to the tag size. As such, PM3 defaults to 1k. In my case also sectors 16 & 17 were used (1k ends at sector 15), where acutally the signature was stored. This made me cut these two sectors at each and every attack, and I never was able to have the reader even recognize it.  
+For mostly all commands there are like ``--2k`` or ``--4k`` flags, that tell PM3 to extend the reading, dumping, attacks, etc.  
+
 # Let's play - general attacks
 
 I will solely stick to attacks against MIFARE Classic tags here, as I did nothing else.  
