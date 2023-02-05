@@ -40,7 +40,7 @@ A tag at least consists of a chip or circuit and an antenna.
 There are active, passive and semi-passive tags, where the active version has it's own powersource (so this adds to the components), the passive one is completely powered by the reader and the semi-passive one has a powered chip or circuit, but data transmission is powered by the reader.  
 Tags can be read-only or read-writeable.  
 RFID can operate on a variety of frequencies, like low-frequency (LF), high-frequency (HF), ultra-high-frequency (UHF), microwave etc., ranging from 120 kHz upto 24,125 GHz. For further info see [here](https://en.wikipedia.org/wiki/Radio-frequency_identification#Frequencies).  
-The used frequency as well as the type of tag play a role when it comes to the range a tag can be red from. We are talking about 10 cm - 200 m.  
+The used frequency as well as the type of tag play a role when it comes to the range a tag can be read from. We are talking about 10 cm - 200 m.  
 Usecases are inventory management, asset / personal tracking like ID tags in animals, etc.   
 
 <img src="/images/2023-01-14/rfid_meme.png"> 
@@ -449,7 +449,7 @@ You want to sandwich your tag, PM3 and reader to get the best results, because w
 <img src="/images/2023-01-14/pm3_sandwich.png"> 
 <img src="/images/2023-01-14/pm3_sandwich2.png"> 
 
-As you can see, I unscrewed the LF antenna as well as the two "front" screws, so I can place the tag "underneath" the HF antenna and approach the reader as close as possible.
+As you can see, I unscrewed the LF antenna as well as the two "front" screws, so I can place the tag closer to the HF antenna and approach the reader as close as possible.
 
 ```
 hf 14a sniff -rc
