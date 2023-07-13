@@ -118,7 +118,7 @@ This type of delegation is very often described as just being the same as Constr
 
 <img src="/images/2022-05-19/delegations_overview.png" width="400">  
 
-What is meant by the other way around is, that rather then granting an account the permission to request ```ST```s as another user, you configure an account in a way that it allows other accounts to impersonate him for certain services on certain devices.  
+What is meant by the other way around is, that rather then granting an account the permission to request ```ST```s as another user, you configure an account in a way that it allows other accounts to impersonate him for certain services on certain devices. You can also add user accounts to the ```msDS-AllowedToActOnBehalfOfOtherIdentity``` attribute. However, the user account must have an SPN set (see also [here](https://www.thehacker.recipes/ad/movement/kerberos/delegations/rbcd)).  
 
 Let's do it together. We want the system ```WIN10X64``` to be able to delegate to the system ```epo```. Instead of editing settings on ```WIN10X64``` like we would have done with Constrained Delegation, we in this case edit the ```msDS-AllowedToActOnBehalfOfOtherIdentity``` attribute of ```epo```, to which we want to delegate to.
 
@@ -346,6 +346,8 @@ Now it's time to set our ```FAKE01``` account to the ```msDS-AllowedToActOnBehal
 ```
 Add-WindowsCapability –online –Name “Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0”
 Set-ADComputer epo -PrincipalsAllowedToDelegateToAccount FAKE01$
+or
+Set-ADComputer epo -PrincipalsAllowedToDelegateToAccount pwnduser_with_SPN
 ```
 <img src="/images/2022-05-19/addfake.png"> 
 
