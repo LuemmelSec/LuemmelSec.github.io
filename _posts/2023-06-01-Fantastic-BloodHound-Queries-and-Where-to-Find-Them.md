@@ -47,7 +47,8 @@ It basically is all about relationships between stuff that is visualized in term
 <img src="/images/2023-06-01/bob_owns_computa.png"> 
 
 But Dan you said Graph Theory and not Node Theory or Edge Theory...  
-That is true my fellow friend. The cool thing here is, that we can combine more nodes and more edges to draw what is called a graph. Let's now assume that in addition to the scenario described above we have a Domain Admin with a session on the ``computer`` node Bob ``owns``, and he is holding the key to the kingdom as we all know from fairy tales. Now if we would like to know how ``Bob`` would be able to enter the castle it would be like this:  
+That is true my fellow friend. The cool thing here is, that we can combine more nodes and more edges to draw what is called a graph.  
+Let's now assume that in addition to the scenario described above we have a Domain Admin with a session on the ``computer`` node Bob ``owns``, and he is holding the key to the kingdom as we all know from fairy tales. Now if we would like to know how ``Bob`` would be able to enter the castle it would be like this:  
 
 <img src="/images/2023-06-01/bob_kingdom.png">
 
@@ -186,7 +187,7 @@ MATCH (n:AZUser WHERE n.onpremisesyncenabled = true) RETURN n
 <img src="/images/2023-06-01/nomeme.png">
 
 But why? The BloodHound GUI even shows this field, but it is empty all the time.  
-It turned out that the API AzureHound is using under the hood (It is the Graph API ``/v1.0/users``) has a default set of values that are fetched if you don't tell it to do otherwise by giving it a ``$select`` parameter with the additional values you want to collect. See [here](https://learn.microsoft.com/en-us/graph/api/resources/users?view=graph-rest-1.0#common-properties) and [here](https://learn.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties) and [here](https://learn.microsoft.com/en-us/graph/api/user-list?view=graph-rest-1.0&tabs=http#optional-query-parameters).  
+It turned out that the API AzureHound is using under the hood (It is the Graph API ``/v1.0/users`` to fetch the Azure user's details) has a default set of values that are fetched if you don't tell it to do otherwise by giving it a ``$select`` parameter with the additional values you want to collect. See [here](https://learn.microsoft.com/en-us/graph/api/resources/users?view=graph-rest-1.0#common-properties) and [here](https://learn.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties) and [here](https://learn.microsoft.com/en-us/graph/api/user-list?view=graph-rest-1.0&tabs=http#optional-query-parameters).  
 
 The only things you get with AzureHound out of the box is this:  
 
@@ -206,7 +207,13 @@ I followed [Fabian Bader`s](https://twitter.com/fabian_bader) [blog](https://clo
 MATCH (u) WHERE (u:User OR u:AZUser) AND (u.name =~ '(?i)^MSOL_|.*AADConnect.*' OR u.userprincipalname =~ '(?i)^sync_.*') OPTIONAL MATCH (u)-[:HasSession]->(s:Session) RETURN u, s
 ```
 
-So we are searching for nodes of the type ``User`` or ``AZUser``. Their name should be (fuck the case) ``MSOL_something`` or contain ``AADConnect`` or ``sync_xxx``. Optional we are also looking if they have sessions, and if yes, return them.
+So we are searching for nodes of the type ``User`` or ``AZUser``. Their name should be (fuck the case) ``MSOL_something`` or contain ``AADConnect`` or ``sync_xxx``. Optional we are also looking if they have sessions, and if yes, return them.  
+
+This will give you something like this:  
+
+<img src="/images/2023-06-01/aadc.png"> 
+
+From this query we have all the AADSync users that reside inside Azure (our endtarget), we have some onPrem users that are related to AADC, and from the Azure AADSync users we can also derive the onPrem AADConnect server names, which we need to target first.  
 
 # Wrap up
 
@@ -214,11 +221,11 @@ I think we are able to simplify tasks with the help of AI, while we should not b
 Things that can help you with cool BloodHound queries:  
 
 - Use existing queries as a starting point. From there adjust them to your needs.
-- Ask ChatGPT. But please, do not just rely on the results and expect ne need to tweak them.
+- Ask ChatGPT. But please, do not just rely on the results and expect ne need to tweak them. Define everything you want as precise as possible. If something in the answer is off, give it a clue to correct the mistake.  
 - Ask the community. I personally reached out to [Jonas] and [Andy] several times asking questions about why certain things won't work and how to work around. One advise though: Do not blindly trust them as well :)  
 - Read the blogs. This one also provides some useful links. The Handbook has even more of them.  
 
-# Acknowledgement FIX ME
+# Acknowledgement
 
 Big shoutout to all you awesome people sharing knowledge and tools:  
 
