@@ -222,7 +222,7 @@ Things that can help you with cool BloodHound queries:
 
 - Use existing queries as a starting point. From there adjust them to your needs.
 - Ask ChatGPT. But please, do not just rely on the results and expect ne need to tweak them. Define everything you want as precise as possible. If something in the answer is off, give it a clue to correct the mistake.  
-- Ask the community. I personally reached out to [Jonas] and [Andy] several times asking questions about why certain things won't work and how to work around. One advise though: Do not blindly trust them as well :)  
+- Ask the community. I personally reached out to Jonas and Andy several times asking questions about why certain things won't work and how to work around. One advise though: Do not blindly trust them as well :)  
 - Read the blogs. This one also provides some useful links. The Handbook has even more of them.  
 
 # Acknowledgement
@@ -232,7 +232,7 @@ Big shoutout to all you awesome people sharing knowledge and tools:
 [Andy](https://twitter.com/_wald0)     
 [Will](https://twitter.com/harmj0y)  
 [Rohan](https://twitter.com/CptJesus)  
-[Lina]()
+[Lina](https://twitter.com/inversecos)
 [Walter](https://twitter.com/SadProcessor)  
 [Ryan](https://twitter.com/Haus3c)  
 [Fabian](https://twitter.com/fabian_bader)  
