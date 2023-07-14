@@ -47,7 +47,7 @@ It basically is all about relationships between stuff that is visualized in term
 <img src="/images/2023-06-01/bob_owns_computa.png"> 
 
 But Dan you said Graph Theory and not Node Theory or Edge Theory...  
-That is true my fellow friend. The cool thing here is, that we can combine more nodes and more edges to draw what is called graphs. Let's now assume that in addition to the scenario described above we have a Domain Admin with a session on the ``computer`` node Bob ``owns``, and he is holding the key to the kingdom as we all know from fairy tales. Now if we would like to know how ``Bob`` would be able to enter the castle it would be like this:  
+That is true my fellow friend. The cool thing here is, that we can combine more nodes and more edges to draw what is called a graph. Let's now assume that in addition to the scenario described above we have a Domain Admin with a session on the ``computer`` node Bob ``owns``, and he is holding the key to the kingdom as we all know from fairy tales. Now if we would like to know how ``Bob`` would be able to enter the castle it would be like this:  
 
 <img src="/images/2023-06-01/bob_kingdom.png">
 
