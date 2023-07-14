@@ -24,7 +24,8 @@ I don't even have a deeper knowledge of all the Azure stuff
 <I AM DUMB MEME OR STH ALIKE>
 
 So all in all the best prerequisits to start of with a new topic I guess.  
-It so happened that at the same time I was doing the Xintra Azure Attack course [Attacking and Defending Azure & M365](https://training.xintra.org/attacking-and-defending-azure-m365) from Lina [@inversecos](https://twitter.com/inversecos), and for nearly each topic there came up several ideas about what to look for or what would be beneficial to search for to carry out certain attacks. So I partly used the course as a sort of guideline to gather some of the queries as well as all the gems I collected in my personal collection of Azure attacks. As sharing is caring I also opened PRs for AzureHound and BloodHound (more on this later).  
+It so happened that at the same time I was doing the Xintra Azure Attack course [Attacking and Defending Azure & M365](https://training.xintra.org/attacking-and-defending-azure-m365) from Lina [@inversecos](https://twitter.com/inversecos), and for nearly each topic there came up several ideas about what to look for or what would be beneficial to search for to carry out certain attacks. So I partly used the course as a sort of guideline to gather some of the queries as well as all the gems I collected in my personal collection of Azure attacks. If you want to dig into attacking Azure, absolutely go for it.  
+As sharing is caring I also opened PRs for AzureHound and BloodHound (more on this later).  
 If you just happen to be here for the fancy stuff -> here are the standalone queries [Awesome BloodHound Queries](https://github.com/LuemmelSec/Custom-BloodHound-Queries) and here the [PR](https://github.com/BloodHoundAD/BloodHound/pull/670) for the tool itself.    
 
 
@@ -224,6 +225,7 @@ Big shoutout to all you awesome people sharing knowledge and tools:
 [Andy](https://twitter.com/_wald0)     
 [Will](https://twitter.com/harmj0y)  
 [Rohan](https://twitter.com/CptJesus)  
+[Lina]()
 [Walter](https://twitter.com/SadProcessor)  
 [Ryan](https://twitter.com/Haus3c)  
 [Fabian](https://twitter.com/fabian_bader)  
