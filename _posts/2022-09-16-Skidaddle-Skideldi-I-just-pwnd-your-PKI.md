@@ -233,9 +233,9 @@ secretsdump.py -just-dc -hashes 'aad3b435b514...:...f7207931' 'mcafeelab.local/A
 
 ## ESC2  
 No matter how often I red through all the stuff I found regarding ESC2, I can't wrap my head around it completely.  
-It describes the case, where there is either the ``Any purpose`` SKU set, or no SKU at all (which would be called a SubCA cert), which utlimately would allow the cert to be used for anything we like. Also low priv users need enrollment rights and no manager approval is in place.  
+It describes the case, where there is either the ``Any purpose`` EKU set, or no EKU at all (which would be called a SubCA cert), which utlimately would allow the cert to be used for anything we like. Also low priv users need enrollment rights and no manager approval is in place.  
 It is however not abusable like ESC1, if we can't specifiy the SAN.  
-A cert with no SKU could additionally be used to sign other certs. Unfortunately these can't be used for domain auth by default, as the ``NTAuthCertificates``(see p. 14 of the whitepaper) object won't trust them.  
+A cert with no EKU could additionally be used to sign other certs. Unfortunately these can't be used for domain auth by default, as the ``NTAuthCertificates``(see p. 14 of the whitepaper) object won't trust them.  
 ~~So the abuse cases are not clear to me. We might stumble upon a cert in a forgotten folder of some other user, maybe. But we are not able to request them. The thing that comes to my mind is relaying, and that might actually work.~~  
 UPDATE:  After releasing the blog, Oliver reached out to me and helped me at quite some topics regarding ADCS. In this case you can abuse ESC2 exactly like [ESC3](#esc3), if the templates you want to target are ``Schema Version 1``, which is true for all the default templates (like ``Doman Controller``, ``Client``, ``Computer`` and so on).   
 
