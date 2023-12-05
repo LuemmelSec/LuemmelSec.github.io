@@ -6,7 +6,7 @@ permalink: /about/
 
 Hey fellas, welcome to my blog.  
 My name is Daniel and I am just a normal IT guy who is interested in InfoSec.  
-I grew up with computers thanks to my dad, and work in IT since 2006.  
+I grew up with computers thanks to my dad, and work in IT since 2003.  
 My InfoSec-only career started in 2018 as a IT-Security \<put cyber wording here\>.  
 
 I run and maintain this pile of shitposts in my sparetime.  
