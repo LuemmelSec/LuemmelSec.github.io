@@ -8,7 +8,7 @@ Rest assured that this text is 100% written by me and not AI generated. Okay, le
 Thoughts are my own.  
 No LLMs were harmed during the writing of this blog post (as far as I am aware of).
 
-<img src="/images/2026-11-07/changemymindmeme.png" width=500>  
+<img src="/images/2026-11-07/changemymindmeme.PNG" width=500>  
 
 <!--more-->
 # Introduction  
@@ -26,13 +26,13 @@ Nowadays mostly everyone is using AI from day to day. Think of the ChatGPT app o
 Or the nice AI Bot that you have to talk to because your house just burned down and you need someone from your insurance to help you. They fired Carl who was there for you in the past, but was since replaced with AI. It asks you at which date the house burned down, you say 07.11.2026 and it rejects your call because it was trained on data from 2024 and now your date seems made up and in the future.   
 Made up you say? I fear not so far away from the truth as you would want it to be:  
 
-<img src="/images/2026-11-07/wdormann.png" width=500>  
+<img src="/images/2026-11-07/wdormann.PNG" width=500>  
 https://infosec.exchange/@wdormann/117535740628165125
 
 Well, we have done the things in the past on our own, so why do we need AI now?  
 The answer you will hear is most likely something like:
 
-<img src="/images/2026-11-07/toystory.png" width=500>
+<img src="/images/2026-11-07/toystory.PNG" width=500>
 
 I'd agree to a certain extend to the first part, totally agree to the 2nd and absolutely disagree with the 3rd one.  
 The deeper problem is not that AI exists. It is that many organizations are currently optimizing for adoption metrics and short-term headcount reduction instead of outcomes and residual risk.
@@ -48,7 +48,7 @@ The big players are not stupid and know very well how to bleed you out. That is 
 Full cloud strategies rarely make sense.  
 There are things that fully profit from being cloud native, and there are things that are best to be run on prem or in hybrid setups. Blindly pushing EVERYTHING there is not smart and also not sustainable.  
 
-<img src="/images/2026-11-07/savings.png" width=500>  
+<img src="/images/2026-11-07/savings.PNG" width=500>  
 
 https://www.puppet.com/blog/cloud-repatriation   
 https://www.thestack.technology/warren-buffetts-geico-repatriates-work-from-the-cloud-continues-ambitious-infrastructure-overhaul/   
@@ -73,7 +73,7 @@ Well, security did not magically improve just because the servers belonged to so
 Finding vulnerabilites in cloud provider infra as such is even more appealing to attackers, because it scales very well.  
 Two worlds collide here. The cloud providers themselves are vulnerable and then you put your vulnerable stuff into their vulnerable environment.  
 
-<img src="/images/2026-11-07/gowrong.png" width=500>   
+<img src="/images/2026-11-07/gowrong.PNG" width=500>   
 
 https://specterops.io/blog/2024/02/02/microsoft-breach-what-happened-what-should-azure-admins-do/  
 https://thehackernews.com/2026/06/miasma-worm-hits-73-microsoft-github.html  
@@ -106,7 +106,7 @@ It works.
 The old SaaS contract can be cancelled.  
 Eric is now employee of the month.
 
-<img src="/images/2026-11-07/claudeforeveryone.png" width=500>
+<img src="/images/2026-11-07/claudeforeveryone.PNG" width=500>
 
 Turns out that some 13 year old kiddo now has all your customer data and you got ransomwared, because admin:admin.  
 Eric didn't know.  
@@ -150,7 +150,7 @@ The same flawed things humans invented over the last decades.
 AI will happily reproduce known flawed patterns, add outdated libraries to your tools and insecure defaults that were common in the data they were trained on. They optimize for looking useful and coherent while not automatically optimizing for being correct under adversarial conditions or for satisfying regulatory requirements you never stated.   
 At the same time you give access to these tools to people that you couldn't even educate by phishing simulations to not blatantly click on malicious links in e-mails.
 
-<img src="/images/2026-11-07/stupid.png" width=500>
+<img src="/images/2026-11-07/stupid.PNG" width=500>
 
 ### The dependency loop
 
