@@ -186,7 +186,7 @@ But sure. Go ahead and wire the same class of agents into your production infras
 
 ### The Dark Side 
 
-<img src="/images/2026-11-07/darkside.png" width=500>
+<img src="/images/2026-11-07/darkside.PNG" width=500>
 
 Guess what, attackers love AI at least as much as you do.  
 They have the same models, the same coding agents, and the same ability to spin up cheap, persistent swarms.  
