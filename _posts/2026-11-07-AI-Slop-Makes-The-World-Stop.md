@@ -13,8 +13,10 @@ No LLMs were harmed during the writing of this blog post (as far as I am aware o
 <!--more-->
 # Introduction  
 
-Of course the headline is exagerated. And don't get me wrong, I love working with AI and see it as a great catalyst and multiplier, that is capable of helping humanity solving real problems and developing awesome stuff. But only if used with caution and care, in the hands of skilled professionals.    
+Of course the headline is exagerated. And don't get me wrong, I love working with AI and see it as a great catalyst and multiplier, that is capable of helping humanity solving real problems and developing awesome stuff. But only if used with caution and care, in the hands of skilled professionals.   
+
 If you have zero clues about deseases and cures, left school at the age of 13 and your hobbies are hugging trees and dancing your name, it's maybe not the smartest idea for you to develop the next vaccine for the T-Virus with the help of Claude.  
+
 The danger starts when FOMO takes the wheel. When organizations treat “everyone is using AI” as a strategy, sideline the people who can actually judge the output, and hand broad production power to whoever comes up with AI slop first. That pattern is already visible, and it scales badly.
 
 # Problems 
